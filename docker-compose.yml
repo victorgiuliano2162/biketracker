@@ -1,0 +1,50 @@
+services:
+  # Banco de Dados PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      # Testa se o banco está pronto para aceitar conexões
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mynet
+
+  #  Aplicação Java 17 (Backend)
+  app:
+    build: ./app
+    container_name: app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      db:
+        condition: service_healthy # Garante que a app só inicie APÓS o 'db' estar saudável
+    restart: on-failure
+    networks:
+      - mynet
+
+
+# Define os volumes nomeados
+volumes:
+  postgres-data:
+    driver: local
+
+# Define a rede customizada
+networks:
+  mynet:
+    driver: bridge
