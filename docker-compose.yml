@@ -12,7 +12,6 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      # Testa se o banco está pronto para aceitar conexões
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
       timeout: 5s
@@ -21,30 +20,54 @@ services:
     networks:
       - mynet
 
-  #  Aplicação Java 17 (Backend)
+  # Aplicação Java 17 (Backend)
   app:
     build: ./app
     container_name: app
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080" # Não expõe mais para o host — só o Nginx acessa internamente
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       db:
-        condition: service_healthy # Garante que a app só inicie APÓS o 'db' estar saudável
+        condition: service_healthy
     restart: on-failure
     networks:
       - mynet
 
+  # Aplicação Angular (Frontend)
+  front:
+    build: ./app-front
+    container_name: biketracker-front
+    expose:
+      - "80" # Só o Nginx acessa internamente
+    restart: unless-stopped
+    networks:
+      - mynet
 
-# Define os volumes nomeados
+  # Nginx — Proxy reverso com HTTPS
+  nginx:
+    image: nginx:alpine
+    container_name: biketracker-nginx
+    ports:
+      - "80:80"   # Redireciona HTTP → HTTPS
+      - "443:443" # HTTPS
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro  # Certificados SSL
+    depends_on:
+      - front
+      - app
+    restart: unless-stopped
+    networks:
+      - mynet
+
 volumes:
   postgres-data:
     driver: local
 
-# Define a rede customizada
 networks:
   mynet:
     driver: bridge
