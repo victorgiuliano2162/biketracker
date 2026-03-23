@@ -1,0 +1,43 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  font-size: 0.8rem;
+
+   --mat-toolbar-container-background-color: transparent;
+  background-color: transparent !important;
+
+  --mat-toolbar-container-background-color: transparent;
+background: linear-gradient(to top, rgba(0,0,0,0.45), transparent) !important;
+
+    color: #fff !important;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.footer-brand mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.footer-copy {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.footer-links {
+  display: flex;
+  gap: 4px;
+}
