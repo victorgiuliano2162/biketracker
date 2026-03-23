@@ -1,0 +1,40 @@
+/* Cor do toolbar */
+mat-toolbar {
+  --mat-toolbar-container-background-color: #e65100;
+  position: fixed !important;
+}
+
+
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: default;
+}
+
+.header-brand.header-brand:hover {
+    cursor: pointer;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-signup {
+  margin-left: 8px;
+  background-color: #fff !important;
+  color: var(--mat-toolbar-container-text-color, #fff) !important;
+  /* herda a cor de texto do tema para contrastar com o fundo branco */
+  color: #1a6b3c !important;
+  font-weight: 600;
+}

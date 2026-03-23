@@ -1,0 +1,74 @@
+<mat-toolbar color="primary">
+
+  <!-- Brand -->
+  <span class="header-brand" routerLink="login">
+    <mat-icon >directions_bike</mat-icon>
+    BikeTrakker
+  </span>
+
+  <!-- Menus — lado esquerdo -->
+  <nav class="header-nav">
+
+    <button mat-button [matMenuTriggerFor]="menuAtividades">
+      Atividades
+      <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #menuAtividades="matMenu">
+      <button mat-menu-item (click)="onAtividade('cross-country')">
+        <mat-icon>terrain</mat-icon>
+        Cross Country
+      </button>
+      <button mat-menu-item (click)="onAtividade('enduro')">
+        <mat-icon>electric_bolt</mat-icon>
+        Enduro
+      </button>
+      <button mat-menu-item (click)="onAtividade('downhill')">
+        <mat-icon>moving</mat-icon>
+        Downhill
+      </button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="menuMapas">
+      Mapas
+      <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #menuMapas="matMenu">
+      <button mat-menu-item (click)="onMapa('meus-mapas')">
+        <mat-icon>map</mat-icon>
+        Meus Mapas
+      </button>
+      <button mat-menu-item (click)="onMapa('criar-mapa')">
+        <mat-icon>add_location_alt</mat-icon>
+        Criar Mapa
+      </button>
+    </mat-menu>
+
+  </nav>
+
+  <span class="spacer"></span>
+
+  <!-- Lado direito -->
+  @if (!isLoggedIn) {
+    <button mat-flat-button class="btn-signup" routerLink="/subscribe">
+      Inscrever-se gratuitamente
+    </button>
+  }
+
+  @if (isLoggedIn) {
+    <button mat-icon-button [matMenuTriggerFor]="menuUsuario">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #menuUsuario="matMenu">
+      <button mat-menu-item (click)="onPerfil()">
+        <mat-icon>person</mat-icon>
+        Meu Perfil
+      </button>
+      <mat-divider />
+      <button mat-menu-item (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        Sair
+      </button>
+    </mat-menu>
+  }
+
+</mat-toolbar>
