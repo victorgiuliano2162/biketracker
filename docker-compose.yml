@@ -2,7 +2,7 @@ services:
   # Banco de Dados PostgreSQL
   db:
     image: postgres:16-alpine
-    container_name: postgres-db
+    container_name: biketracker-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
