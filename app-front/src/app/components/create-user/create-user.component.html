@@ -1,0 +1,115 @@
+<mat-card class="register-card" appearance="outlined">
+
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>person_add</mat-icon>
+    </div>
+    <mat-card-title>Criar conta</mat-card-title>
+    <mat-card-subtitle>Preencha os dados para se cadastrar</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+
+      <mat-divider />
+
+      <!-- Nome -->
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Nome completo</mat-label>
+        <input matInput formControlName="name" placeholder="Seu nome completo" />
+        <mat-icon matPrefix>person_outline</mat-icon>
+        <mat-error *ngIf="registerForm.get('name')?.hasError('required')">Nome é obrigatório</mat-error>
+        <mat-error *ngIf="registerForm.get('name')?.hasError('minlength')">Mínimo de 3 caracteres</mat-error>
+      </mat-form-field>
+
+      <!-- E-mail -->
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="seu@email.com" />
+        <mat-icon matPrefix>mail_outline</mat-icon>
+        <mat-error *ngIf="registerForm.get('email')?.hasError('required')">E-mail é obrigatório</mat-error>
+        <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Informe um e-mail válido</mat-error>
+      </mat-form-field>
+
+      <!-- Senha -->
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Senha</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
+        <mat-icon matPrefix>lock_outline</mat-icon>
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-hint>Mínimo de 8 caracteres</mat-hint>
+        @if (registerForm.get('password')?.hasError('pattern')) {
+          <mat-error>A senha deve conter ao menos uma letra maiúscula e um número</mat-error>
+        }
+
+        <mat-error *ngIf="registerForm.get('password')?.hasError('required')">Senha é obrigatória</mat-error>
+        <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">Mínimo de 8 caracteres</mat-error>
+      </mat-form-field>
+
+      <!-- Confirmar senha -->
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Confirmar senha</mat-label>
+        <input matInput [type]="hideConfirm ? 'password' : 'text'" formControlName="confirmPassword" />
+        <mat-icon matPrefix>lock_outline</mat-icon>
+        <button mat-icon-button matSuffix type="button" (click)="hideConfirm = !hideConfirm">
+          <mat-icon>{{ hideConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="registerForm.hasError('passwordMismatch')">As senhas não coincidem</mat-error>
+      </mat-form-field>
+
+      <!-- Linha: Idade + Peso -->
+      <div class="form-row">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Idade</mat-label>
+          <input matInput type="number" formControlName="age" placeholder="25" />
+          <mat-icon matPrefix>cake</mat-icon>
+          <mat-hint>Anos</mat-hint>
+          <mat-error *ngIf="registerForm.get('age')?.hasError('required')">Obrigatório</mat-error>
+          <mat-error *ngIf="registerForm.get('age')?.hasError('min')">Idade inválida</mat-error>
+          <mat-error *ngIf="registerForm.get('age')?.hasError('max')">Idade inválida</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Peso</mat-label>
+          <input matInput type="number" formControlName="weight" placeholder="70.5" step="0.1" />
+          <mat-icon matPrefix>monitor_weight</mat-icon>
+          <!-- <mat-hint>Kg</mat-hint> -->
+          <mat-error *ngIf="registerForm.get('weight')?.hasError('required')">Obrigatório</mat-error>
+          <mat-error *ngIf="registerForm.get('weight')?.hasError('min')">Peso inválido</mat-error>
+        </mat-form-field>
+
+      </div>
+
+      <!-- Data de nascimento -->
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Data de nascimento</mat-label>
+        <input matInput [matDatepicker]="pickerBorn" formControlName="bornAt" />
+        <mat-icon matPrefix>event</mat-icon>
+        <mat-datepicker-toggle matIconSuffix [for]="pickerBorn" />
+        <mat-datepicker #pickerBorn />
+        <mat-error *ngIf="registerForm.get('bornAt')?.hasError('required')">Data de nascimento é obrigatória</mat-error>
+      </mat-form-field>
+
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button
+      mat-flat-button
+      style="width: 100%"
+      [disabled]="registerForm.invalid"
+      (click)="onRegister()"
+    >
+      Criar conta
+    </button>
+  </mat-card-actions>
+
+  <div class="register-footer">
+    <span>Já tem uma conta?</span>
+    <a mat-button routerLink="/login">Entrar</a>
+  </div>
+
+</mat-card>
