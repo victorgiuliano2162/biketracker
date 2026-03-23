@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Comments {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -29,7 +29,7 @@ public class Comments {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    public Comments(User user, String content) {
+    public Comment(User user, String content) {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
         this.user = user;
