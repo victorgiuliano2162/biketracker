@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* O mat-card-header usa flex row por padrão por causa do avatar.
+   Precisamos sobrescrever para centralizar título e subtítulo. */
+mat-card-header {
+  flex-direction: column;
+  align-items: center;
+}
+
+mat-card-title,
+mat-card-subtitle {
+  text-align: center;
+}
+
+mat-card-actions {
+  padding: 4px 16px !important;
+}
+ 
+mat-card-actions button {
+  width: 100%;
+}
