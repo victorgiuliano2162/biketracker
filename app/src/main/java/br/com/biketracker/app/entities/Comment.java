@@ -21,7 +21,7 @@ public class Comments {
     @ManyToOne
     private User user;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     private boolean edited;
