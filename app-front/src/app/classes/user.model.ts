@@ -1,4 +1,5 @@
 export class User {
+    id: string;
   name: string;
   email: string;
   password: string;
@@ -8,6 +9,7 @@ export class User {
   bornAt: Date;
  
   constructor(partial: Partial<User> = {}) {
+    this.id       = partial.id        ?? '';
     this.name      = partial.name      ?? '';
     this.email     = partial.email     ?? '';
     this.password  = partial.password  ?? '';
