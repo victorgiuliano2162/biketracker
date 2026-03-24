@@ -24,13 +24,16 @@ services:
   app:
     build: ./app
     container_name: app
+    env_file:
+      - .env
     expose:
       - "8080" # Não expõe mais para o host — só o Nginx acessa internamente
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-    depends_on:
+
+    depends_on: 
       db:
         condition: service_healthy
     restart: on-failure
