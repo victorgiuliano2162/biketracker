@@ -20,10 +20,8 @@ public class UserService {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }
-
-    // -------------------------
     // Buscas básicas
-    // -------------------------
+   
 
     public List<User> findAll() {
         return repository.findAll();
@@ -43,17 +41,13 @@ public class UserService {
         return repository.existsByEmail(email);
     }
 
-    // -------------------------
-    // Buscas por nome
-    // -------------------------
+
+
 
     public List<User> findByName(String name) {
         return repository.findByNameContainingIgnoreCase(name);
     }
 
-    // -------------------------
-    // Buscas por idade
-    // -------------------------
 
     public List<User> findByAge(int age) {
         return repository.findByAge(age);
@@ -74,9 +68,6 @@ public class UserService {
         return repository.findByAgeLessThanEqual(maxAge);
     }
 
-    // -------------------------
-    // Buscas por peso
-    // -------------------------
 
     public List<User> findByWeightBetween(double minWeight, double maxWeight) {
         if (minWeight > maxWeight) {
@@ -84,10 +75,6 @@ public class UserService {
         }
         return repository.findByWeightBetween(minWeight, maxWeight);
     }
-
-    // -------------------------
-    // Buscas por data de nascimento
-    // -------------------------
 
     public List<User> findByBornAtBetween(LocalDateTime start, LocalDateTime end) {
         if (start.isAfter(end)) {
@@ -104,9 +91,7 @@ public class UserService {
         return repository.findByBornAtAfter(date);
     }
 
-    // -------------------------
-    // Buscas por data de criação
-    // -------------------------
+
 
     public List<User> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
         if (start.isAfter(end)) {
