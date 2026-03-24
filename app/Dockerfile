@@ -9,6 +9,7 @@ RUN ./mvnw dependency:go-offline
 
 COPY src ./src
 
+ENV MAVEN_OPTS="-Dfile.encoding=UTF-8"
 RUN ./mvnw package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine
@@ -18,4 +19,4 @@ COPY --from=builder /build/target/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "-Dfile.encoding=UTF-8", "app.jar"]
