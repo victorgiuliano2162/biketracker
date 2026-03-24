@@ -4,6 +4,7 @@ import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +14,11 @@ import java.time.LocalDateTime;
 public class UserService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // -------------------------
@@ -147,6 +150,7 @@ public class UserService {
         if (emailExists(entity.getEmail())) {
             throw new IllegalStateException("Já existe um usuário cadastrado com o email: " + entity.getEmail());
         }
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
         return repository.save(entity);
     }
