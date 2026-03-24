@@ -35,6 +35,6 @@ mat-toolbar {
   background-color: #fff !important;
   color: var(--mat-toolbar-container-text-color, #fff) !important;
   /* herda a cor de texto do tema para contrastar com o fundo branco */
-  color: #1a6b3c !important;
+  color: #000000 !important;
   font-weight: 600;
 }
