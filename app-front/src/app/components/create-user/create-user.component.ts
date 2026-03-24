@@ -1,3 +1,4 @@
+import { UserService } from './../../services/user.service';
 import { Component } from '@angular/core';
 import { 
   AbstractControl, 
@@ -68,7 +69,7 @@ export class CreateUserComponent {
  
   registerForm: FormGroup;
  
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private userService: UserService) {
     this.registerForm = this.fb.group(
      {
         name:            ['', [Validators.required, Validators.minLength(3)]],
@@ -100,5 +101,16 @@ export class CreateUserComponent {
  
     console.log('Usuário a cadastrar:', user);
     // Envie `user` para o seu serviço de autenticação/API aqui
+
+    this.userService.create(user).subscribe({
+      next: (createdUser) => {
+        console.log('Usuário criado com sucesso:', createdUser);
+        // Redirecione ou mostre uma mensagem de sucesso aqui
+      },
+      error: (err) => {
+        console.error('Erro ao criar usuário:', err);
+        // Mostre uma mensagem de erro para o usuário aqui
+      }
+    });
   }
 }
