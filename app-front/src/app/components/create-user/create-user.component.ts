@@ -1,28 +1,36 @@
-import { UserService } from './../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 import { Component } from '@angular/core';
-import { 
-  AbstractControl, 
-  ReactiveFormsModule, 
-  FormBuilder, 
-  FormGroup, 
-  Validators, 
-  ValidationErrors
- } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import {
+  AbstractControl,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ValidationErrors,
+} from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DATE_LOCALE, MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import {
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 import { User } from './../../classes/user.model';
+import { MatDialog } from '@angular/material/dialog';
+import { SuccessdialogComponent } from '../successdialog/successdialog.component';
 
-function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+function passwordMatchValidator(
+  control: AbstractControl,
+): ValidationErrors | null {
   const password = control.get('password')?.value;
-  const confirm  = control.get('confirmPassword')?.value;
+  const confirm = control.get('confirmPassword')?.value;
   return password && confirm && password !== confirm
     ? { passwordMismatch: true }
     : null;
@@ -32,16 +40,16 @@ function pastDateValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value;
   if (!value) return null;
   const selected = new Date(value);
-  const today    = new Date();
+  const today = new Date();
   today.setHours(23, 59, 59, 999); // permite o dia atual
   return selected > today ? { futureDate: true } : null;
 }
 
 @Component({
   selector: 'app-create-user',
-   providers: [
+  providers: [
     provideNativeDateAdapter(),
-    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }, 
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
   ],
   imports: [
     CommonModule,
@@ -57,60 +65,76 @@ function pastDateValidator(control: AbstractControl): ValidationErrors | null {
     MatDividerModule,
   ],
   templateUrl: './create-user.component.html',
-  styleUrl: './create-user.component.css'
+  styleUrl: './create-user.component.css',
 })
-
-
-
 export class CreateUserComponent {
-
   hidePassword = true;
-  hideConfirm  = true;
- 
+  hideConfirm = true;
+
   registerForm: FormGroup;
- 
-  constructor(private fb: FormBuilder, private userService: UserService) {
+
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private router: Router,
+    private dialog: MatDialog,
+  ) {
     this.registerForm = this.fb.group(
-     {
-        name:            ['', [Validators.required, Validators.minLength(3)]],
-        email:           ['', [Validators.required, Validators.email]],
-        password:        ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
+      {
+        name: ['', [Validators.required, Validators.minLength(3)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/),
+          ],
+        ],
         confirmPassword: ['', Validators.required],
-        age:             [null, [Validators.required, Validators.min(5), Validators.max(120)]],
-        weight:          [null, [Validators.required, Validators.min(1)]],
-        bornAt:          [null, [Validators.required, pastDateValidator]],
+        age: [
+          null,
+          [Validators.required, Validators.min(5), Validators.max(120)],
+        ],
+        weight: [null, [Validators.required, Validators.min(1)]],
+        bornAt: [null, [Validators.required, pastDateValidator]],
       },
-      { validators: passwordMatchValidator }
+      { validators: passwordMatchValidator },
     );
   }
- 
+
   onRegister(): void {
     if (this.registerForm.invalid) return;
- 
+
     const formValue = this.registerForm.value;
- 
+
     const user = new User({
-      name:      formValue.name,
-      email:     formValue.email,
-      password:  formValue.password,
-      age:       formValue.age,
-      weight:    formValue.weight,
-      bornAt:    formValue.bornAt,
+      name: formValue.name,
+      email: formValue.email,
+      password: formValue.password,
+      age: formValue.age,
+      weight: formValue.weight,
+      bornAt: formValue.bornAt,
       createdAt: new Date(),
     });
- 
+
     console.log('Usuário a cadastrar:', user);
     // Envie `user` para o seu serviço de autenticação/API aqui
 
     this.userService.create(user).subscribe({
       next: (createdUser) => {
-        console.log('Usuário criado com sucesso:', createdUser);
-        // Redirecione ou mostre uma mensagem de sucesso aqui
+        const dialogRef = this.dialog.open(SuccessdialogComponent, {
+          width: '360px',
+          disableClose: true,
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+          this.router.navigate(['/login']);
+        });
       },
       error: (err) => {
         console.error('Erro ao criar usuário:', err);
-        // Mostre uma mensagem de erro para o usuário aqui
-      }
+      },
     });
   }
 }
