@@ -2,7 +2,11 @@ package br.com.biketracker.app.controllers;
 
 
 import br.com.biketracker.app.entities.User;
+import br.com.biketracker.app.entities.dtos.authDto.UserRequest;
+import br.com.biketracker.app.entities.dtos.authDto.UserResponse;
 import br.com.biketracker.app.services.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +25,19 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User u = this.userService.save(user);
-        return ResponseEntity.ok(u);
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
+        User user = new User(
+                request.name(),
+                request.email(),
+                request.password(),
+                request.age(),
+                request.weight(),
+                request.bornAt(),
+                request.tipoSanguineo()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(UserResponse.from(userService.save(user)));
+
     }
 }
