@@ -1,3 +1,4 @@
+import { AuthService } from './../../services/auth/auth.service';
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -20,9 +21,8 @@ import { MatDividerModule } from '@angular/material/divider';
   styleUrl: './top-bar.component.css'
 })
 export class TopBarComponent {
-  // Controla a exibição do botão de inscrição vs avatar do usuário.
-  // Passe [isLoggedIn]="true" no componente pai quando o usuário estiver autenticado.
-  @Input() isLoggedIn = false;
+
+  constructor(public authService: AuthService) {}
  
   onAtividade(tipo: string): void {
     console.log('Atividade selecionada:', tipo);
@@ -40,7 +40,7 @@ export class TopBarComponent {
  
   onLogout(): void {
     console.log('Logout');
-    // Implemente a lógica de logout aqui
+    this.authService.logout();
   }
 
 }
