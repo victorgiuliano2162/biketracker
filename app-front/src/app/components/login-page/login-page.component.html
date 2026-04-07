@@ -18,7 +18,7 @@
 
       <mat-form-field appearance="outline" style="width: 100%">
         <mat-label>Senha</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password" required />
+        <input autocomplete="current-password" matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password" required />
         <mat-icon matPrefix>lock_outline</mat-icon>
         <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
@@ -30,7 +30,7 @@
   </mat-card-content>
 
   <mat-card-actions >
-    <button mat-flat-button (click)="onLogin()">Entrar</button>
+    <button mat-flat-button type="submit" (click)="onLogin()">Entrar</button>
    
   </mat-card-actions>
   <mat-card-actions>
