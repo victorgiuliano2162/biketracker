@@ -3,8 +3,10 @@ package br.com.biketracker.app.services;
 import br.com.biketracker.app.entities.dtos.authDto.LoginRequest;
 import br.com.biketracker.app.entities.dtos.authDto.LoginResponse;
 import br.com.biketracker.app.entities.dtos.authDto.RefreshRequest;
+import br.com.biketracker.app.exceptions.Exceptions;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -39,15 +41,18 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
 
-        String accessToken  = generateAccessToken(authentication.getName());
-        String refreshToken = generateRefreshToken(authentication.getName());
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+            String accessToken  = generateAccessToken(authentication.getName());
+            String refreshToken = generateRefreshToken(authentication.getName());
+            return new LoginResponse(accessToken, refreshToken);
 
-        return new LoginResponse(accessToken, refreshToken);
+        } catch (BadCredentialsException e) {
+            throw new Exceptions.UnauthorizedException("E-mail ou senha incorretos");
+        }
     }
 
     public LoginResponse refresh(RefreshRequest request) {

@@ -53,7 +53,7 @@ export class AuthService {
     );
   }
 
-logout(): void {
+  logout(): void {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     this.isAuthenticated.set(false);
