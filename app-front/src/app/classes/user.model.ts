@@ -1,5 +1,5 @@
 export class User {
-    id: string;
+  id: string;
   name: string;
   email: string;
   password: string;
@@ -7,6 +7,7 @@ export class User {
   weight: number;
   createdAt: Date;
   bornAt: Date;
+  tipoSanguineo: string;
  
   constructor(partial: Partial<User> = {}) {
     this.id       = partial.id        ?? '';
@@ -17,5 +18,6 @@ export class User {
     this.weight    = partial.weight    ?? 0;
     this.createdAt = partial.createdAt ?? new Date();
     this.bornAt    = partial.bornAt    ?? new Date();
+    this.tipoSanguineo = partial.tipoSanguineo ?? '';
   }
 }
