@@ -116,6 +116,7 @@ export class CreateUserComponent {
       weight: formValue.weight,
       bornAt: formValue.bornAt,
       createdAt: new Date(),
+      tipoSanguineo: formValue.tipoSanguineo,
     });
 
     console.log('Usuário a cadastrar:', user);
