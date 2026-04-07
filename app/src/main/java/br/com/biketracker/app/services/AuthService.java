@@ -3,6 +3,7 @@ package br.com.biketracker.app.services;
 import br.com.biketracker.app.entities.dtos.authDto.LoginRequest;
 import br.com.biketracker.app.entities.dtos.authDto.LoginResponse;
 import br.com.biketracker.app.entities.dtos.authDto.RefreshRequest;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,7 +29,8 @@ public class AuthService {
     
     private static final long REFRESH_TOKEN_EXPIRY_DAYS = 7;
 
-    public AuthService(AuthenticationManager authenticationManager,
+    public AuthService(
+                        @Lazy AuthenticationManager authenticationManager,
                        JwtEncoder jwtEncoder,
                        JwtDecoder jwtDecoder) {
         this.authenticationManager = authenticationManager;
