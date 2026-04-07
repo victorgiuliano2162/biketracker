@@ -48,17 +48,12 @@
   <span class="spacer"></span>
 
   <!-- Lado direito -->
-  @if (!isLoggedIn) {
+  @if (!authService.isAuthenticated()) {
     <button mat-flat-button class="btn-signup" routerLink="/subscribe">
       Inscrever-se gratuitamente
     </button>
-  }
-
-  @if (isLoggedIn) {
-    <button mat-icon-button [matMenuTriggerFor]="menuUsuario">
-      <mat-icon>account_circle</mat-icon>
-    </button>
-    <mat-menu #menuUsuario="matMenu">
+  } @else  {
+ 
       <button mat-menu-item (click)="onPerfil()">
         <mat-icon>person</mat-icon>
         Meu Perfil
@@ -68,7 +63,7 @@
         <mat-icon>logout</mat-icon>
         Sair
       </button>
-    </mat-menu>
+   
   }
 
 </mat-toolbar>
