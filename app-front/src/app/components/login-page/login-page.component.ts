@@ -5,10 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login-page',
+  standalone: true,
   imports: [
     FormsModule,
     MatCardModule,
@@ -16,23 +18,42 @@ import { RouterLink } from "@angular/router";
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    RouterLink
-],
+    RouterLink,
+  ],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.css'
 })
 export class LoginPageComponent {
+
   email: string = '';
   password: string = '';
   hidePassword: boolean = true;
- 
+  errorMessage: string = '';
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
   onLogin(): void {
-    console.log('Login com:', this.email, this.password);
-    // Implemente sua lógica de autenticação aqui
+    if (!this.email || !this.password) return;
+
+    this.errorMessage = '';
+
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: () => { 
+        console.log('Login token:', this.authService.getAccessToken());
+        this.router.navigate(['/home'])
+      },
+      error: (err) => {
+        this.errorMessage = err.status === 401
+          ? 'E-mail ou senha incorretos.'
+          : 'Erro ao realizar login. Tente novamente.';
+      }
+    });
   }
- 
+
   onRegister(): void {
-    console.log('Navegar para cadastro');
-    // Implemente a navegação para a tela de cadastro aqui
+    this.router.navigate(['/subscribe']);
   }
 }
