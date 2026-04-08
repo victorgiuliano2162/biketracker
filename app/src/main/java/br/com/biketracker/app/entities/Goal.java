@@ -1,12 +1,14 @@
 package br.com.biketracker.app.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -33,20 +35,23 @@ public class Goal {
     // Unidade da meta — ex: "km", "rides", "horas"
     private String unit;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime deadLine;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate deadLine;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private User user;
 
-    public Goal(String name, String description, double targetValue, String unit, LocalDateTime deadLine, User user) {
+    public Goal(String name, String description, double targetValue, String unit, LocalDate deadLine, User user) {
         this.name = name;
         this.description = description;
         this.targetValue = targetValue;
         this.currentValue = 0;
         this.unit = unit;
-        this.createdAt = LocalDateTime.now();
         this.deadLine = deadLine;
+        this.createdAt = LocalDate.now();
         this.user = user;
     }
 
