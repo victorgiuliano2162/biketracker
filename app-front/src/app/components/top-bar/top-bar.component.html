@@ -3,7 +3,7 @@
   <!-- Brand -->
   <span class="header-brand" routerLink="login">
     <mat-icon >directions_bike</mat-icon>
-    BikeTrakker
+    BikeTraker
   </span>
 
   <!-- Menus — lado esquerdo -->
@@ -53,17 +53,14 @@
       Inscrever-se gratuitamente
     </button>
   } @else  {
- 
-      <button mat-menu-item (click)="onPerfil()">
-        <mat-icon>person</mat-icon>
-        Meu Perfil
+   <div class="user-controls-container">
+      <button mat-button (click)="onPerfil()" style="color: white;">
+        <mat-icon>person</mat-icon> Perfil
       </button>
-      <mat-divider />
-      <button mat-menu-item (click)="onLogout()">
-        <mat-icon>logout</mat-icon>
-        Sair
+      <button mat-button (click)="onLogout()" style="color: white;">
+        <mat-icon>logout</mat-icon> Sair
       </button>
-   
+    </div>
   }
 
 </mat-toolbar>

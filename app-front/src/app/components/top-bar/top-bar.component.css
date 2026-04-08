@@ -2,6 +2,10 @@
 mat-toolbar {
   --mat-toolbar-container-background-color: #e65100;
   position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
 
@@ -37,4 +41,11 @@ mat-toolbar {
   /* herda a cor de texto do tema para contrastar com o fundo branco */
   color: #000000 !important;
   font-weight: 600;
+}
+
+.user-controls-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espaço entre Perfil e Sair */
+  margin-left: 8px;
 }
