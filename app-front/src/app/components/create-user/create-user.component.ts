@@ -15,16 +15,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  MAT_DATE_LOCALE,
-  MatNativeDateModule,
-  provideNativeDateAdapter,
-} from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatNativeDateModule, provideNativeDateAdapter, MatOption } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 import { User } from './../../classes/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SuccessdialogComponent } from '../successdialog/successdialog.component';
+import { MatSelectModule } from '@angular/material/select';
+
 
 function passwordMatchValidator(
   control: AbstractControl,
@@ -45,6 +43,17 @@ function pastDateValidator(control: AbstractControl): ValidationErrors | null {
   return selected > today ? { futureDate: true } : null;
 }
 
+const tipoSanguineo = [
+  { label: 'O+', value: 'O_POSITIVO' },
+  { label: 'A+', value: 'A_POSITIVO' },
+  { label: 'B+', value: 'B_POSITIVO' },
+  { label: 'O-', value: 'O_NEGATIVO' },
+  { label: 'A-', value: 'A_NEGATIVO' },
+  { label: 'AB+', value: 'AB_POSITIVO' },
+  { label: 'B-', value: 'B_NEGATIVO' },
+  { label: 'AB-', value: 'AB_NEGATIVO' },
+];
+
 @Component({
   selector: 'app-create-user',
   providers: [
@@ -63,13 +72,17 @@ function pastDateValidator(control: AbstractControl): ValidationErrors | null {
     MatDatepickerModule,
     MatNativeDateModule,
     MatDividerModule,
-  ],
+    MatOption,
+    MatSelectModule
+],
   templateUrl: './create-user.component.html',
   styleUrl: './create-user.component.css',
 })
 export class CreateUserComponent {
   hidePassword = true;
   hideConfirm = true;
+  
+  tiposSanguineos = Object.values(tipoSanguineo);
 
   registerForm: FormGroup;
 
@@ -98,6 +111,7 @@ export class CreateUserComponent {
         ],
         weight: [null, [Validators.required, Validators.min(1)]],
         bornAt: [null, [Validators.required, pastDateValidator]],
+        tipoSanguineo: ['', Validators.required],
       },
       { validators: passwordMatchValidator },
     );
@@ -119,8 +133,6 @@ export class CreateUserComponent {
       tipoSanguineo: formValue.tipoSanguineo,
     });
 
-    console.log('Usuário a cadastrar:', user);
-    // Envie `user` para o seu serviço de autenticação/API aqui
 
     this.userService.create(user).subscribe({
       next: (createdUser) => {
