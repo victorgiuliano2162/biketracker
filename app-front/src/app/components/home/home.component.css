@@ -1,0 +1,195 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Boas-vindas ──────────────────────────────────── */
+.welcome-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #1a6b3c, #2e9e5b);
+  border-radius: 12px;
+  color: white;
+}
+
+.welcome-banner h1 {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.welcome-banner p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.welcome-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  opacity: 0.9;
+}
+
+/* ── Cards de estatísticas ────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card mat-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px !important;
+  text-align: center;
+  gap: 4px;
+}
+
+.stat-card mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ── Gráfico + Rides ──────────────────────────────── */
+.middle-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+}
+
+.chart-card mat-card-content,
+.rides-card mat-card-content {
+  padding: 16px !important;
+}
+
+/* ── Rides ────────────────────────────────────────── */
+.ride-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ride-item:last-child {
+  border-bottom: none;
+}
+
+.ride-icon {
+  color: #1a6b3c;
+}
+
+.ride-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ride-distance {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.ride-meta {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+/* ── Metas ────────────────────────────────────────── */
+.goals-card mat-card-content {
+  padding: 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.goal-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.goal-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.goal-meta {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.goal-percent {
+  font-size: 0.78rem;
+  color: #1a6b3c;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ── Empty states ─────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  color: #9ca3af;
+  gap: 8px;
+}
+
+.empty-state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+/* ── Responsividade ───────────────────────────────── */
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .middle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .home-container {
+    padding: 16px;
+  }
+}
