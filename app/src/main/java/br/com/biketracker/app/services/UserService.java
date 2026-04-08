@@ -3,7 +3,7 @@ package br.com.biketracker.app.services;
 import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +27,7 @@ public class UserService {
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public User findById(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
