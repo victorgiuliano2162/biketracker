@@ -1,10 +1,9 @@
-package br.com.biketracker.app.entities.dtos.authDto;
+package br.com.biketracker.app.entities.dtos;
 
 import java.util.List;
 
 public record HomeStatsResponse(
 
-        // Cards de estatísticas
         double totalDistanceKm,
         double totalElevationMeters,
         long totalActivitySeconds,
