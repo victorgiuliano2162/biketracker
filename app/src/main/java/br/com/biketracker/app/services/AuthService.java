@@ -3,7 +3,7 @@ package br.com.biketracker.app.services;
 import br.com.biketracker.app.entities.dtos.authDto.LoginRequest;
 import br.com.biketracker.app.entities.dtos.authDto.LoginResponse;
 import br.com.biketracker.app.entities.dtos.authDto.RefreshRequest;
-import br.com.biketracker.app.exceptions.Exceptions;
+import br.com.biketracker.app.exceptions.ex.UnauthorizedException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -51,7 +51,7 @@ public class AuthService {
             return new LoginResponse(accessToken, refreshToken);
 
         } catch (BadCredentialsException e) {
-            throw new Exceptions.UnauthorizedException("E-mail ou senha incorretos");
+            throw new UnauthorizedException("E-mail ou senha incorretos");
         }
     }
 
