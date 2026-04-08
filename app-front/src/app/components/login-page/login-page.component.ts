@@ -35,6 +35,10 @@ export class LoginPageComponent {
     private router: Router
   ) {}
 
+  isValid(): boolean {
+    return this.email.trim() !== '' && this.password.trim() !== '';
+  }
+
   onLogin(): void {
     if (!this.email || !this.password) return;
 
