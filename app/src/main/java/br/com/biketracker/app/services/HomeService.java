@@ -1,7 +1,7 @@
 package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.Ride;
-import br.com.biketracker.app.entities.dtos.authDto.HomeStatsResponse;
+import br.com.biketracker.app.entities.dtos.HomeStatsResponse;
 import br.com.biketracker.app.repositories.GoalRepository;
 import br.com.biketracker.app.repositories.RideRepository;
 import br.com.biketracker.app.repositories.UserRepository;
@@ -28,7 +28,9 @@ public class HomeService {
         this.userRepository = userRepository;
     }
 
-    public HomeStatsResponse getHomeStats(String userId) {
+    public HomeStatsResponse getHomeStats(String userEmail) {
+
+        var userId = userRepository.findByEmail(userEmail).get().getId();
 
         // ── Estatísticas gerais ──────────────────────────────────────────
         double totalDistance  = rideRepository.sumDistanceByUserId(userId);
