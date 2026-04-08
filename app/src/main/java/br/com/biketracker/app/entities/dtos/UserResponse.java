@@ -1,10 +1,11 @@
-package br.com.biketracker.app.entities.dtos.authDto;
+package br.com.biketracker.app.entities.dtos;
 
 
 import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.entities.enums.TipoSanguineo;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record UserResponse(
         String id,
@@ -13,7 +14,10 @@ public record UserResponse(
         int age,
         double weight,
         LocalDateTime bornAt,
-        TipoSanguineo tipoSanguineo
+        TipoSanguineo tipoSanguineo,
+        List<GoalResponse> goals
+        //List<RideResponse> rides
+        
 ) {
 
     public static UserResponse from(User user) {
@@ -24,7 +28,9 @@ public record UserResponse(
                 user.getAge(),
                 user.getWeight(),
                 user.getBornAt(),
-                user.getTipoSanguineo()
+                user.getTipoSanguineo(),
+                user.getGoals() == null ? List.of() : user.getGoals().stream().map(GoalResponse::from).toList()
+                //user.getRides() == null ? List.of() : user.getRides().stream().map(RideResponse::from).toList()
         );
     }
 }
