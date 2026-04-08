@@ -1,6 +1,6 @@
 package br.com.biketracker.app.controllers;
 
-import br.com.biketracker.app.entities.dtos.authDto.HomeStatsResponse;
+import br.com.biketracker.app.entities.dtos.HomeStatsResponse;
 import br.com.biketracker.app.services.HomeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
