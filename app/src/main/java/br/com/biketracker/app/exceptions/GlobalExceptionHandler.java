@@ -1,6 +1,7 @@
 package br.com.biketracker.app.exceptions;
 
 
+import br.com.biketracker.app.exceptions.ex.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -23,45 +24,45 @@ public class GlobalExceptionHandler {
 
     // ─── Exceções customizadas ───────────────────────────────────────────────
 
-    @ExceptionHandler(Exceptions.ResourceNotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(
-            Exceptions.ResourceNotFoundException ex, HttpServletRequest request) {
+            ResourceNotFoundException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ErrorResponse(404, "Not Found", ex.getMessage(), request.getRequestURI())
         );
     }
 
-    @ExceptionHandler(Exceptions.DuplicateResourceException.class)
+    @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateResource(
-            Exceptions.DuplicateResourceException ex, HttpServletRequest request) {
+            DuplicateResourceException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new ErrorResponse(409, "Conflict", ex.getMessage(), request.getRequestURI())
         );
     }
 
-    @ExceptionHandler(Exceptions.BusinessException.class)
+    @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(
-            Exceptions.BusinessException ex, HttpServletRequest request) {
+            BusinessException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(
                 new ErrorResponse(422, "Unprocessable Entity", ex.getMessage(), request.getRequestURI())
         );
     }
 
-    @ExceptionHandler(Exceptions.UnauthorizedException.class)
+    @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorized(
-            Exceptions.UnauthorizedException ex, HttpServletRequest request) {
+            UnauthorizedException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 new ErrorResponse(401, "Unauthorized", ex.getMessage(), request.getRequestURI())
         );
     }
 
-    @ExceptionHandler(Exceptions.ForbiddenException.class)
+    @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(
-            Exceptions.ForbiddenException ex, HttpServletRequest request) {
+            ForbiddenException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 new ErrorResponse(403, "Forbidden", ex.getMessage(), request.getRequestURI())
