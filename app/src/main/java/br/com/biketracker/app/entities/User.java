@@ -1,6 +1,7 @@
 package br.com.biketracker.app.entities;
 
 import br.com.biketracker.app.entities.enums.TipoSanguineo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -49,10 +50,13 @@ public class User {
 
     private TipoSanguineo tipoSanguineo;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    //TODO evaluete the use os eager fetch
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+    @JsonManagedReference
     private List<Goal> goals;
 
     @OneToMany(fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Ride> rides;
 
     public User(String name,
@@ -71,6 +75,11 @@ public class User {
         this.createdAt = LocalDateTime.now();
         this.bornAt = bornAt;
         this.tipoSanguineo =  tipoSanguineo;
+    }
+
+    public void addGoal(Goal goal) {
+        this.goals.add(goal);
+        goal.setUser(this);
     }
 
 }
