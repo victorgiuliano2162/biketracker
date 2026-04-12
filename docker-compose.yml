@@ -1,7 +1,7 @@
 services:
   # Banco de Dados PostgreSQL
   db:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.4
     container_name: biketracker-db
     environment:
       POSTGRES_USER: postgres
@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./init-postgis.sql:/docker-entrypoint-initdb.d/init-postgis.sql
     ports:
       - "5432:5432"
     healthcheck:
