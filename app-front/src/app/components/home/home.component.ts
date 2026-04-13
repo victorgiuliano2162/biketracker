@@ -32,6 +32,7 @@ export class HomeComponent implements OnInit {
     this.homeDataService.getStats().subscribe({
       next: (data) => {
         this.stats = data;
+        this.stats.activeGoals.sort((a,b) => b.progressPercent - a.progressPercent);
         this.chartData = data.weeklyChart.map(d => ({
           name: d.date,
           value: d.distanceKm
