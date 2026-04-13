@@ -50,9 +50,11 @@ export class LoginPageComponent {
         this.router.navigate(['/home'])
       },
       error: (err) => {
+        console.log(err)
         this.errorMessage = err.status === 401
           ? 'E-mail ou senha incorretos.'
           : 'Erro ao realizar login. Tente novamente.';
+          alert(this.errorMessage);
       }
     });
   }
