@@ -1,7 +1,8 @@
-package br.com.biketracker.app.entities.dtos;
+package br.com.biketracker.app.entities.dtos.user;
 
 
 import br.com.biketracker.app.entities.User;
+import br.com.biketracker.app.entities.dtos.GoalResponse;
 import br.com.biketracker.app.entities.enums.TipoSanguineo;
 
 import java.time.LocalDateTime;

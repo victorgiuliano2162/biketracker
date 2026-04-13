@@ -1,4 +1,4 @@
-package br.com.biketracker.app.entities.dtos;
+package br.com.biketracker.app.entities.dtos.user;
 
 import br.com.biketracker.app.entities.enums.TipoSanguineo;
 

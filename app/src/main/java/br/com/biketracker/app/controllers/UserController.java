@@ -2,8 +2,8 @@ package br.com.biketracker.app.controllers;
 
 
 import br.com.biketracker.app.entities.User;
-import br.com.biketracker.app.entities.dtos.UserRequest;
-import br.com.biketracker.app.entities.dtos.UserResponse;
+import br.com.biketracker.app.entities.dtos.user.UserRequest;
+import br.com.biketracker.app.entities.dtos.user.UserResponse;
 import br.com.biketracker.app.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

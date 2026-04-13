@@ -1,4 +1,4 @@
-package br.com.biketracker.app.entities.dtos;
+package br.com.biketracker.app.entities.dtos.ride;
 
 import java.time.LocalDateTime;
 

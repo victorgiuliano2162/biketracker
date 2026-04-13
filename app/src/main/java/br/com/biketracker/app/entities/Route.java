@@ -1,6 +1,6 @@
 package br.com.biketracker.app.entities;
 
-import br.com.biketracker.app.entities.dtos.TrackPoint;
+import br.com.biketracker.app.entities.dtos.ride.TrackPoint;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
