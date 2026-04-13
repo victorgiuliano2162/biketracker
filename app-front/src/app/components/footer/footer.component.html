@@ -1,8 +1,10 @@
 
-<mat-toolbar class="footer">
-  <span class="footer-brand">
-    <mat-icon>directions_bike</mat-icon>
-    BikeTraker
+@if (!showFooter()) {
+
+  <mat-toolbar class="footer">
+    <span class="footer-brand">
+      <mat-icon>directions_bike</mat-icon>
+      BikeTraker
   </span>
 
   <span class="spacer"></span>
@@ -17,3 +19,4 @@
     <a mat-button href="#" (click)="$event.preventDefault()">Suporte</a>
   </div>
 </mat-toolbar>
+}
