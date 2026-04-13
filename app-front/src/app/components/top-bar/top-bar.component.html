@@ -6,6 +6,7 @@
     BikeTraker
   </span>
 
+  @if (authService.isAuthenticated()) {
   <!-- Menus — lado esquerdo -->
   <nav class="header-nav">
 
@@ -33,17 +34,18 @@
       <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
     </button>
     <mat-menu #menuMapas="matMenu">
-      <button mat-menu-item (click)="onMapa('meus-mapas')">
-        <mat-icon>map</mat-icon>
-        Meus Mapas
-      </button>
       <button mat-menu-item (click)="onMapa('criar-mapa')">
         <mat-icon>add_location_alt</mat-icon>
-        Criar Mapa
+        Criar rota
+      </button>
+      <button mat-menu-item routerLink="map">
+        <mat-icon>map</mat-icon>
+        Minhas Rotas
       </button>
     </mat-menu>
 
   </nav>
+}
 
   <span class="spacer"></span>
 
