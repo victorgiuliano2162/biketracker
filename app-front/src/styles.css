@@ -1,15 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
-/* styles.css */
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
   min-height: 100vh;
-  background-image:  url('assets/tyler-lastovich-etuPl3bjiOk-unsplash.jpg');
+  background-image: url('assets/tyler-lastovich-etuPl3bjiOk-unsplash.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-
 }
 
 app-root {
@@ -20,7 +15,3 @@ app-root {
 router-outlet + * {
   padding-top: 80px;
 }
-
-
-
-
