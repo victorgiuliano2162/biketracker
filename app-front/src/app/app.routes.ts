@@ -1,3 +1,4 @@
+import { MapComponent } from './components/map/map.component';
 import { Routes } from '@angular/router';
 import { LoginPageComponent } from './components/login-page/login-page.component';
 import { CreateUserComponent } from './components/create-user/create-user.component';
@@ -25,6 +26,10 @@ export const routes: Routes = [
     loadComponent: () =>
         import('./components/home/home.component').then((m) => m.HomeComponent),
     canActivate: [authGuard],
+  },
+  {
+    path: 'map',
+    loadComponent: () => import('./components/map/map.component').then((m) => m.MapComponent), canActivate: [authGuard],
   },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
