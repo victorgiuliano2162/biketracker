@@ -18,6 +18,9 @@ mat-toolbar {
   font-weight: 700;
   letter-spacing: 0.3px;
   cursor: default;
+  color: #fff;
+  font-weight: normal;
+  
 }
 
 .header-brand.header-brand:hover {
@@ -40,7 +43,7 @@ mat-toolbar {
   color: var(--mat-toolbar-container-text-color, #fff) !important;
   /* herda a cor de texto do tema para contrastar com o fundo branco */
   color: #000000 !important;
-  font-weight: 600;
+  font-weight: 580;
 }
 
 .user-controls-container {
