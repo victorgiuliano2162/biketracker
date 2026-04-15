@@ -44,14 +44,14 @@ function pastDateValidator(control: AbstractControl): ValidationErrors | null {
 }
 
 const tipoSanguineo = [
-  { label: 'O+', value: 'O_POSITIVO' },
-  { label: 'A+', value: 'A_POSITIVO' },
-  { label: 'B+', value: 'B_POSITIVO' },
-  { label: 'O-', value: 'O_NEGATIVO' },
-  { label: 'A-', value: 'A_NEGATIVO' },
-  { label: 'AB+', value: 'AB_POSITIVO' },
-  { label: 'B-', value: 'B_NEGATIVO' },
-  { label: 'AB-', value: 'AB_NEGATIVO' },
+  { label: 'O+', value: 'O+' },
+  { label: 'A+', value: 'A+' },
+  { label: 'B+', value: 'B+' },
+  { label: 'O-', value: 'O-' },
+  { label: 'A-', value: 'A+' },
+  { label: 'AB+', value: 'AB+' },
+  { label: 'B-', value: 'B-' },
+  { label: 'AB-', value: 'AB-' },
 ];
 
 @Component({
@@ -133,14 +133,13 @@ export class CreateUserComponent {
       tipoSanguineo: formValue.tipoSanguineo,
     });
 
-
+    console.log(user);
     this.userService.create(user).subscribe({
       next: (createdUser) => {
         const dialogRef = this.dialog.open(SuccessdialogComponent, {
           width: '360px',
           disableClose: true,
         });
-
         dialogRef.afterClosed().subscribe(() => {
           this.router.navigate(['/login']);
         });
