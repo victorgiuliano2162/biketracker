@@ -20,6 +20,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36, columnDefinition = "VARCHAR(36)")
     private String id;
 
     @NotBlank(message = "Nome é obrigatório")
@@ -28,6 +29,7 @@ public class User {
 
     @NotBlank(message = "E-mail é obrigatório")
     @Email(message = "E-mail inválido")
+    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")
@@ -48,6 +50,7 @@ public class User {
     @PastOrPresent(message = "Data de nascimento não pode ser futura")
     private LocalDateTime bornAt;
 
+    @Enumerated(EnumType.STRING)
     private TipoSanguineo tipoSanguineo;
 
     //TODO evaluete the use os eager fetch
@@ -55,9 +58,9 @@ public class User {
     @JsonManagedReference
     private List<Goal> goals;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany
     @JsonManagedReference
-    private List<Ride> rides;
+    private List<Route> routes;
 
     public User(String name,
                 String email,

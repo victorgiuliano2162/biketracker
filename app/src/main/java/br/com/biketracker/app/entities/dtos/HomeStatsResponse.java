@@ -7,7 +7,7 @@ public record HomeStatsResponse(
         double totalDistanceKm,
         double totalElevationMeters,
         long totalActivitySeconds,
-        int totalRides,
+        long totalRides,
 
 
         List<RideSummary> recentRides,
@@ -18,7 +18,7 @@ public record HomeStatsResponse(
 
 ) {
     public record RideSummary(
-            Long id,
+            String id,
             double distanceInKm,
             double elevationInMeters,
             long activityTimeInSeconds,
