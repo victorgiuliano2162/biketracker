@@ -8,12 +8,8 @@ import br.com.biketracker.app.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -28,6 +24,8 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
+        try {
+
         User user = new User(
                 request.name(),
                 request.email(),
@@ -40,12 +38,15 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(UserResponse.from(userService.save(user)));
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage()+"/n"+request.toString(), ex);
+        }
 
     }
 
     //TODO allow only authenticated requests to acesses this method
-    @GetMapping
-    public ResponseEntity<UserResponse> getUser(@RequestParam String id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
         User user = userService.findById(id);
         return user != null ? ResponseEntity.ok(UserResponse.from(user)) : ResponseEntity.notFound().build();
     }
