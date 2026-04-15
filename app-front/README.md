@@ -1,59 +1,70 @@
-# AppFront
+# Configuração do ambiente
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.22.
+## Estrutura esperada de pastas
 
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
+```
+projeto/
+├── app/                  ← backend Spring Boot (já existente)
+├── app-front/            ← frontend Angular
+│   └── Dockerfile        ← copie o Dockerfile.front para cá com esse nome
+├── nginx/
+│   ├── nginx.conf        ← configuração do Nginx
+│   └── certs/
+│       ├── cert.pem      ← certificado SSL
+│       └── key.pem       ← chave privada SSL
+└── docker-compose.yml
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Gerando certificados autoassinados (desenvolvimento)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Execute na raiz do projeto:
 
 ```bash
-ng generate --help
+mkdir -p nginx/certs
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout nginx/certs/key.pem \
+  -out nginx/certs/cert.pem \
+  -subj "/CN=localhost"
 ```
 
-## Building
+> O navegador vai exibir um aviso de segurança por ser autoassinado — basta aceitar para desenvolvimento local.
 
-To build the project run:
+---
+
+## Certificado real com Let's Encrypt (produção)
+
+Para produção com domínio real, use o Certbot:
 
 ```bash
-ng build
+apt install certbot
+certbot certonly --standalone -d seudominio.com
+
+# Os certificados serão gerados em:
+# /etc/letsencrypt/live/seudominio.com/fullchain.pem  → cert.pem
+# /etc/letsencrypt/live/seudominio.com/privkey.pem    → key.pem
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Atualize o `nginx.conf` com `server_name seudominio.com;` e aponte os volumes para os caminhos do Certbot.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Subindo o ambiente
 
 ```bash
-ng test
+docker compose up --build
 ```
 
-## Running end-to-end tests
+Acesse: **https://localhost**
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
+## Como as requisições são roteadas
+
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+https://localhost/          → Angular (front)
+https://localhost/api/      → Spring Boot (app:8080)
+http://localhost/           → redireciona automaticamente para HTTPS
+```
