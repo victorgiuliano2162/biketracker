@@ -1,0 +1,136 @@
+<div class="map-page">
+
+  <div class="map-container">
+    <div id="leaflet-map"></div>
+  </div>
+
+  <!-- Botão filtro de rotas (canto superior direito) -->
+  <button
+    mat-mini-fab
+    class="sidebar-toggle"
+    (click)="sidebarOpen = !sidebarOpen"
+    [matTooltip]="sidebarOpen ? 'Fechar painel' : 'Filtrar rotas'">
+    <mat-icon>{{ sidebarOpen ? 'close' : 'layers' }}</mat-icon>
+  </button>
+
+  <!-- Controles flutuantes (canto inferior direito) -->
+  <div class="map-controls">
+
+    <!-- Centralizar na localização -->
+    <button
+      mat-mini-fab
+      color="primary"
+      matTooltip="Minha localização"
+      (click)="centerOnUser()"
+      [disabled]="locating">
+      <mat-icon>{{ locating ? 'pending' : 'my_location' }}</mat-icon>
+    </button>
+
+    <!-- Carregar GPX -->
+    <button
+      mat-mini-fab
+      matTooltip="Carregar arquivo GPX"
+      (click)="openGpxPicker()">
+      <mat-icon>upload_file</mat-icon>
+    </button>
+
+    <!-- Limpar GPX (só aparece quando há GPX carregado) -->
+    <button
+      *ngIf="hasGpx"
+      mat-mini-fab
+      color="warn"
+      matTooltip="Remover rota GPX"
+      (click)="clearGpx()">
+      <mat-icon>delete_outline</mat-icon>
+    </button>
+
+  </div>
+
+  <!-- Painel de stats do GPX -->
+<!-- Painel de stats do GPX -->
+<div class="gpx-stats" [class.expanded]="gpxExpanded" *ngIf="gpxStats">
+
+  <!-- Cabeçalho sempre visível -->
+  <div class="gpx-stats-header">
+    <mat-icon class="gpx-icon">route</mat-icon>
+    <span class="gpx-name" [matTooltip]="gpxStats.name">{{ gpxStats.name }}</span>
+    <button
+      mat-icon-button
+      class="gpx-expand-btn"
+      [matTooltip]="gpxExpanded ? 'Recolher' : 'Ver perfil de elevação'"
+      (click)="toggleGpxExpand()"
+      [disabled]="gpxStats.loadingElevation || !gpxStats.elevationProfile">
+      <mat-icon>{{ gpxExpanded ? 'expand_more' : 'expand_less' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Stats compactos -->
+  <div class="gpx-stats-body">
+    <div class="gpx-stat-item">
+      <mat-icon>straighten</mat-icon>
+      <span>{{ gpxStats.distanceKm | number:'1.1-1' }} km</span>
+    </div>
+    <div class="gpx-stat-item">
+      <mat-icon>landscape</mat-icon>
+      <span *ngIf="!gpxStats.loadingElevation && gpxStats.elevationGainM !== null">
+        +{{ gpxStats.elevationGainM | number:'1.0-0' }} m
+      </span>
+      <mat-spinner *ngIf="gpxStats.loadingElevation" diameter="16" />
+      <span *ngIf="!gpxStats.loadingElevation && gpxStats.elevationGainM === null">—</span>
+    </div>
+    <div class="gpx-stat-item">
+      <mat-icon>place</mat-icon>
+      <span>{{ gpxStats.points }} pts</span>
+    </div>
+  </div>
+
+  <!-- Gráfico expandido -->
+  <div class="gpx-chart-container" *ngIf="gpxExpanded">
+    <canvas id="elevation-chart"></canvas>
+  </div>
+
+</div>
+
+  <!-- Input de arquivo oculto -->
+  <input
+    #gpxInput
+    type="file"
+    accept=".gpx"
+    style="display: none"
+    (change)="onGpxFileSelected($event)" />
+
+  <!-- Painel flutuante de rotas -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Rotas</span>
+      <button mat-icon-button matTooltip="Limpar seleção" (click)="clearAll()">
+        <mat-icon>layers_clear</mat-icon>
+      </button>
+    </div>
+
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="route-tree">
+
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle>
+          <mat-icon>
+            {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+          </mat-icon>
+        </button>
+        <span class="group-label">{{ node.name }}</span>
+      </mat-tree-node>
+
+      <mat-tree-node *matTreeNodeDef="let node; when: isLeaf" matTreeNodePadding>
+        <button mat-icon-button disabled></button>
+        <mat-checkbox
+          [checked]="isSelected(node)"
+          (change)="toggleRoute(node)"
+          [style.accent-color]="node.color">
+        </mat-checkbox>
+        <span class="route-dot" [style.background]="node.color"></span>
+        <span class="route-label">{{ node.name }}</span>
+      </mat-tree-node>
+
+    </mat-tree>
+  </aside>
+
+</div>
