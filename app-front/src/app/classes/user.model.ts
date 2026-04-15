@@ -1,3 +1,8 @@
+export type TipoSanguineoType = 
+  | 'A_POSITIVO' | 'A_NEGATIVO' 
+  | 'B_POSITIVO' | 'B_NEGATIVO' 
+  | 'AB_POSITIVO' | 'AB_NEGATIVO' 
+  | 'O_POSITIVO' | 'O_NEGATIVO';
 export class User {
   id: string;
   name: string;
@@ -7,7 +12,7 @@ export class User {
   weight: number;
   createdAt: Date;
   bornAt: Date;
-  tipoSanguineo: string;
+  tipoSanguineo: TipoSanguineoType | '';
  
   constructor(partial: Partial<User> = {}) {
     this.id       = partial.id        ?? '';
