@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -26,7 +27,7 @@ public class AuthService {
     private final JwtDecoder jwtDecoder;
 
 
-    private static final long ACCESS_TOKEN_EXPIRY_MINUTES = 15;
+    private static final long ACCESS_TOKEN_EXPIRY_MINUTES = 35;
 
     
     private static final long REFRESH_TOKEN_EXPIRY_DAYS = 7;
