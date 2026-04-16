@@ -45,9 +45,7 @@ O **Trackker** é um aplicativo web destinado a atletas amadores que desejam reg
 | RF-20     | Administração                 | Administrador desativar/excluir contas de usuários                                     | 3          |
 
 **Legenda de Prioridade:**  
-1 = Must Have (obrigatório no MVP)  
-2 = Should Have (importante – entregar até final de maio)  
-3 = Could Have (desejável – pode ficar para versões futuras)
+asssssssssssssssssssssssssssssssss
 
 ## 4. Requisitos Não Funcionais (RNF)
 
@@ -67,26 +65,9 @@ O **Trackker** é um aplicativo web destinado a atletas amadores que desejam reg
 | RNF-12    | Acessibilidade         | Atender WCAG 2.1 nível AA (contraste e navegação por teclado)                          | 3          |
 
 **Legenda de Prioridade:**  
-1 = Must Have (obrigatório no MVP)  
-2 = Should Have (importante – entregar até final de maio)  
-3 = Could Have (desejável – pode ficar para versões futuras)
+1 = 1 (obrigatório no MVP)  
+2 = 2 (importante – entregar até final de maio)  
+3 = 2 (desejável – pode ficar para versões futuras)
 
 ---
 
-## Observações Finais
-
-- Este documento serve como base para a elicitação de requisitos e pode ser usado diretamente na documentação do projeto.
-- As prioridades foram definidas considerando a data de entrega do MVP (16/04/2026).
-- O foco principal do MVP deve ser a criação, visualização e compartilhamento básico de rotas com mapas funcionais.
-
----
-
-Você pode copiar todo o conteúdo acima e salvar como `elicitação-requisitos-trackker.md`.
-
-Quer que eu faça algum ajuste adicional antes de finalizar?  
-Exemplos:
-- Adicionar seção de Suposições e Restrições?
-- Incluir uma seção de Sugestão de Sprints?
-- Adicionar mais requisitos (importação GPX, estatísticas avançadas, etc.)?
-
-É só falar!
