@@ -15,14 +15,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DATE_LOCALE, MatNativeDateModule, provideNativeDateAdapter, MatOption } from '@angular/material/core';
+import {
+  MAT_DATE_LOCALE,
+  MatNativeDateModule,
+  provideNativeDateAdapter,
+  MatOption,
+} from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
-import { User } from './../../classes/user.model';
+import { User } from '../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SuccessdialogComponent } from '../successdialog/successdialog.component';
 import { MatSelectModule } from '@angular/material/select';
-
 
 function passwordMatchValidator(
   control: AbstractControl,
@@ -73,15 +77,15 @@ const tipoSanguineo = [
     MatNativeDateModule,
     MatDividerModule,
     MatOption,
-    MatSelectModule
-],
+    MatSelectModule,
+  ],
   templateUrl: './create-user.component.html',
   styleUrl: './create-user.component.css',
 })
 export class CreateUserComponent {
   hidePassword = true;
   hideConfirm = true;
-  
+
   tiposSanguineos = Object.values(tipoSanguineo);
 
   registerForm: FormGroup;
@@ -146,6 +150,7 @@ export class CreateUserComponent {
       },
       error: (err) => {
         console.error('Erro ao criar usuário:', err);
+        alert(err);
       },
     });
   }
