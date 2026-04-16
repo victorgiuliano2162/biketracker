@@ -34,11 +34,11 @@
       <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
     </button>
     <mat-menu #menuMapas="matMenu">
-      <button mat-menu-item (click)="onMapa('criar-mapa')">
+      <button mat-menu-item routerLink="map">
         <mat-icon>add_location_alt</mat-icon>
         Criar rota
       </button>
-      <button mat-menu-item routerLink="map">
+      <button mat-menu-item routerLink="routes">
         <mat-icon>map</mat-icon>
         Minhas Rotas
       </button>
