@@ -31,7 +31,7 @@ public class RouteService {
 
     @Transactional
     public RouteResponse createRoute(String userId, CreateRouteRequest request) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Route route = new Route();
@@ -51,8 +51,9 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public Page<RouteResponse> listMyRoutes(String userId, Pageable pageable) {
+        var u = userRepository.findByEmail(userId);
         return routeRepository
-                .findByUserIdOrderByStartTimeDesc(userId, pageable)
+                .findByUserIdOrderByStartTimeDesc(u.get().getId(), pageable)
                 .map(RouteResponse::from);
     }
 
@@ -70,7 +71,8 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public RouteReplayResponse getRouteReplay(String userId, String routeId) {
-        List<Object[]> rows = routeRepository.findRoutePointsByRouteId(routeId, userId);
+        var u = userRepository.findByEmail(userId);
+        List<Object[]> rows = routeRepository.findRoutePointsByRouteId(routeId, u.get().getId());
 
         if (rows.isEmpty()) {
             throw new ResourceNotFoundException("Route not found: " + routeId);
@@ -90,8 +92,9 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
+        var u = userRepository.findByEmail(userId);
         List<Long> ids = routeRepository.findIdsByUserAndBoundingBox(
-                userId,
+                u.get().getId(),
                 bbox.minLon(), bbox.minLat(),
                 bbox.maxLon(), bbox.maxLat()
         );
