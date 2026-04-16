@@ -1,0 +1,67 @@
+<div class="routes-container">
+
+  <h2 class="page-title">Minhas rotas</h2>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  @if (!loading && routes.length === 0) {
+    <p class="empty-state">Nenhuma rota encontrada.</p>
+  }
+
+  @for (route of routes; track route.id) {
+    <mat-card class="route-card">
+      <mat-card-content>
+
+        <div class="route-header">
+          <div class="route-meta">
+            <span class="route-location">{{ route.startCity }}, {{ route.country }}</span>
+            <span class="route-date">
+              {{ formatDate(route.startTime) }} · {{ formatTime(route.startTime) }}
+            </span>
+          </div>
+          <div class="route-distance">
+            <span class="distance-value">{{ route.distanceInKm | number:'1.1-1' }}</span>
+            <span class="distance-unit">km</span>
+          </div>
+        </div>
+
+        <div class="route-metrics">
+          <div class="metric">
+            <mat-icon>terrain</mat-icon>
+            <span>{{ route.elevationInMeters | number:'1.0-0' }} m</span>
+          </div>
+          <div class="metric">
+            <mat-icon>timer</mat-icon>
+            <span>{{ formatDuration(route.activityTimeInSeconds) }}</span>
+          </div>
+          <div class="metric">
+            <mat-icon>speed</mat-icon>
+            <span>{{ avgSpeed(route) }} km/h</span>
+          </div>
+        </div>
+
+        <div class="route-footer">
+          <mat-chip [class]="route.isPublic ? 'chip-public' : 'chip-private'">
+            {{ route.isPublic ? 'Pública' : 'Privada' }}
+          </mat-chip>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (totalElements > 0) {
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)"
+    />
+  }
+
+</div>
