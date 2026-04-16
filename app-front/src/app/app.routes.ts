@@ -31,6 +31,10 @@ export const routes: Routes = [
     path: 'map',
     loadComponent: () => import('./components/map/map.component').then((m) => m.MapComponent), canActivate: [authGuard],
   },
+   {
+    path: 'routes',
+    loadComponent: () => import('./components/my-routes/my-routes.component').then((m) => m.MyRoutesComponent), canActivate: [authGuard],
+  },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },

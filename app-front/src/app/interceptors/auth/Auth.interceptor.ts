@@ -7,9 +7,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
   // Rotas públicas — não anexa token
-  const publicRoutes = ['/api/auth/login', 
-    '/api/auth/refresh'
-    //, '/api/user'
+  const publicRoutes = [
+    '/api/auth/login', 
+    '/api/auth/refresh',
+    '/api/user'
 ];
   const isPublic = publicRoutes.some(route => req.url.includes(route));
 
@@ -40,7 +41,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               return next(retryReq);
             }),
             catchError(() => {
-              // Refresh também falhou — desloga o usuário
               authService.logout();
               return throwError(() => error);
             })
