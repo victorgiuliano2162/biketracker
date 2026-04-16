@@ -25,11 +25,11 @@ O **Trackker** é um aplicativo web destinado a atletas amadores que desejam reg
 |-----------|-------------------------------|----------------------------------------------------------------------------------------|------------|
 | RF-01     | Autenticação e Usuários       | Cadastro de novo usuário (nome, e-mail, senha, foto de perfil opcional)                | 1          |
 | RF-02     | Autenticação e Usuários       | Login e logout com JWT                                                                 | 1          |
-| RF-03     | Autenticação e Usuários       | Visualizar e editar dados do perfil (nome, e-mail, senha, foto)                        | 1          |
+| RF-03     | Autenticação e Usuários       | Visualizar e editar dados do perfil (nome, e-mail, senha, foto)                        | 2          |
 | RF-04     | Autenticação e Usuários       | Administrador visualizar lista de todos os usuários                                    | 3          |
 | RF-05     | Gerenciamento de Rotas        | Criar nova rota (nome, descrição, tipo de atividade, data, pontos no mapa, visibilidade pública/privada) | 1          |
 | RF-06     | Gerenciamento de Rotas        | Armazenar rota utilizando PostGIS (GEOMETRY LineString ou GEOGRAPHY)                   | 1          |
-| RF-07     | Gerenciamento de Rotas        | Editar rota própria (nome, descrição, visibilidade, pontos)                            | 1          |
+| RF-07     | Gerenciamento de Rotas        | Editar rota própria (nome, descrição, visibilidade, pontos)                            | 2          |
 | RF-08     | Gerenciamento de Rotas        | Excluir rota própria                                                                   | 1          |
 | RF-09     | Gerenciamento de Rotas        | Adicionar comentários e fotos às próprias rotas                                        | 2          |
 | RF-10     | Gerenciamento de Rotas        | Calcular automaticamente distância total (km) e elevação acumulada                    | 1          |
