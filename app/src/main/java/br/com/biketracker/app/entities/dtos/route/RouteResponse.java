@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record RouteResponse(
         String id,
+        String name,
         double distanceInKm,
         double elevationInMeters,
         LocalDateTime startTime,
@@ -18,6 +19,7 @@ public record RouteResponse(
     public static RouteResponse from(Route route) {
         return new RouteResponse(
                 route.getId(),
+                route.getName(),
                 route.getDistanceInKm(),
                 route.getElevationInMeters(),
                 route.getStartTime(),

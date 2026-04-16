@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.locationtech.jts.geom.CoordinateXYZM;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,6 +22,8 @@ public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    private String name;
 
     private double distanceInKm;
     private double elevationInMeters;
@@ -43,10 +42,10 @@ public class Route {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(columnDefinition = "geography(Point, 4326)")
+    @Column(columnDefinition = "geography(PointZ, 4326)")
     private Point startPoint;
 
-    @Column(columnDefinition = "geography(Point, 4326)")
+    @Column(columnDefinition = "geography(PointZ, 4326)")
     private Point endPoint;
 
     @Column(columnDefinition = "geography(LineStringZM, 4326)")
@@ -66,9 +65,12 @@ public class Route {
                         tp.recordedAt().toEpochSecond(ZoneOffset.UTC)
                 ))
                 .toArray(CoordinateXYZM[]::new);
+        Coordinate startCoord = new Coordinate(coords[0].x, coords[0].y);
+        Coordinate endCoord   = new Coordinate(coords[coords.length - 1].x, coords[coords.length - 1].y);
 
+        this.startPoint = factory.createPoint(startCoord);
+        this.endPoint   = factory.createPoint(endCoord);
         this.path = factory.createLineString(coords);
-        this.startPoint = factory.createPoint(coords[0]);
-        this.endPoint   = factory.createPoint(coords[coords.length - 1]);
+
     }
 }
