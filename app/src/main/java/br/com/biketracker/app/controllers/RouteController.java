@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,10 +30,12 @@ public class RouteController {
     // Registra nova rota
     @PostMapping
     public ResponseEntity<RouteResponse> create(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody CreateRouteRequest request
     ) {
-        String userId = userDetails.getUsername();
+        System.out.println(jwt);
+        System.out.println(jwt.getSubject());
+        String userId = jwt.getSubject();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(routeService.createRoute(userId, request));
     }
@@ -40,10 +43,10 @@ public class RouteController {
     // Lista rotas do usuário autenticado
     @GetMapping("/my")
     public ResponseEntity<Page<RouteResponse>> listMine(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal Jwt jwt,
             @PageableDefault(size = 10, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        String userId = userDetails.getUsername();
+        String userId = jwt.getSubject();
         return ResponseEntity.ok(routeService.listMyRoutes(userId, pageable));
     }
 
