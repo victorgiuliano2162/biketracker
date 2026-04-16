@@ -55,6 +55,7 @@ export class LoginPageComponent {
           ? 'E-mail ou senha incorretos.'
           : 'Erro ao realizar login. Tente novamente.';
           alert(this.errorMessage);
+          this.password = '';
       }
     });
   }
