@@ -26,7 +26,7 @@ interface RouteNode {
   elevations?: number[];
   color?: string;
   isSaved?: boolean;
-  savedId?: number;
+  savedId?: string;
   children?: RouteNode[];
 }
 
@@ -39,7 +39,7 @@ interface FlatRouteNode {
   elevations?: number[];
   color?: string;
   isSaved?: boolean;
-  savedId?: number;
+  savedId?: string;
 }
 
 interface GpxStats {
@@ -118,7 +118,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     elevations: node.elevations,
     color: node.color,
     isSaved: node.isSaved,
-    savedId: node.savedId,
+    savedId: node.savedId?.toString(),
   });
 
   treeControl = new FlatTreeControl<FlatRouteNode>(
