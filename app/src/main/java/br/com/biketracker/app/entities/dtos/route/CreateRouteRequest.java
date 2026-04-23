@@ -6,6 +6,7 @@ import java.util.List;
 
 public record CreateRouteRequest(
         double distanceInKm,
+        String name,
         double elevationInMeters,
         LocalDateTime startTime,
         LocalDateTime endTime,
