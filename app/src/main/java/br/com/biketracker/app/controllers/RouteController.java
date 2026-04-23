@@ -62,23 +62,23 @@ public class RouteController {
     // Replay de uma rota específica do usuário
     @GetMapping("/my/{routeId}/replay")
     public ResponseEntity<RouteReplayResponse> replay(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId
     ) {
-        String userId = userDetails.getUsername();
+        String userId = jwt.getSubject();
         return ResponseEntity.ok(routeService.getRouteReplay(userId, routeId));
     }
 
     // Busca rotas do usuário por região geográfica
     @GetMapping("/my/search/region")
     public ResponseEntity<List<RouteResponse>> findByRegion(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam double minLon,
             @RequestParam double minLat,
             @RequestParam double maxLon,
             @RequestParam double maxLat
     ) {
-        String userId = userDetails.getUsername();
+        String userId = jwt.getSubject();
         var bbox = new BoundingBoxRequest(minLon, minLat, maxLon, maxLat);
         return ResponseEntity.ok(routeService.findByBoundingBox(userId, bbox));
     }
