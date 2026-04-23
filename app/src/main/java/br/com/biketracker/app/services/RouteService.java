@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -43,6 +46,7 @@ public class RouteService {
         route.setCountry(request.country());
         route.setPublic(request.isPublic());
         route.setUser(user);
+        route.setName(request.name());
         route.buildPath(geometryFactory, request.trackPoints());
         route.calculateActivityTime();
 
@@ -79,12 +83,23 @@ public class RouteService {
         }
 
         List<TrackPoint> points = rows.stream()
-                .map(row -> new TrackPoint(
-                        ((Number) row[0]).doubleValue(),
-                        ((Number) row[1]).doubleValue(),
-                        ((Number) row[2]).doubleValue(),
-                        ((Timestamp) row[3]).toLocalDateTime()
-                ))
+                .map(row -> {
+                    LocalDateTime recordedAt;
+                    if (row[3] instanceof Timestamp ts) {
+                        recordedAt = ts.toLocalDateTime();
+                    } else if (row[3] instanceof Instant instant) {
+                        recordedAt = instant.atZone(ZoneOffset.UTC).toLocalDateTime();
+                    } else {
+                        throw new IllegalStateException("Tipo inesperado para recorded_at: " + row[3].getClass());
+                    }
+
+                    return new TrackPoint(
+                            ((Number) row[0]).doubleValue(),
+                            ((Number) row[1]).doubleValue(),
+                            ((Number) row[2]).doubleValue(),
+                            recordedAt
+                    );
+                })
                 .toList();
 
         return new RouteReplayResponse(routeId, points);
