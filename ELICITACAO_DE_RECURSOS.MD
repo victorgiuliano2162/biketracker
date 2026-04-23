@@ -40,34 +40,36 @@ O **Trackker** é um aplicativo web destinado a atletas amadores que desejam reg
 | RF-15     | Exploração e Visualização     | Mapas totalmente responsivos (desktop e tablet)                                        | 1          |
 | RF-16     | Exportação                    | Exportar rota no formato .GPX                                                          | 2          |
 | RF-17     | Comentários e Mídia           | Adicionar comentários em rotas públicas                                                | 2          |
-| RF-18     | Comentários e Mídia           | Fazer upload de até 5 fotos por rota                                                   | 2          |
+| RF-18     | Importação           | Fazer upload de rotas                                                   | 2          |
 | RF-19     | Perfil do Usuário             | Perfil exibir histórico de rotas e estatísticas básicas (total km, número de rotas)    | 2          |
 | RF-20     | Administração                 | Administrador desativar/excluir contas de usuários                                     | 3          |
 
 **Legenda de Prioridade:**  
-asssssssssssssssssssssssssssssssss
+1 = obrigatório no MVP
+2 = importante – entregar até final de maio
+3 = desejável – pode ficar para versões futuras
 
 ## 4. Requisitos Não Funcionais (RNF)
 
-| ID        | Categoria              | Descrição do Requisito                                                                 | Prioridade |
-|-----------|------------------------|----------------------------------------------------------------------------------------|------------|
-| RNF-01    | Desempenho             | Carregamento de mapas e rotas em menos de 2 segundos                                   | 1          |
-| RNF-02    | Desempenho             | Busca por rotas próximas retornar em menos de 1 segundo (com índice espacial)          | 1          |
-| RNF-03    | Usabilidade            | Interface intuitiva e com uso fluído (mobile-first)                                    | 1          |
-| RNF-04    | Usabilidade            | Mapas responsivos em resoluções de 320px até 4K                                        | 1          |
-| RNF-05    | Segurança              | Autenticação JWT segura com proteção contra ataques comuns                             | 1          |
-| RNF-06    | Segurança              | Respeitar visibilidade das rotas (privada só para o dono)                              | 1          |
-| RNF-07    | Segurança              | Validação de uploads de fotos (tipo e tamanho máximo 5 MB)                             | 1          |
-| RNF-08    | Manutenibilidade       | Código bem estruturado e documentado (endpoints e classes)                             | 1          |
-| RNF-09    | Escalabilidade         | Suportar até 1.000 rotas por usuário e 10.000 usuários ativos (meta inicial)           | 2          |
+| ID        | Categoria              | Descrição do Requisito                                                                 
+|-----------|------------------------|------------------------------------------------------------------------------------------------------
+| RNF-01    | Desempenho             | Carregamento de mapas e rotas em menos de 2 segundos                                   
+| RNF-02    | Desempenho             | Busca por rotas próximas retornar em menos de 1 segundo (com índice espacial)          
+| RNF-03    | Usabilidade            | Interface intuitiva e com uso fluído (mobile-first)                                    
+| RNF-04    | Usabilidade            | Mapas responsivos em resoluções de 320px até 4K                                        
+| RNF-05    | Segurança              | Autenticação JWT segura com proteção contra ataques comuns                             
+| RNF-06    | Segurança              | Respeitar visibilidade das rotas (privada só para o dono)                              
+| RNF-07    | Segurança              | Validação de uploads de fotos (tipo e tamanho máximo 5 MB)                             
+| RNF-08    | Manutenibilidade       | Código bem estruturado e documentado (endpoints e classes)                             
+| RNF-09    | Escalabilidade         | Suportar até 1.000 rotas por usuário e 10.000 usuários ativos (meta inicial)           
 | RNF-10    | Integridade de Dados   | Cálculos de distância e altimetria feitos automaticamente no backend (PostGIS)         | 1          |
 | RNF-11    | Compatibilidade        | Funcionar corretamente nos navegadores Chrome, Firefox e Edge (versões recentes)       | 1          |
 | RNF-12    | Acessibilidade         | Atender WCAG 2.1 nível AA (contraste e navegação por teclado)                          | 3          |
 
 **Legenda de Prioridade:**  
-1 = 1 (obrigatório no MVP)  
-2 = 2 (importante – entregar até final de maio)  
-3 = 2 (desejável – pode ficar para versões futuras)
+1 = obrigatório no MVP
+2 = importante – entregar até final de maio
+3 = desejável – pode ficar para versões futuras
 
 ---
 
