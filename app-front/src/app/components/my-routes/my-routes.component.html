@@ -1,11 +1,12 @@
 <div class="routes-container">
 
-  <h2 class="page-title">Minhas rotas</h2>
+  <div class="page-header">
+    <h2>Minhas rotas</h2>
+    <span>{{ totalElements.toString() }} rotas</span>
+  </div>
 
   @if (loading) {
-    <div class="loading-wrapper">
-      <mat-spinner diameter="40" />
-    </div>
+    <div class="loading-wrapper"><mat-spinner diameter="40" /></div>
   }
 
   @if (!loading && routes.length === 0) {
@@ -13,42 +14,84 @@
   }
 
   @for (route of routes; track route.id) {
-    <mat-card class="route-card">
+    <mat-card class="route-card" [class.expanded]="expandedRouteId === route.id"
+              (click)="toggleRoute(route.id)">
       <mat-card-content>
 
-        <div class="route-header">
-          <div class="route-meta">
-            <span class="route-location">{{ route.startCity }}, {{ route.country }}</span>
-            <span class="route-date">
+        <div class="route-summary">
+          <div class="route-left">
+            <div class="route-name">{{ route.name }}</div>
+            <div class="route-sub">
               {{ formatDate(route.startTime) }} · {{ formatTime(route.startTime) }}
-            </span>
+              &nbsp;·&nbsp; {{ route.startCity }}, {{ route.country }}
+            </div>
+            <div class="route-left-metrics">
+              <div class="lm">
+                <span class="lm-label">Tempo</span>
+                <span class="lm-value">{{ formatDuration(route.activityTimeInSeconds) }}</span>
+              </div>
+              <div class="lm">
+                <span class="lm-label">Velocidade méd.</span>
+                <span class="lm-value">{{ avgSpeed(route) }} km/h</span>
+              </div>
+            </div>
           </div>
-          <div class="route-distance">
-            <span class="distance-value">{{ route.distanceInKm | number:'1.1-1' }}</span>
-            <span class="distance-unit">km</span>
+
+          <div class="route-right">
+            <div class="dist-big">
+              {{ route.distanceInKm | number:'1.1-1' }}
+              <span class="dist-unit">km</span>
+            </div>
+
+            <div class="metrics-col">
+              <div class="rm">
+                <mat-icon>terrain</mat-icon>
+                <span><strong>{{ route.elevationInMeters | number:'1.0-0' }} m</strong> elev.</span>
+              </div>
+              <div class="rm">
+                <mat-icon>show_chart</mat-icon>
+                @if (avgElevCache.has(route.id)) {
+                  <span><strong>{{ avgElevCache.get(route.id) }} m</strong> elev. méd.</span>
+                } @else {
+                  <span class="muted">— elev. méd.</span>
+                }
+              </div>
+              <div class="rm">
+                <mat-icon>timer</mat-icon>
+                <span>{{ formatDuration(route.activityTimeInSeconds) }}</span>
+              </div>
+            </div>
+
+            <div class="route-footer">
+              <mat-chip [class]="route.isPublic ? 'chip-public' : 'chip-private'">
+                {{ route.isPublic ? 'Pública' : 'Privada' }}
+              </mat-chip>
+
+              @if (replayCache.has(route.id)) {
+                <button mat-icon-button
+                        matTooltip="Baixar GPX"
+                        (click)="downloadGpx(route, $event)">
+                  <mat-icon>download</mat-icon>
+                </button>
+              }
+            </div>
           </div>
         </div>
 
-        <div class="route-metrics">
-          <div class="metric">
-            <mat-icon>terrain</mat-icon>
-            <span>{{ route.elevationInMeters | number:'1.0-0' }} m</span>
+        @if (expandedRouteId === route.id) {
+          <div class="expand-area">
+            @if (replayLoading) {
+              <div class="chart-loading"><mat-spinner diameter="28" /></div>
+            } @else {
+              <div class="chart-wrap">
+                <canvas [id]="'chart-' + route.id" #chartCanvas
+                        role="img"
+                        [attr.aria-label]="'Altimetria da rota ' + route.name">
+                </canvas>
+              </div>
+            }
           </div>
-          <div class="metric">
-            <mat-icon>timer</mat-icon>
-            <span>{{ formatDuration(route.activityTimeInSeconds) }}</span>
-          </div>
-          <div class="metric">
-            <mat-icon>speed</mat-icon>
-            <span>{{ avgSpeed(route) }} km/h</span>
-          </div>
-        </div>
-
-        <div class="route-footer">
-          <mat-chip [class]="route.isPublic ? 'chip-public' : 'chip-private'">
-            {{ route.isPublic ? 'Pública' : 'Privada' }}
-          </mat-chip>
-        </div>
+        }
 
       </mat-card-content>
     </mat-card>
@@ -60,8 +103,7 @@
       [pageSize]="pageSize"
       [pageIndex]="pageIndex"
       [pageSizeOptions]="[5, 10, 20]"
-      (page)="onPageChange($event)"
-    />
+      (page)="onPageChange($event)" />
   }
 
 </div>
