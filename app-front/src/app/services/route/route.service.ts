@@ -22,7 +22,7 @@ export interface CreateRouteRequest {
 }
 
 export interface RouteResponse {
-  id: number;
+  id: string;
   name: string,
   distanceInKm: number;
   elevationInMeters: number;
