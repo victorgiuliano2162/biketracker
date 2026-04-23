@@ -33,17 +33,17 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
 
     // Replay: extrai os pontos da LineStringZM de uma rota
     @Query(value = """
-            SELECT
-                ST_X((dp).geom)               AS longitude,
-                ST_Y((dp).geom)               AS latitude,
-                ST_Z((dp).geom)               AS altitude_in_meters,
-                to_timestamp(ST_M((dp).geom)) AS recorded_at
-            FROM (
-                SELECT ST_DumpPoints(r.path) AS dp
-                FROM routes r
-                WHERE r.id = :routeId AND r.user_id = :userId
-            ) AS dumped
-            ORDER BY (dp).path[1]
+SELECT
+    ST_X((dp).geom::geometry)               AS longitude,
+    ST_Y((dp).geom::geometry)               AS latitude,
+    ST_Z((dp).geom::geometry)               AS altitude_in_meters,
+    to_timestamp(ST_M((dp).geom::geometry)) AS recorded_at
+FROM (
+    SELECT ST_DumpPoints(r.path::geometry) AS dp
+    FROM routes r
+    WHERE r.id = ?1 AND r.user_id = ?2
+) AS dumped
+ORDER BY (dp).path[1]
             """, nativeQuery = true)
     List<Object[]> findRoutePointsByRouteId(
             @Param("routeId") String routeId,
