@@ -15,7 +15,7 @@ public class Equipment {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private User user;
     private String name;
     private String description;
