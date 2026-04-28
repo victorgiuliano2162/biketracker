@@ -1,41 +1,84 @@
 <mat-card class="login-card" appearance="outlined">
-
   <mat-card-header>
-
     <mat-card-title>Traker</mat-card-title>
     <mat-card-subtitle></mat-card-subtitle>
-    <br>
-    
+    <br />
   </mat-card-header>
 
   <mat-card-content>
     <form (ngSubmit)="onLogin()">
-
       <mat-form-field appearance="outline" style="width: 100%">
         <mat-label>E-mail</mat-label>
-        <input autocomplete="username" matInput type="email" [(ngModel)]="email" name="email" required />
+        <input
+          autocomplete="username"
+          matInput
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
         <mat-icon matPrefix>mail_outline</mat-icon>
         <mat-error>Informe um e-mail válido</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" style="width: 100%">
         <mat-label>Senha</mat-label>
-        <input autocomplete="current-password" matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password" required />
+
+        <!-- sempre type="password" → browser reconhece para autocomplete -->
+        @if (hidePassword) {
+          <input
+            autocomplete="current-password"
+            matInput
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+        } @else {
+          <input
+            autocomplete="current-password"
+            matInput
+            type="text"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+        }
+
         <mat-icon matPrefix>lock_outline</mat-icon>
-        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword = !hidePassword"
+        >
+          <mat-icon>{{
+            hidePassword ? "visibility_off" : "visibility"
+          }}</mat-icon>
         </button>
         <mat-error>A senha é obrigatória</mat-error>
       </mat-form-field>
-      
-      <button mat-flat-button type="submit" style="width: 100%" [disabled]="!isValid()">Entrar</button>
+
+      <button
+        mat-flat-button
+        type="submit"
+        style="width: 100%"
+        [disabled]="!isValid()"
+      >
+        Entrar
+      </button>
     </form>
   </mat-card-content>
 
- 
-   
   <mat-card-actions>
- <button mat-stroked-button color="primary" (click)="onRegister()" routerLink="/subscribe">Criar conta</button>
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="onRegister()"
+      routerLink="/subscribe"
+    >
+      Criar conta
+    </button>
   </mat-card-actions>
-<br>
+  <br />
 </mat-card>

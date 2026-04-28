@@ -47,7 +47,7 @@ export class LoginPageComponent {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => { 
         console.log('Login token:', this.authService.getAccessToken());
-        this.router.navigate(['/home'])
+        setTimeout(() => this.router.navigate(['/home']), 150);
       },
       error: (err) => {
         console.log(err)
