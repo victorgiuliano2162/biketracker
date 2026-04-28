@@ -23,7 +23,7 @@ export interface CreateRouteRequest {
 
 export interface RouteResponse {
   id: string;
-  name: string,
+  name: string;
   distanceInKm: number;
   elevationInMeters: number;
   startTime: string;
@@ -40,17 +40,20 @@ export interface RouteReplayResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RouteService {
-
   private readonly base = '/api/routes';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  listMine(page = 0, size = 10): Observable<{ content: RouteResponse[]; totalElements: number }> {
+  listMine(
+    page = 0,
+    size = 10,
+  ): Observable<{ content: RouteResponse[]; totalElements: number }> {
     return this.http.get<{ content: RouteResponse[]; totalElements: number }>(
-    `${this.base}/my`, { params: { page, size } }
+      `${this.base}/my`,
+      { params: { page, size } },
     );
   }
 
@@ -59,7 +62,30 @@ export class RouteService {
   }
 
   getReplay(routeId: string): Observable<RouteReplayResponse> {
-  return this.http.get<RouteReplayResponse>(`${this.base}/my/${routeId}/replay`);
-}
+    return this.http.get<RouteReplayResponse>(
+      `${this.base}/my/${routeId}/replay`,
+    );
+  }
 
+  deleteRoute(routeId: string): Observable<any> {
+    return this.http.delete(`${this.base}/del?routeId=${routeId}`);
+  }
+
+  findByRegion(
+    minLon: number,
+    minLat: number,
+    maxLon: number,
+    maxLat: number,
+  ): Observable<RouteResponse[]> {
+    return this.http.get<RouteResponse[]>(`${this.base}/my/search/region`, {
+      params: { minLon, minLat, maxLon, maxLat },
+    });
+  }
+
+  toggleVisibility(routeId: string): Observable<RouteResponse> {
+    return this.http.patch<RouteResponse>(
+      `${this.base}/${routeId}/visibility`,
+      {},
+    );
+  }
 }
