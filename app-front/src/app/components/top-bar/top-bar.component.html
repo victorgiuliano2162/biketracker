@@ -10,24 +10,27 @@
   <!-- Menus — lado esquerdo -->
   <nav class="header-nav">
 
-    <button mat-button [matMenuTriggerFor]="menuAtividades">
-      Atividades
-      <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
-    </button>
-    <mat-menu #menuAtividades="matMenu">
-      <button mat-menu-item (click)="onAtividade('cross-country')">
-        <mat-icon>terrain</mat-icon>
-        Cross Country
+    @if(false) {
+
+      <button mat-button [matMenuTriggerFor]="menuAtividades">
+        Atividades
+        <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
       </button>
-      <button mat-menu-item (click)="onAtividade('enduro')">
-        <mat-icon>electric_bolt</mat-icon>
-        Enduro
-      </button>
-      <button mat-menu-item (click)="onAtividade('downhill')">
-        <mat-icon>moving</mat-icon>
-        Downhill
-      </button>
-    </mat-menu>
+      <mat-menu #menuAtividades="matMenu">
+        <button mat-menu-item (click)="onAtividade('cross-country')">
+          <mat-icon>terrain</mat-icon>
+          Cross Country
+        </button>
+        <button mat-menu-item (click)="onAtividade('enduro')">
+          <mat-icon>electric_bolt</mat-icon>
+          Enduro
+        </button>
+        <button mat-menu-item (click)="onAtividade('downhill')">
+          <mat-icon>moving</mat-icon>
+          Downhill
+        </button>
+      </mat-menu>
+    }
 
     <button mat-button [matMenuTriggerFor]="menuMapas">
       Mapas
@@ -41,6 +44,21 @@
       <button mat-menu-item routerLink="routes">
         <mat-icon>map</mat-icon>
         Minhas Rotas
+      </button>
+    </mat-menu>
+
+        <button mat-button [matMenuTriggerFor]="menuMetas">
+      Metas
+        <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #menuMetas="matMenu">
+      <button mat-menu-item routerLink="map">
+        <mat-icon>rewarded_ads</mat-icon>
+        Criar metas
+      </button>
+      <button mat-menu-item routerLink="routes">
+        <mat-icon>bookmark_flag</mat-icon>
+        Minhas metas
       </button>
     </mat-menu>
 
