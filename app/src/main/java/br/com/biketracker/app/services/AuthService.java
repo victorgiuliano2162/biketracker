@@ -25,6 +25,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
+    private final UserService userService;
 
 
     private static final long ACCESS_TOKEN_EXPIRY_MINUTES = 35;
@@ -35,10 +36,13 @@ public class AuthService {
     public AuthService(
                         @Lazy AuthenticationManager authenticationManager,
                        JwtEncoder jwtEncoder,
-                       JwtDecoder jwtDecoder) {
+                       JwtDecoder jwtDecoder,
+                        UserService userService
+    ) {
         this.authenticationManager = authenticationManager;
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
+        this.userService = userService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -76,13 +80,14 @@ public class AuthService {
 
     private String generateAccessToken(String email) {
         Instant now = Instant.now();
-
+        var user = userService.findByEmail(email);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("biketracker")
                 .subject(email)
                 .issuedAt(now)
                 .expiresAt(now.plus(ACCESS_TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES))
                 .claim("token_type", "access")
+                .claim("user_id", user.getId())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
