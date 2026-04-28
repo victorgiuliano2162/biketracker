@@ -1,5 +1,6 @@
 package br.com.biketracker.app.services;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import br.com.biketracker.app.entities.Route;
@@ -108,7 +109,7 @@ public class RouteService {
     @Transactional(readOnly = true)
     public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
         var u = userRepository.findByEmail(userId);
-        List<Long> ids = routeRepository.findIdsByUserAndBoundingBox(
+        List<String> ids = routeRepository.findIdsByUserAndBoundingBox(
                 u.get().getId(),
                 bbox.minLon(), bbox.minLat(),
                 bbox.maxLon(), bbox.maxLat()
@@ -120,5 +121,42 @@ public class RouteService {
                 .stream()
                 .map(RouteResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public boolean deleteRoute(String userId, String routeId) {
+        User u = userRepository.findByEmail(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada"));
+
+        if (!route.getUser().getId().equals(u.getId())) {
+            throw new AccessDeniedException("Essa rota não pertence ao usuário");
+        }
+
+        routeRepository.delete(route);
+
+        if (routeRepository.findById(routeId).isPresent()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Transactional
+    public RouteResponse toggleVisibility(String userId, String routeId) {
+        User user = userRepository.findByEmail(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada"));
+
+        if (!route.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Essa rota não pertence ao usuário");
+        }
+
+        route.setPublic(!route.isPublic());
+        return RouteResponse.from(routeRepository.save(route));
     }
 }
