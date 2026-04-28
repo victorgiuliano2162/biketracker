@@ -90,4 +90,25 @@ public class RouteController {
     ) {
         return ResponseEntity.ok(routeService.listPublicRoutes(pageable));
     }
+
+    @DeleteMapping("/del")
+    public ResponseEntity<?> delete(@AuthenticationPrincipal Jwt jwt, @RequestParam String routeId) {
+        String userId = jwt.getSubject();
+        var routeDeleteResponse = routeService.deleteRoute(userId, routeId);
+        if (routeDeleteResponse) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
+    @PatchMapping("/{routeId}/visibility")
+    public ResponseEntity<RouteResponse> updateVisibility(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String routeId
+    ) {
+        String userId = jwt.getSubject();
+        return ResponseEntity.ok(routeService.toggleVisibility(userId, routeId));
+    }
 }
