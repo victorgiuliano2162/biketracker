@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface RouteRepository extends JpaRepository<Route, Long> {
+public interface RouteRepository extends JpaRepository<Route, String> {
 
     // Lista rotas do usuário, mais recentes primeiro
     Page<Route> findByUserIdOrderByStartTimeDesc(String userId, Pageable pageable);
@@ -61,7 +61,7 @@ ORDER BY (dp).path[1]
               )
             ORDER BY r.start_time DESC
             """, nativeQuery = true)
-    List<Long> findIdsByUserAndBoundingBox(
+    List<String> findIdsByUserAndBoundingBox(
             @Param("userId") String userId,
             @Param("minLon") double minLon,
             @Param("minLat") double minLat,
@@ -75,4 +75,21 @@ ORDER BY (dp).path[1]
 
     @Query("SELECT r FROM Route r WHERE r.user.id = :userId AND r.startTime >= :since ORDER BY r.startTime DESC")
     List<Route> findByUserIdSince(@Param("userId") String userId, @Param("since") LocalDateTime since);
+
+    @Query(value = """
+    SELECT r.id
+    FROM routes r
+    WHERE r.user_id = :userId
+      AND ST_Intersects(
+            r.path,
+            ST_MakeEnvelope(:minLon, :minLat, :maxLon, :maxLat, 4326)
+          )
+    """, nativeQuery = true)
+    List<Long> findIdsByUserAndBoundingBox(
+            @Param("userId") Long userId,
+            @Param("minLon") double minLon,
+            @Param("minLat") double minLat,
+            @Param("maxLon") double maxLon,
+            @Param("maxLat") double maxLat
+    );
 }
