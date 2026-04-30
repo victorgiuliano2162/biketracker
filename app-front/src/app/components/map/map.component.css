@@ -7,75 +7,274 @@
 .map-container { width: 100%; height: 100%; }
 #leaflet-map { width: 100%; height: 100%; }
 
+/* ── Botão sidebar toggle ────────────────────────────────────────── */
 .sidebar-toggle {
   position: absolute;
   top: 16px; right: 16px;
   z-index: 1000;
 }
 
+/* ── Controles flutuantes ────────────────────────────────────────── */
 .map-controls {
   position: absolute;
   bottom: 32px; right: 16px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
+}
+
+.controls-divider {
+  width: 24px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 2px 0;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────────── */
 .sidebar {
   position: absolute;
   top: 64px; right: 16px;
-  width: 280px;
-  max-height: calc(100% - 80px);
+  width: 300px;
+  max-height: calc(100% - 88px);
   z-index: 999;
-  background: var(--mat-sys-surface-container, #f4f4f4);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  overflow-y: auto;
+  background: var(--mat-sys-surface, #fff);
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 16px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(16px) scale(0.98);
   pointer-events: none;
   transition: opacity 200ms ease, transform 200ms ease;
+  transform-origin: top right;
 }
 
-.sidebar.open { opacity: 1; transform: translateX(0); pointer-events: all; }
+.sidebar.open {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: all;
+}
 
+/* ── Header ──────────────────────────────────────────────────────── */
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 12px 8px;
-  border-bottom: 1px solid var(--mat-sys-outline-variant, #ddd);
-  position: sticky; top: 0;
-  background: inherit;
-  border-radius: 12px 12px 0 0;
-}
-
-.sidebar-title { font-size: 1rem; font-weight: 600; color: var(--mat-sys-on-surface, #1a1a1a); }
-.route-tree { background: transparent; padding: 8px 0; }
-.group-label { font-weight: 500; font-size: 0.875rem; color: var(--mat-sys-on-surface-variant, #555); }
-.route-label { font-size: 0.875rem; color: var(--mat-sys-on-surface, #1a1a1a); flex: 1; }
-
-.route-dot {
-  display: inline-block;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  margin-right: 6px;
+  padding: 14px 8px 14px 16px;
+  background: var(--mat-sys-surface-container-low, #f8f8f8);
+  border-bottom: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
   flex-shrink: 0;
 }
 
-.save-btn { margin-left: auto; opacity: 0.7; }
-.save-btn:hover { opacity: 1; }
+.sidebar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-.saved-icon {
-  font-size: 16px; width: 16px; height: 16px;
+.sidebar-header-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
   color: var(--mat-sys-primary, #1976d2);
-  margin-left: auto;
+  opacity: 0.9;
+}
+
+.sidebar-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--mat-sys-on-surface, #1a1a1a);
+}
+
+.sidebar-clear-btn {
+  opacity: 0.5;
+  transition: opacity 150ms;
+}
+.sidebar-clear-btn:hover { opacity: 1; }
+
+/* ── Body / scroll ───────────────────────────────────────────────── */
+.sidebar-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 0;
+}
+
+.sidebar-body::-webkit-scrollbar { width: 4px; }
+.sidebar-body::-webkit-scrollbar-track { background: transparent; }
+.sidebar-body::-webkit-scrollbar-thumb {
+  background: var(--mat-sys-outline-variant, #ccc);
+  border-radius: 4px;
+}
+
+/* ── Tree base ───────────────────────────────────────────────────── */
+.route-tree {
+  background: transparent;
+}
+
+/* ── Grupo ───────────────────────────────────────────────────────── */
+.group-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 2px 8px 2px 0;
+  gap: 2px;
+}
+
+.group-toggle {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mat-sys-on-surface-variant, #666);
+  flex: 1;
+}
+
+.group-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--mat-sys-surface-container, #efefef);
+  color: var(--mat-sys-on-surface-variant, #666);
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-right: 8px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ── Nó de rota ──────────────────────────────────────────────────── */
+.route-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 8px 4px 4px;
+  border-radius: 8px;
+  gap: 6px;
+  position: relative;
+  transition: background 150ms ease;
+  cursor: default;
+  min-height: 40px;
+}
+
+.route-row:hover {
+  background: var(--mat-sys-surface-container, #f5f5f5);
+}
+
+.route-row--active {
+  background: var(--mat-sys-surface-container-low, #f0f4ff);
+}
+
+/* Barra de cor lateral */
+.route-color-bar {
+  width: 3px;
+  height: 28px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Checkbox — remove padding interno padrão do mat */
+.route-checkbox {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.route-label {
+  font-size: 0.825rem;
+  color: var(--mat-sys-on-surface, #1a1a1a);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Ações da rota (save + delete) ───────────────────────────────── */
+.route-actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.route-row:hover .route-actions {
+  opacity: 1;
+}
+
+/* Mantém visível quando spinner está rodando */
+.route-row .route-actions:has(.mat-mdc-progress-spinner) {
+  opacity: 1;
+}
+
+.action-btn {
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 !important;
+}
+
+.action-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.action-btn--save {
+  color: var(--mat-sys-primary, #1976d2);
+  opacity: 0.8;
+}
+.action-btn--save:hover { opacity: 1; }
+
+.action-btn--delete {
+  color: var(--mat-sys-error, #c62828);
+  opacity: 0.65;
+}
+.action-btn--delete:hover { opacity: 1; }
+
+.saved-badge {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--mat-sys-primary, #1976d2);
   opacity: 0.7;
+  flex-shrink: 0;
+}
+
+/* ── Estado vazio ────────────────────────────────────────────────── */
+.sidebar-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--mat-sys-on-surface-variant, #999);
+  opacity: 0.5;
+}
+
+.sidebar-empty mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.sidebar-empty span {
+  font-size: 0.8rem;
 }
 
 /* ── Stats GPX ───────────────────────────────────────────────────── */
@@ -102,15 +301,9 @@
   padding-bottom: 6px;
 }
 
-.gpx-color-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
+.gpx-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .gpx-expand-btn { margin-left: auto; width: 28px; height: 28px; line-height: 28px; }
 .gpx-expand-btn mat-icon { font-size: 18px; }
-
 .gpx-icon { font-size: 18px; width: 18px; height: 18px; color: #e53935; flex-shrink: 0; }
 
 .gpx-name {
@@ -134,9 +327,7 @@
 .gpx-chart-container canvas { width: 100% !important; height: 100% !important; }
 
 /* ── Marcador pulsante no mapa ───────────────────────────────────── */
-.cursor-marker-pulse {
-  animation: pulse 1s ease-in-out infinite;
-}
+.cursor-marker-pulse { animation: pulse 1s ease-in-out infinite; }
 
 @keyframes pulse {
   0%   { transform: scale(1);   opacity: 1; }
