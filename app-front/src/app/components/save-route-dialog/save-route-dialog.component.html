@@ -1,0 +1,102 @@
+
+<div class="dialog-wrap">
+
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <mat-icon>cloud_upload</mat-icon>
+    </div>
+    <div class="header-text">
+      <h2 mat-dialog-title>'Sa'lvar rota</h2>
+      <p class="header-sub">Revise as informações antes de enviar</p>
+    </div>
+    <button mat-icon-button class="close-btn" (click)="cancel()" matTooltip="Cancelar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <mat-icon class="stat-icon">route</mat-icon>
+      <span class="stat-value">{{ distanceLabel }}</span>
+      <span class="stat-label">distância</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-chip">
+      <mat-icon class="stat-icon">terrain</mat-icon>
+      <span class="stat-value">{{ elevationLabel }}</span>
+      <span class="stat-label">elevação acumulada</span>
+    </div>
+  </div>
+
+  <mat-divider />
+
+  <!-- Form -->
+  <mat-dialog-content>
+    <form [formGroup]="form" class="route-form">
+
+      <!-- Nome -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nome da rota</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Trilha da Serra" maxlength="80" />
+        <mat-icon matSuffix>edit</mat-icon>
+        @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+        @if (form.get('name')?.hasError('maxlength')) {
+          <mat-error>Máximo de 80 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- País -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>País</mat-label>
+        <mat-select formControlName="country">
+          @for (c of countries; track c.code) {
+            <mat-option [value]="c.code">
+              <span class="flag">{{ c.flag }}</span>
+              {{ c.name }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>public</mat-icon>
+      </mat-form-field>
+
+      <!-- Visibilidade -->
+      <div class="visibility-field">
+        <span class="visibility-label">Visibilidade</span>
+        <mat-button-toggle-group formControlName="isPublic" class="visibility-toggle">
+          <mat-button-toggle [value]="false">
+            <mat-icon>lock</mat-icon>
+            Privada
+          </mat-button-toggle>
+          <mat-button-toggle [value]="true">
+            <mat-icon>public</mat-icon>
+            Pública
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        <p class="visibility-hint">
+          @if (form.get('isPublic')?.value) {
+            Outros ciclistas poderão ver esta rota no mapa.
+          } @else {
+            Somente você verá esta rota.
+          }
+        </p>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <!-- Actions -->
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary"
+      [disabled]="form.invalid"
+      (click)="confirm()">
+      <mat-icon>cloud_upload</mat-icon>
+      Salvar rota
+    </button>
+  </mat-dialog-actions>
+
+</div>
