@@ -1,0 +1,148 @@
+.list-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--mat-sys-surface, #fff);
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 14px;
+  padding: 20px 24px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.page-sub {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.55;
+}
+
+/* ── Tabela ────────────────────────────────────────────── */
+.table-wrap {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.goals-table {
+  width: 100%;
+}
+
+/* Nome + descrição */
+.goal-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+
+.goal-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.goal-desc {
+  font-size: 0.775rem;
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+/* Progresso */
+.progress-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.progress-bar-wrap {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mat-sys-surface-container, #e0e0e0);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--mat-sys-primary, #1976d2);
+  transition: width 400ms ease;
+}
+
+.progress-bar-fill--done {
+  background: #2e7d32;
+}
+
+.progress-label {
+  font-size: 0.775rem;
+  opacity: 0.65;
+}
+
+.progress-pct {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* Prazo expirado */
+.deadline-expired {
+  color: var(--mat-sys-error, #c62828);
+  font-weight: 600;
+}
+
+/* Ações */
+.action-cell {
+  display: flex;
+  gap: 0;
+  justify-content: flex-end;
+}
+
+.goal-row:hover {
+  background: var(--mat-sys-surface-container-low, #f5f5f5);
+}
+
+/* ── Estados ───────────────────────────────────────────── */
+.state-center {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.state-empty {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.5;
+}
+
+.state-empty mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.state-empty span {
+  font-size: 0.9rem;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .goal-desc    { max-width: 140px; }
+  .progress-cell { min-width: 120px; }
+}

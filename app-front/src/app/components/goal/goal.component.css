@@ -13,6 +13,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  background: var(--mat-sys-surface, #fff);
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 14px;
+  padding: 20px 24px;
 }
 
 .page-title {
@@ -71,7 +75,10 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding-top: 4px;
+  background: var(--mat-sys-surface, #fff);
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 14px;
+  padding: 16px 24px;
 }
 
 .page-actions button[mat-flat-button] mat-icon,
