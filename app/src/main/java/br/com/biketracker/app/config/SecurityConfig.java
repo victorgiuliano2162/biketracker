@@ -59,8 +59,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/user").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/goal").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/goal").permitAll()
                         .requestMatchers("/error").permitAll()
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .anyRequest().authenticated()
