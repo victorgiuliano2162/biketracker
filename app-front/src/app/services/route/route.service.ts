@@ -68,7 +68,7 @@ export class RouteService {
   }
 
   deleteRoute(routeId: string): Observable<any> {
-    return this.http.delete(`${this.base}/del?routeId=${routeId}`);
+    return this.http.delete(`${this.base}/del/${routeId}`);
   }
 
   findByRegion(
