@@ -1,0 +1,43 @@
+<div class="elevation-panel">
+
+  <div class="panel-header" (click)="toggleExpand()">
+    <div class="panel-header-left">
+      <span class="route-name">{{ stats.name }}</span>
+      <span class="route-meta">
+        {{ stats.distanceKm | number:'1.1-1' }} km
+        &nbsp;·&nbsp;
+        {{ stats.points }} pontos
+      </span>
+    </div>
+
+    <div class="panel-header-right">
+      @if (stats.loadingElevation) {
+        <mat-spinner diameter="16" />
+      } @else if (stats.elevationGainM !== null) {
+        <span class="elev-badge">
+          <mat-icon>trending_up</mat-icon>
+          {{ stats.elevationGainM | number:'1.0-0' }} m
+        </span>
+      }
+      <mat-icon class="expand-icon" [class.rotated]="expanded">
+        expand_less
+      </mat-icon>
+    </div>
+  </div>
+
+  @if (expanded) {
+    <div class="chart-area">
+      @if (stats.loadingElevation) {
+        <div class="chart-loading">
+          <mat-spinner diameter="28" />
+          <span>Carregando elevação…</span>
+        </div>
+      } @else if (stats.elevationProfile) {
+        <canvas #chartCanvas class="chart-canvas"></canvas>
+      } @else {
+        <p class="no-data">Dados de elevação indisponíveis.</p>
+      }
+    </div>
+  }
+
+</div>
