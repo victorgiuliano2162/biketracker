@@ -35,6 +35,15 @@ export const routes: Routes = [
     path: 'routes',
     loadComponent: () => import('./components/my-routes/my-routes.component').then((m) => m.MyRoutesComponent), canActivate: [authGuard],
   },
+  {
+    path: 'goals',
+    loadComponent: () => import('./components/goal-list/goal-list.component').then((m) => m.GoalListComponent), canActivate: [authGuard]
+  },
+  {
+    path: 'goal',
+    loadComponent: () => import('./components/goal/goal.component').then((m) => m.GoalComponent), canActivate: [authGuard]
+  },
+  {},
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
