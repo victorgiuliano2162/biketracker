@@ -7,13 +7,13 @@
       
       @if (stats.totalRides == 0) {
         <h1>Bem-vindo!</h1>
-        <p>Você ainda não tem pedaladas registradas. Vamos começar?</p>
+        <p>Você ainda não tem rotas registradas. Vamos começar?</p>
       } @else if (stats.totalRides == 1) {
         <h1>Bem-vindo de volta!</h1>
-        <p>Você tem <strong>1</strong> pedalada registrada. Que tal sair para a próxima?</p>
+        <p>Você tem <strong>1</strong> rota registrada. Que tal sair para a próxima?</p>
       } @else {
         <h1>Bem-vindo de volta! </h1>
-        <p>Você tem <strong>{{ stats.totalRides }}</strong> pedaladas registradas. Continue assim!</p>
+        <p>Você tem <strong>{{ stats.totalRides }}</strong> rotas registradas. Continue assim!</p>
       }
     </div>
   </div>
@@ -36,22 +36,23 @@
         <p class="stat-label">Elevação total</p>
       </mat-card-content>
     </mat-card>
-
-    <mat-card appearance="outlined" class="stat-card">
-      <mat-card-content>
-        <mat-icon color="primary">timer</mat-icon>
-        <p class="stat-value">{{ formatDuration(stats.totalActivitySeconds) }}</p>
-        <p class="stat-label">Tempo de atividade</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card appearance="outlined" class="stat-card">
-      <mat-card-content>
-        <mat-icon color="primary">flag</mat-icon>
-        <p class="stat-value">{{ stats.totalRides }}</p>
-        <p class="stat-label">Pedaladas</p>
-      </mat-card-content>
-    </mat-card>
+    <!--
+      <mat-card appearance="outlined" class="stat-card">
+        <mat-card-content>
+          <mat-icon color="primary">timer</mat-icon>
+          <p class="stat-value">{{ formatDuration(stats.totalActivitySeconds) }}</p>
+          <p class="stat-label">Tempo de atividade</p>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card appearance="outlined" class="stat-card">
+        <mat-card-content>
+          <mat-icon color="primary">flag</mat-icon>
+          <p class="stat-value">{{ stats.totalRides }}</p>
+          <p class="stat-label">Pedaladas</p>
+        </mat-card-content>
+      </mat-card>
+      -->
 
   </div>
 
@@ -59,12 +60,13 @@
   <div class="middle-grid">
 
     <!-- Gráfico -->
-    <mat-card appearance="outlined" class="chart-card">
-      <mat-card-header>
-        <mat-card-title>Distância — últimos 7 dias</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <ngx-charts-bar-vertical
+     @if (false) {
+       <mat-card appearance="outlined" class="chart-card">
+         <mat-card-header>
+           <mat-card-title>Distância — últimos 7 dias</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ngx-charts-bar-vertical
           [results]="chartData"
           [xAxis]="true"
           [yAxis]="true"
@@ -78,11 +80,12 @@
         </ngx-charts-bar-vertical>
       </mat-card-content>
     </mat-card>
+  }
 
     <!-- Últimas rides -->
     <mat-card appearance="outlined" class="rides-card">
       <mat-card-header>
-        <mat-card-title>Últimas atividades</mat-card-title>
+        <mat-card-title>Últimas rotas</mat-card-title>
       </mat-card-header>
       <mat-card-content>
 
@@ -96,7 +99,7 @@
           <div class="ride-info">
             <span class="ride-distance">{{ ride.distanceInKm | number:'1.1-1' }} km</span>
             <span class="ride-meta">
-              {{ formatDuration(ride.activityTimeInSeconds) }} &bull;
+              
               {{ ride.elevationInMeters | number:'1.0-0' }}m elevação &bull;
               {{ ride.startTime }}
             </span>
