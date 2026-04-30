@@ -1,0 +1,110 @@
+<div class="create-page">
+
+  <div class="page-header">
+    <div class="header-text">
+      <h1 class="page-title">Nova meta</h1>
+      <p class="page-sub">Defina seus objetivos de ciclismo</p>
+    </div>
+    <a mat-stroked-button routerLink="/goals">
+      <mat-icon>list</mat-icon>
+      Ver metas
+    </a>
+  </div>
+
+  <!-- Cards de metas a criar -->
+  <div class="goals-draft-list">
+    @for (fg of goalForms.controls; track $index) {
+      <mat-card class="goal-card" appearance="outlined">
+        <mat-card-header>
+          <div class="card-header-row">
+            <span class="card-index">Meta {{ $index + 1 }}</span>
+            @if (goalForms.length > 1) {
+              <button mat-icon-button color="warn"
+                matTooltip="Remover esta meta"
+                (click)="removeGoal($index)">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
+        </mat-card-header>
+
+        <mat-card-content [formGroup]="asGroup(fg)">
+          <div class="form-grid">
+
+            <!-- Nome -->
+            <mat-form-field appearance="outline" class="span-2">
+              <mat-label>Nome da meta</mat-label>
+              <input matInput formControlName="name" placeholder="Ex: Pedalar 500 km em janeiro" />
+              <mat-icon matSuffix>emoji_events</mat-icon>
+              @if (asGroup(fg).get('name')?.invalid && asGroup(fg).get('name')?.touched) {
+                <mat-error>Nome é obrigatório</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Descrição -->
+            <mat-form-field appearance="outline" class="span-2">
+              <mat-label>Descrição</mat-label>
+              <textarea matInput formControlName="description" rows="2"
+                placeholder="Detalhe o objetivo..." cdkTextareaAutosize></textarea>
+              @if (asGroup(fg).get('description')?.invalid && asGroup(fg).get('description')?.touched) {
+                <mat-error>Descrição é obrigatória</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Valor alvo -->
+            <mat-form-field appearance="outline">
+              <mat-label>Valor alvo</mat-label>
+              <input matInput type="number" formControlName="targetValue" min="0.1" placeholder="500" />
+              <mat-icon matSuffix>flag</mat-icon>
+              @if (asGroup(fg).get('targetValue')?.invalid && asGroup(fg).get('targetValue')?.touched) {
+                <mat-error>Informe um valor maior que zero</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Unidade -->
+            <mat-form-field appearance="outline">
+              <mat-label>Unidade</mat-label>
+              <mat-select formControlName="unit">
+                @for (u of units; track u.value) {
+                  <mat-option [value]="u.value">{{ u.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Prazo -->
+            <mat-form-field appearance="outline" class="span-2">
+              <mat-label>Prazo</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="deadLine"
+                placeholder="dd/mm/aaaa" [min]="today" />
+              <mat-datepicker-toggle matIconSuffix [for]="picker" />
+              <mat-datepicker #picker />
+              @if (asGroup(fg).get('deadLine')?.invalid && asGroup(fg).get('deadLine')?.touched) {
+                <mat-error>Informe uma data válida</mat-error>
+              }
+            </mat-form-field>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Ações -->
+  <div class="page-actions">
+    <button mat-stroked-button (click)="addGoal()" [disabled]="saving">
+      <mat-icon>add</mat-icon>
+      Adicionar outra meta
+    </button>
+
+    <button mat-flat-button color="primary" (click)="submit()"
+      [disabled]="saving || form.invalid">
+      @if (saving) {
+        <mat-spinner diameter="18" />
+      } @else {
+        <mat-icon>cloud_upload</mat-icon>
+      }
+      {{ saving ? 'Salvando…' : 'Salvar metas' }}
+    </button>
+  </div>
+
+</div>

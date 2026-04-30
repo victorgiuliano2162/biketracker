@@ -1,0 +1,89 @@
+.create-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.page-sub {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.55;
+}
+
+/* ── Goal cards ────────────────────────────────────────── */
+.goals-draft-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.goal-card {
+  border-radius: 14px !important;
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.card-index {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+/* ── Form grid ─────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+  padding-top: 8px;
+}
+
+.span-2 { grid-column: span 2; }
+
+/* ── Actions ───────────────────────────────────────────── */
+.page-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.page-actions button[mat-flat-button] mat-icon,
+.page-actions button[mat-flat-button] mat-spinner {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .span-2    { grid-column: span 1; }
+  .page-actions { flex-direction: column; }
+  .page-actions button { width: 100%; }
+}
