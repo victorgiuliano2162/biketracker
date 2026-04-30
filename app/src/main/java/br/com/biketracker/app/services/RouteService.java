@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.biketracker.app.entities.Route;
 import br.com.biketracker.app.entities.User;
-import br.com.biketracker.app.entities.dtos.BoundingBoxRequest;
+import br.com.biketracker.app.entities.dtos.route.BoundingBoxRequest;
 import br.com.biketracker.app.entities.dtos.route.*;
 import br.com.biketracker.app.exceptions.ex.ResourceNotFoundException;
 import br.com.biketracker.app.repositories.RouteRepository;
@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;

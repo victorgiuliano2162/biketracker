@@ -1,6 +1,6 @@
 package br.com.biketracker.app.controllers;
 
-import br.com.biketracker.app.entities.dtos.BoundingBoxRequest;
+import br.com.biketracker.app.entities.dtos.route.BoundingBoxRequest;
 import br.com.biketracker.app.entities.dtos.route.CreateRouteRequest;
 import br.com.biketracker.app.entities.dtos.route.RouteReplayResponse;
 import br.com.biketracker.app.entities.dtos.route.RouteResponse;

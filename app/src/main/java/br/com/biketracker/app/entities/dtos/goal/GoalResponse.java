@@ -1,4 +1,4 @@
-package br.com.biketracker.app.entities.dtos;
+package br.com.biketracker.app.entities.dtos.goal;
 
 import br.com.biketracker.app.entities.Goal;
 
