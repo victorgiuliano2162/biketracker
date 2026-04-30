@@ -7,6 +7,8 @@ import br.com.biketracker.app.entities.dtos.route.RouteResponse;
 import br.com.biketracker.app.entities.dtos.route.RouteStatsResponse;
 import br.com.biketracker.app.services.RouteService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +28,7 @@ import java.util.List;
 public class RouteController {
 
     private final RouteService routeService;
+    private static final Logger logger = LoggerFactory.getLogger(RouteController.class);
 
     // Registra nova rota
     @PostMapping
@@ -91,16 +94,13 @@ public class RouteController {
         return ResponseEntity.ok(routeService.listPublicRoutes(pageable));
     }
 
-    @DeleteMapping("/del")
-    public ResponseEntity<?> delete(@AuthenticationPrincipal Jwt jwt, @RequestParam String routeId) {
-        String userId = jwt.getSubject();
-        var routeDeleteResponse = routeService.deleteRoute(userId, routeId);
-        if (routeDeleteResponse) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-
+    @DeleteMapping("/del/{routeId}")
+    public ResponseEntity<?> delete(@AuthenticationPrincipal Jwt jwt,
+                                    @PathVariable String routeId) {
+        String userId = jwt.getClaimAsString("user_id");
+        boolean deleted = routeService.deleteRoute(routeId, userId);
+        return deleted ? ResponseEntity.ok().build()
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PatchMapping("/{routeId}/visibility")

@@ -18,6 +18,9 @@ public interface RouteRepository extends JpaRepository<Route, String> {
     // Lista rotas do usuário, mais recentes primeiro
     Page<Route> findByUserIdOrderByStartTimeDesc(String userId, Pageable pageable);
 
+    void deleteRouteById(String id);
+
+    boolean existsByIdAndUserId(String id, String userId);
     @Query("""
         SELECT
             COUNT(r)                      AS totalRoutes,

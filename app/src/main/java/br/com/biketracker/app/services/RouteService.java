@@ -1,5 +1,7 @@
 package br.com.biketracker.app.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +26,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class RouteService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RouteService.class);
+
 
     private final RouteRepository routeRepository;
     private final UserRepository userRepository;
@@ -124,24 +130,16 @@ public class RouteService {
     }
 
     @Transactional
-    public boolean deleteRoute(String userId, String routeId) {
-        User u = userRepository.findByEmail(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+    public boolean deleteRoute(String routeId, String userId) {
+        logger.info("Tentando deletar routeId={} userId={}", routeId, userId);
+        logger.info("Exists check: {}", routeRepository.existsByIdAndUserId(routeId, userId));
 
-        Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada"));
+        // garante que a rota pertence ao usuário antes de deletar
+        boolean owns = routeRepository.existsByIdAndUserId(routeId, userId);
+        if (!owns) return false;
 
-        if (!route.getUser().getId().equals(u.getId())) {
-            throw new AccessDeniedException("Essa rota não pertence ao usuário");
-        }
-
-        routeRepository.delete(route);
-
-        if (routeRepository.findById(routeId).isPresent()) {
-            return false;
-        } else {
-            return true;
-        }
+        routeRepository.deleteById(routeId);
+        return true;
     }
 
     @Transactional
