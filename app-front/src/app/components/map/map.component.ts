@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,15 +15,39 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+import {
+  MatTreeFlatDataSource,
+  MatTreeFlattener,
+} from '@angular/material/tree';
 import * as L from 'leaflet';
 import { LocationService } from '../../services/location/location.service';
-import { RouteService, CreateRouteRequest, RouteResponse } from '../../services/route/route.service';
+import {
+  RouteService,
+  CreateRouteRequest,
+  RouteResponse,
+} from '../../services/route/route.service';
+import { GpxParserService } from '../../services/gpx/gpx-parser.service';
+import {
+  ElevationService,
+  ElevationProfile,
+} from '../../services/gpx/elevation.service';
+import { ElevationPanelComponent } from './elevation-panel/elevation-panel.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import {
+  SaveRouteDialogComponent,
+  SaveRouteDialogData,
+  SaveRouteDialogResult,
+} from './../save-route-dialog/save-route-dialog.component';
 
-// ── Paleta de cores para rotas GPX ───────────────────────────────────
 const GPX_COLORS = [
-  '#e53935', '#8e24aa', '#1e88e5', '#00897b',
-  '#f4511e', '#6d4c41', '#00acc1', '#43a047',
+  '#e53935',
+  '#8e24aa',
+  '#1e88e5',
+  '#00897b',
+  '#f4511e',
+  '#6d4c41',
+  '#00acc1',
+  '#43a047',
 ];
 
 interface RouteNode {
@@ -42,14 +73,14 @@ interface FlatRouteNode {
   savedId?: string;
 }
 
-interface GpxStats {
-  activeId: string; // id da rota cujo perfil está ativo
+export interface GpxStats {
+  activeId: string;
   name: string;
   points: number;
   distanceKm: number;
   elevationGainM: number | null;
   loadingElevation: boolean;
-  elevationProfile: { distances: number[], elevations: number[], coords: [number, number][] } | null;
+  elevationProfile: ElevationProfile | null;
 }
 
 @Component({
@@ -63,50 +94,82 @@ interface GpxStats {
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatSnackBarModule,
+    ElevationPanelComponent,
+    MatDialogModule,
   ],
   templateUrl: './map.component.html',
-  styleUrl: './map.component.css'
+  styleUrl: './map.component.css',
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
-
   @ViewChild('gpxInput') gpxInput!: ElementRef<HTMLInputElement>;
 
   private map!: L.Map;
   private layers = new Map<string, L.Polyline>();
   private userMarker: L.CircleMarker | null = null;
-  private cursorMarker: L.CircleMarker | null = null;
-  private chartInstance: any = null;
 
-  // Rotas carregadas localmente (não salvas)
+  // Estado do cursor — preenchido pelo ElevationPanelComponent via Output
+  cursorCoord: [number, number] | null = null;
+  private cursorMarker: L.CircleMarker | null = null;
+
   localRoutes: RouteNode[] = [];
-  // Rotas salvas no backend
   savedRoutes: RouteNode[] = [];
-  fileName: string = '';
+  fileName = '';
   selectedRouteIds = new Set<string>();
   sidebarOpen = false;
   locating = false;
-  gpxStats: GpxStats | null = null;
-  gpxExpanded = false;
   savingRouteId: string | null = null;
+
+  // Passado ao ElevationPanelComponent via @Input
+  gpxStats: GpxStats | null = null;
+
+  regionRoutes: RouteNode[] = [];
+  private regionSearchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private locationService: LocationService,
     private routeService: RouteService,
-    private snackBar: MatSnackBar
+    private gpxParser: GpxParserService,
+    private elevationService: ElevationService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
   ) {}
 
   // ── Tree ─────────────────────────────────────────────────────────────
 
   private get treeData(): RouteNode[] {
     return [
-      { name: 'Carregadas',   children: this.localRoutes },
+      { name: 'Carregadas', children: this.localRoutes },
+      { name: 'Salvas', children: this.savedRoutes },
+      { name: 'Na região', children: this.regionRoutes },
     ];
   }
 
-  getActiveColor(): string {
-  return this.localRoutes.find(r => r.id === this.gpxStats?.activeId)?.color
-    ?? this.savedRoutes.find(r => r.id === this.gpxStats?.activeId)?.color
-    ?? '#e53935';
+  private onMapMoveEnd(): void {
+    if (this.regionSearchTimeout) clearTimeout(this.regionSearchTimeout);
+    this.regionSearchTimeout = setTimeout(() => {
+      const b = this.map.getBounds();
+      this.routeService
+        .findByRegion(b.getWest(), b.getSouth(), b.getEast(), b.getNorth())
+        .subscribe({
+          next: (routes) => {
+            // Adiciona só rotas que ainda não estão na lista de salvas
+            const knownIds = new Set(this.savedRoutes.map((r) => r.savedId));
+            const newRoutes = routes.filter((r) => !knownIds.has(r.id));
+            newRoutes.forEach((r) => {
+              this.regionRoutes.push({
+                id: `region-${r.id}`,
+                name: r.name || `Rota ${r.id}`,
+                color: this.pickColor(),
+                isSaved: true,
+                savedId: r.id,
+                coordinates: undefined,
+              });
+            });
+            this.refreshTree();
+          },
+          error: () => {},
+        });
+    }, 600); // debounce de 600ms
   }
 
   private transformer = (node: RouteNode, level: number): FlatRouteNode => ({
@@ -118,29 +181,56 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     elevations: node.elevations,
     color: node.color,
     isSaved: node.isSaved,
-    savedId: node.savedId?.toString(),
+    savedId: node.savedId,
   });
 
   treeControl = new FlatTreeControl<FlatRouteNode>(
-    node => node.level,
-    node => node.expandable
+    (node) => node.level,
+    (node) => node.expandable,
   );
 
   treeFlattener = new MatTreeFlattener(
     this.transformer,
-    node => node.level,
-    node => node.expandable,
-    node => node.children
+    (node) => node.level,
+    (node) => node.expandable,
+    (node) => node.children,
   );
 
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
   hasChild = (_: number, node: FlatRouteNode) => node.expandable;
-  isLeaf   = (_: number, node: FlatRouteNode) => !node.expandable;
+  isLeaf = (_: number, node: FlatRouteNode) => !node.expandable;
 
   private refreshTree(): void {
     this.dataSource.data = this.treeData;
     this.treeControl.expandAll();
+  }
+
+  getActiveColor(): string {
+    return (
+      this.localRoutes.find((r) => r.id === this.gpxStats?.activeId)?.color ??
+      this.savedRoutes.find((r) => r.id === this.gpxStats?.activeId)?.color ??
+      '#e53935'
+    );
+  }
+
+  private pickColor(): string {
+    const usedColors = new Set([
+      ...this.localRoutes.map((r) => r.color),
+      ...this.savedRoutes.map((r) => r.color),
+      ...this.regionRoutes.map((r) => r.color),
+    ]);
+
+    const free = GPX_COLORS.find((c) => !usedColors.has(c));
+
+    // Se todas as cores já estão em uso, gera uma cor HSL única por índice
+    if (!free) {
+      const total = usedColors.size;
+      const hue = Math.round((total * 137.5) % 360); // golden angle — espaçamento uniforme
+      return `hsl(${hue}, 70%, 45%)`;
+    }
+
+    return free;
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────
@@ -152,11 +242,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initMap();
-    this.loadChartJs();
   }
 
   ngOnDestroy(): void {
-    if (this.chartInstance) this.chartInstance.destroy();
     if (this.map) this.map.remove();
   }
 
@@ -174,68 +262,152 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       maxZoom: 19,
     }).addTo(this.map);
 
-    this.locationService.getUserLocation()
-      .then(coords => this.map.flyTo([coords.lat, coords.lng], 15, { animate: true, duration: 1.5 }))
+    this.locationService
+      .getUserLocation()
+      .then((coords) =>
+        this.map.flyTo([coords.lat, coords.lng], 15, {
+          animate: true,
+          duration: 1.5,
+        }),
+      )
       .catch(() => {});
+
+    this.map.on('moveend', () => this.onMapMoveEnd());
   }
 
   // ── Localização ──────────────────────────────────────────────────────
 
   centerOnUser(): void {
     this.locating = true;
-    this.locationService.getUserLocation()
-      .then(coords => {
-        this.map.flyTo([coords.lat, coords.lng], 16, { animate: true, duration: 1.2 });
+    this.locationService
+      .getUserLocation()
+      .then((coords) => {
+        this.map.flyTo([coords.lat, coords.lng], 16, {
+          animate: true,
+          duration: 1.2,
+        });
         if (this.userMarker) this.map.removeLayer(this.userMarker);
         this.userMarker = L.circleMarker([coords.lat, coords.lng], {
-          radius: 8, fillColor: '#1976d2', fillOpacity: 1, color: '#fff', weight: 2,
-        }).addTo(this.map).bindPopup('Você está aqui');
+          radius: 8,
+          fillColor: '#1976d2',
+          fillOpacity: 1,
+          color: '#fff',
+          weight: 2,
+        })
+          .addTo(this.map)
+          .bindPopup('Você está aqui');
       })
-      .catch(() => this.snackBar.open('Não foi possível obter sua localização.', 'OK', { duration: 3000 }))
-      .finally(() => this.locating = false);
+      .catch(() =>
+        this.snackBar.open('Não foi possível obter sua localização.', 'OK', {
+          duration: 3000,
+        }),
+      )
+      .finally(() => (this.locating = false));
   }
 
   // ── Toggle de rota no mapa ───────────────────────────────────────────
 
   toggleRoute(node: FlatRouteNode): void {
-    if (!node.id || !node.coordinates) return;
+    if (!node.id) return;
 
     if (this.selectedRouteIds.has(node.id)) {
-      this.selectedRouteIds.delete(node.id);
-      const layer = this.layers.get(node.id);
-      if (layer) { this.map.removeLayer(layer); this.layers.delete(node.id); }
-      if (this.gpxStats?.activeId === node.id) {
-        this.gpxStats = null;
-        this.gpxExpanded = false;
-        if (this.chartInstance) { this.chartInstance.destroy(); this.chartInstance = null; }
-        if (this.cursorMarker) { this.map.removeLayer(this.cursorMarker); this.cursorMarker = null; }
-      }
-    } else {
-      this.selectedRouteIds.add(node.id);
-      const polyline = L.polyline(node.coordinates, {
-        color: node.color ?? '#1976d2', weight: 4, opacity: 0.85,
-      }).addTo(this.map);
-      polyline.bindPopup(`<b>${node.name}</b>`);
-      this.layers.set(node.id, polyline);
-      this.map.fitBounds(polyline.getBounds(), { padding: [40, 40] });
+      this.deselectRoute(node);
+      return;
+    }
 
-      // Abre o painel de stats para a rota clicada
-      this.openStatsForNode(node);
+    // Rota salva sem coordenadas ainda — lazy load
+    if (node.isSaved && !node.coordinates && node.savedId) {
+      this.loadReplayAndSelect(node);
+      return;
+    }
+
+    if (node.coordinates) {
+      this.selectRoute(node, node.coordinates, node.elevations);
     }
   }
 
-  private openStatsForNode(node: FlatRouteNode): void {
-    if (!node.coordinates) return;
-    const distanceKm = this.calculateDistance(node.coordinates);
-    const elevations = node.elevations ?? [];
+  private selectRoute(
+    node: FlatRouteNode,
+    coords: [number, number][],
+    elevations?: number[],
+  ): void {
+    this.selectedRouteIds.add(node.id!);
 
-    if (elevations.length === node.coordinates.length && elevations.length > 0) {
-      const gain = this.calculateElevationGain(elevations);
-      const profile = this.buildElevationProfile(node.coordinates, elevations);
+    const polyline = L.polyline(coords, {
+      color: node.color ?? '#1976d2',
+      weight: 4,
+      opacity: 0.85,
+    }).addTo(this.map);
+    polyline.bindPopup(`<b>${node.name}</b>`);
+    this.layers.set(node.id!, polyline);
+    this.map.fitBounds(polyline.getBounds(), { padding: [40, 40] });
+
+    this.openStats(node, coords, elevations);
+  }
+
+  private deselectRoute(node: FlatRouteNode): void {
+    this.selectedRouteIds.delete(node.id!);
+    const layer = this.layers.get(node.id!);
+    if (layer) {
+      this.map.removeLayer(layer);
+      this.layers.delete(node.id!);
+    }
+
+    if (this.gpxStats?.activeId === node.id) {
+      this.gpxStats = null;
+      this.clearCursorMarker();
+    }
+  }
+
+  // ── Lazy load de coordenadas para rotas salvas ───────────────────────
+
+  private loadReplayAndSelect(node: FlatRouteNode): void {
+    this.routeService.getReplay(node.savedId!).subscribe({
+      next: (replay) => {
+        const coords = replay.points.map(
+          (p) => [p.latitude, p.longitude] as [number, number],
+        );
+        const elevations = replay.points.map((p) => p.altitudeInMeters);
+
+        // Atualiza o nó na lista para cachear as coordenadas
+        const saved = this.savedRoutes.find((r) => r.id === node.id);
+        if (saved) {
+          saved.coordinates = coords;
+          saved.elevations = elevations;
+        }
+
+        this.selectRoute(
+          { ...node, coordinates: coords, elevations },
+          coords,
+          elevations,
+        );
+        this.refreshTree();
+      },
+      error: () =>
+        this.snackBar.open('Erro ao carregar rota.', 'OK', { duration: 3000 }),
+    });
+  }
+
+  // ── Stats para o ElevationPanelComponent ─────────────────────────────
+
+  private openStats(
+    node: FlatRouteNode,
+    coords: [number, number][],
+    elevations?: number[],
+  ): void {
+    const distanceKm = this.elevationService.calculateDistanceKm(coords);
+
+    if (
+      elevations &&
+      elevations.length === coords.length &&
+      elevations.length > 0
+    ) {
+      const gain = this.elevationService.calculateElevationGain(elevations);
+      const profile = this.elevationService.buildProfile(coords, elevations);
       this.gpxStats = {
         activeId: node.id!,
         name: node.name,
-        points: node.coordinates.length,
+        points: coords.length,
         distanceKm,
         elevationGainM: gain,
         loadingElevation: false,
@@ -245,18 +417,41 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.gpxStats = {
         activeId: node.id!,
         name: node.name,
-        points: node.coordinates.length,
+        points: coords.length,
         distanceKm,
         elevationGainM: null,
         loadingElevation: true,
         elevationProfile: null,
       };
-      this.fetchElevation(node.coordinates);
+      this.fetchElevation(node.id!, coords);
     }
+  }
 
-    // Re-renderiza gráfico se estava expandido
-    if (this.gpxExpanded) {
-      setTimeout(() => this.renderElevationChart(), 50);
+  private async fetchElevation(
+    routeId: string,
+    coords: [number, number][],
+  ): Promise<void> {
+    try {
+      const sample = this.elevationService.sample(coords, 100);
+      const elevations = await this.elevationService.fetchElevations(coords);
+
+      if (!elevations || this.gpxStats?.activeId !== routeId) return;
+
+      const gain = this.elevationService.calculateElevationGain(elevations);
+      const profile = this.elevationService.buildProfile(sample, elevations);
+      this.gpxStats = {
+        ...this.gpxStats,
+        elevationGainM: gain,
+        loadingElevation: false,
+        elevationProfile: profile,
+      };
+    } catch {
+      if (this.gpxStats?.activeId === routeId) {
+        this.gpxStats = { ...this.gpxStats!, loadingElevation: false };
+      }
+      this.snackBar.open('Não foi possível obter dados de elevação.', 'OK', {
+        duration: 3000,
+      });
     }
   }
 
@@ -265,13 +460,46 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearAll(): void {
-    this.layers.forEach(layer => this.map.removeLayer(layer));
+    this.layers.forEach((layer) => this.map.removeLayer(layer));
     this.layers.clear();
     this.selectedRouteIds.clear();
     this.gpxStats = null;
-    this.gpxExpanded = false;
-    if (this.chartInstance) { this.chartInstance.destroy(); this.chartInstance = null; }
-    if (this.cursorMarker) { this.map.removeLayer(this.cursorMarker); this.cursorMarker = null; }
+    this.clearCursorMarker();
+  }
+
+  // ── Cursor no mapa — vem do ElevationPanelComponent via Output ────────
+
+  onCursorMove(coord: [number, number] | null): void {
+    if (!coord) {
+      this.clearCursorMarker();
+      return;
+    }
+
+    const color = this.gpxStats
+      ? (this.localRoutes.find((r) => r.id === this.gpxStats?.activeId)
+          ?.color ??
+        this.savedRoutes.find((r) => r.id === this.gpxStats?.activeId)?.color ??
+        '#e53935')
+      : '#e53935';
+
+    if (this.cursorMarker) {
+      this.cursorMarker.setLatLng(coord);
+    } else {
+      this.cursorMarker = L.circleMarker(coord, {
+        radius: 7,
+        fillColor: color,
+        fillOpacity: 1,
+        color: '#fff',
+        weight: 2,
+      }).addTo(this.map);
+    }
+  }
+
+  private clearCursorMarker(): void {
+    if (this.cursorMarker) {
+      this.map.removeLayer(this.cursorMarker);
+      this.cursorMarker = null;
+    }
   }
 
   // ── GPX — carregar arquivo ───────────────────────────────────────────
@@ -283,25 +511,30 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   onGpxFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
-
-    Array.from(input.files).forEach(file => this.processGpxFile(file));
+    Array.from(input.files).forEach((file) => this.processGpxFile(file));
     input.value = '';
   }
 
   private processGpxFile(file: File): void {
     const reader = new FileReader();
     this.fileName = file.name;
+
     reader.onload = (e) => {
-      const content = e.target?.result as string;
-      const { coords, elevations } = this.parseGpx(content);
+      const { coords, elevations } = this.gpxParser.parse(
+        e.target?.result as string,
+      );
 
       if (coords.length < 2) {
-        this.snackBar.open(`"${file.name}": GPX inválido ou sem pontos.`, 'OK', { duration: 3000 });
+        this.snackBar.open(
+          `"${file.name}": GPX inválido ou sem pontos.`,
+          'OK',
+          { duration: 3000 },
+        );
         return;
       }
 
       const id = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const color = GPX_COLORS[this.localRoutes.length % GPX_COLORS.length];
+      const color = this.pickColor();
 
       const node: RouteNode = {
         id,
@@ -311,273 +544,203 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         color,
         isSaved: false,
       };
-
       this.localRoutes.push(node);
       this.refreshTree();
 
-      // Adiciona automaticamente no mapa
       this.selectedRouteIds.add(id);
-      const polyline = L.polyline(coords, { color, weight: 4, opacity: 0.9, dashArray: '6, 4' }).addTo(this.map);
+      const polyline = L.polyline(coords, {
+        color,
+        weight: 4,
+        opacity: 0.9,
+        dashArray: '6, 4',
+      }).addTo(this.map);
       polyline.bindPopup(`<b>📁 ${node.name}</b>`);
       this.layers.set(id, polyline);
       this.map.fitBounds(polyline.getBounds(), { padding: [40, 40] });
 
-      this.openStatsForNode({ ...node, expandable: false, level: 1 } as FlatRouteNode);
+      this.openStats(
+        { ...node, expandable: false, level: 1 } as FlatRouteNode,
+        coords,
+        elevations,
+      );
     };
+
     reader.readAsText(file);
   }
 
-  private parseGpx(content: string): { coords: [number, number][], elevations: number[] } {
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(content, 'application/xml');
-    const trkpts = xml.querySelectorAll('trkpt, rtept');
-    const coords: [number, number][] = [];
-    const elevations: number[] = [];
-
-    Array.from(trkpts).forEach(pt => {
-      const lat = parseFloat(pt.getAttribute('lat') ?? '');
-      const lon = parseFloat(pt.getAttribute('lon') ?? '');
-      if (isNaN(lat) || isNaN(lon)) return;
-      coords.push([lat, lon]);
-      const eleEl = pt.querySelector('ele');
-      if (eleEl?.textContent) {
-        const ele = parseFloat(eleEl.textContent);
-        if (!isNaN(ele)) elevations.push(ele);
-      }
-    });
-
-    return { coords, elevations };
-  }
-
-  // ── GPX — persistir no backend ───────────────────────────────────────
+  // ── GPX — salvar no backend ───────────────────────────────────────────
 
   saveRoute(node: FlatRouteNode, event: MouseEvent): void {
     event.stopPropagation();
     if (!node.id || !node.coordinates || node.isSaved) return;
 
-    this.savingRouteId = node.id;
     const coords = node.coordinates;
-    const now = new Date().toISOString();
+    const distanceInKm = this.elevationService.calculateDistanceKm(coords);
+    const elevationInMeters = node.elevations
+      ? this.elevationService.calculateElevationGain(node.elevations)
+      : 0;
 
-    const trackPoints = coords.map((c, i) => ({
-      latitude: c[0],
-      longitude: c[1],
-      altitudeInMeters: node.elevations?.[i] ?? 0,
-      recordedAt: now,
-    }));
+    // Monta os stats para exibir no dialog.
+    // Reutiliza gpxStats se for desta rota; caso contrário constrói um snapshot mínimo.
+    const stats: import('./map.component').GpxStats =
+      this.gpxStats?.activeId === node.id
+        ? this.gpxStats!
+        : {
+            activeId: node.id,
+            name: node.name,
+            points: coords.length,
+            distanceKm: distanceInKm,
+            elevationGainM: node.elevations
+              ? this.elevationService.calculateElevationGain(node.elevations)
+              : null,
+            loadingElevation: false,
+            elevationProfile: null,
+          };
 
-    const request: CreateRouteRequest = {
-      distanceInKm: this.calculateDistance(coords),
-      elevationInMeters: node.elevations ? this.calculateElevationGain(node.elevations) : 0,
-      startTime: now,
-      endTime: now,
-      startCity: '',
-      country: '',
-      isPublic: false,
-      trackPoints,
-      name: this.fileName
-    };
+    const dialogRef = this.dialog.open<
+      SaveRouteDialogComponent,
+      SaveRouteDialogData,
+      SaveRouteDialogResult
+    >(SaveRouteDialogComponent, {
+      data: { stats, defaultName: node.name },
+      width: '480px',
+      autoFocus: 'dialog',
+    });
 
-    this.routeService.save(request).subscribe({
-      next: (saved) => {
-        // Remove da lista local e adiciona nas salvas
-        this.localRoutes = this.localRoutes.filter(r => r.id !== node.id);
-        this.savedRoutes.push({
-          id: `saved-${saved.id}`,
-          name: node.name,
-          coordinates: node.coordinates,
-          elevations: node.elevations,
-          color: node.color,
-          isSaved: true,
-          savedId: saved.id,
-        });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return; // usuário cancelou
 
-        // Atualiza a layer para o novo id
-        const layer = this.layers.get(node.id!);
-        if (layer) {
-          this.layers.delete(node.id!);
-          this.layers.set(`saved-${saved.id}`, layer);
-        }
-        this.selectedRouteIds.delete(node.id!);
-        this.selectedRouteIds.add(`saved-${saved.id}`);
+      this.savingRouteId = node.id!;
+      const now = new Date().toISOString();
 
-        this.refreshTree();
-        this.savingRouteId = null;
-        this.snackBar.open(`"${node.name}" salva com sucesso!`, '✓', { duration: 3000 });
-      },
-      error: () => {
-        this.savingRouteId = null;
-        this.snackBar.open('Erro ao salvar rota. Tente novamente.', 'OK', { duration: 3000 });
-      }
+      const request: CreateRouteRequest = {
+        name: result.name,
+        distanceInKm,
+        elevationInMeters,
+        startTime: now,
+        endTime: now,
+        startCity: '',
+        country: result.country,
+        isPublic: result.isPublic,
+        trackPoints: coords.map((c, i) => ({
+          latitude: c[0],
+          longitude: c[1],
+          altitudeInMeters: node.elevations?.[i] ?? 0,
+          recordedAt: now,
+        })),
+      };
+
+      this.routeService.save(request).subscribe({
+        next: (saved) => {
+          this.localRoutes = this.localRoutes.filter((r) => r.id !== node.id);
+          const savedNode: RouteNode = {
+            id: `saved-${saved.id}`,
+            name: result.name, // usa o nome editado pelo usuário
+            coordinates: node.coordinates,
+            elevations: node.elevations,
+            color: node.color,
+            isSaved: true,
+            savedId: saved.id,
+          };
+          this.savedRoutes.push(savedNode);
+
+          const layer = this.layers.get(node.id!);
+          if (layer) {
+            this.layers.delete(node.id!);
+            this.layers.set(`saved-${saved.id}`, layer);
+            layer.bindPopup(`<b>${result.name}</b>`); // atualiza popup com novo nome
+          }
+          this.selectedRouteIds.delete(node.id!);
+          this.selectedRouteIds.add(`saved-${saved.id}`);
+
+          this.refreshTree();
+          this.savingRouteId = null;
+          this.snackBar.open(`"${result.name}" salva com sucesso!`, '✓', {
+            duration: 3000,
+          });
+        },
+        error: () => {
+          this.savingRouteId = null;
+          this.snackBar.open('Erro ao salvar rota.', 'OK', { duration: 3000 });
+        },
+      });
     });
   }
 
-  // ── Carregar rotas salvas do backend ─────────────────────────────────
+  saveActiveRoute(): void {
+    if (!this.gpxStats?.activeId) return;
+    const node = this.localRoutes.find((r) => r.id === this.gpxStats!.activeId);
+    if (!node || node.isSaved || !node.coordinates) return;
+
+    // Constrói um FlatRouteNode mínimo para repassar ao saveRoute()
+    const flat: FlatRouteNode = {
+      expandable: false,
+      level: 1,
+      id: node.id,
+      name: node.name,
+      coordinates: node.coordinates,
+      elevations: node.elevations,
+      color: node.color,
+      isSaved: node.isSaved,
+      savedId: node.savedId,
+    };
+
+    // Cria um MouseEvent sintético só para satisfazer a assinatura
+    this.saveRoute(flat, new MouseEvent('click'));
+  }
+
+  deleteRoute(node: FlatRouteNode, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!node.id) return;
+
+    const doDelete = () => {
+      const layer = this.layers.get(node.id!);
+      if (layer) {
+        this.map.removeLayer(layer);
+        this.layers.delete(node.id!);
+      }
+      this.selectedRouteIds.delete(node.id!);
+      if (this.gpxStats?.activeId === node.id) {
+        this.gpxStats = null;
+        this.clearCursorMarker();
+      }
+      if (node.isSaved) {
+        this.savedRoutes = this.savedRoutes.filter((r) => r.id !== node.id);
+      } else {
+        this.localRoutes = this.localRoutes.filter((r) => r.id !== node.id);
+      }
+      this.refreshTree();
+    };
+
+    if (node.savedId != null) {
+      this.routeService.deleteRoute(node.savedId).subscribe({
+        next: () => doDelete(),
+        error: () =>
+          this.snackBar.open('Erro ao excluir rota.', 'OK', { duration: 3000 }),
+      });
+    } else {
+      doDelete();
+    }
+  }
+
+  // ── Carregar rotas salvas ────────────────────────────────────────────
 
   private loadSavedRoutes(): void {
     this.routeService.listMine().subscribe({
       next: (page) => {
-        this.savedRoutes = page.content.map((r, i) => ({
-          id: `saved-${r.id}`,
-          name: r.startCity || `Rota ${r.id}`,
-          color: GPX_COLORS[i % GPX_COLORS.length],
-          isSaved: true,
-          savedId: r.id,
-          // Coordenadas virão via replay endpoint — por ora só listamos
-          coordinates: undefined,
-        }));
+        page.content.forEach((r) => {
+          this.savedRoutes.push({
+            id: `saved-${r.id}`,
+            name: r.name || r.startCity || `Rota ${r.id}`,
+            color: this.pickColor(),
+            isSaved: true,
+            savedId: r.id,
+            coordinates: undefined,
+          });
+        });
         this.refreshTree();
       },
-      error: () => {} // silencioso — usuário pode não ter rotas ainda
-    });
-  }
-
-  // ── Cálculos ─────────────────────────────────────────────────────────
-
-  private calculateDistance(coords: [number, number][]): number {
-    let totalMeters = 0;
-    for (let i = 1; i < coords.length; i++) {
-      totalMeters += this.map.distance(coords[i - 1], coords[i]);
-    }
-    return Math.round(totalMeters / 10) / 100;
-  }
-
-  private calculateElevationGain(elevations: number[]): number {
-    let gain = 0;
-    for (let i = 1; i < elevations.length; i++) {
-      const diff = elevations[i] - elevations[i - 1];
-      if (diff > 0) gain += diff;
-    }
-    return Math.round(gain);
-  }
-
-  private buildElevationProfile(
-    coords: [number, number][],
-    elevations: number[]
-  ): { distances: number[], elevations: number[], coords: [number, number][] } {
-    const distances: number[] = [0];
-    let accumulated = 0;
-    for (let i = 1; i < coords.length; i++) {
-      accumulated += this.map.distance(coords[i - 1], coords[i]) / 1000;
-      distances.push(Math.round(accumulated * 100) / 100);
-    }
-    return { distances, elevations, coords };
-  }
-
-  private sampleCoords(coords: [number, number][], max: number): [number, number][] {
-    if (coords.length <= max) return coords;
-    const step = Math.ceil(coords.length / max);
-    return coords.filter((_, i) => i % step === 0);
-  }
-
-  private fetchElevation(coords: [number, number][]): void {
-    const sample = this.sampleCoords(coords, 100);
-    const lats = sample.map(c => c[0]).join(',');
-    const lons = sample.map(c => c[1]).join(',');
-
-    fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lons}`)
-      .then(r => r.json())
-      .then(data => {
-        if (!data.elevation || !this.gpxStats) return;
-        const gain = this.calculateElevationGain(data.elevation);
-        const profile = this.buildElevationProfile(sample, data.elevation);
-        this.gpxStats = { ...this.gpxStats, elevationGainM: gain, loadingElevation: false, elevationProfile: profile };
-        if (this.gpxExpanded) setTimeout(() => this.renderElevationChart(), 50);
-      })
-      .catch(() => {
-        if (this.gpxStats) this.gpxStats = { ...this.gpxStats, loadingElevation: false };
-        this.snackBar.open('Não foi possível obter dados de elevação.', 'OK', { duration: 3000 });
-      });
-  }
-
-  // ── Gráfico de elevação ──────────────────────────────────────────────
-
-  private loadChartJs(): void {
-    if ((window as any).Chart) return;
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-    document.head.appendChild(script);
-  }
-
-  toggleGpxExpand(): void {
-    this.gpxExpanded = !this.gpxExpanded;
-    if (this.gpxExpanded) {
-      setTimeout(() => this.renderElevationChart(), 50);
-    } else {
-      if (this.chartInstance) { this.chartInstance.destroy(); this.chartInstance = null; }
-      if (this.cursorMarker) { this.map.removeLayer(this.cursorMarker); this.cursorMarker = null; }
-    }
-  }
-
-  private renderElevationChart(): void {
-    const canvas = document.getElementById('elevation-chart') as HTMLCanvasElement;
-    if (!canvas || !this.gpxStats?.elevationProfile) return;
-    if (this.chartInstance) this.chartInstance.destroy();
-
-    const ctx = canvas.getContext('2d')!;
-    const { distances, elevations, coords } = this.gpxStats.elevationProfile;
-    const color = this.gpxStats ? (this.localRoutes.find(r => r.id === this.gpxStats?.activeId)?.color
-      ?? this.savedRoutes.find(r => r.id === this.gpxStats?.activeId)?.color
-      ?? '#e53935') : '#e53935';
-
-    this.chartInstance = new (window as any).Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: distances.map(d => `${d.toFixed(1)} km`),
-        datasets: [{
-          label: 'Elevação (m)',
-          data: elevations,
-          borderColor: color,
-          backgroundColor: color + '20',
-          borderWidth: 2,
-          pointRadius: 0,
-          fill: true,
-          tension: 0.3,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-              title: (items: any[]) => `Dist: ${items[0].label}`,
-              label: (item: any) => `Elevação: ${item.raw.toFixed(0)} m`,
-            },
-            external: () => {} // sobrescrito abaixo via evento
-          }
-        },
-        onHover: (_: any, elements: any[]) => {
-          if (!elements.length) {
-            if (this.cursorMarker) { this.map.removeLayer(this.cursorMarker); this.cursorMarker = null; }
-            return;
-          }
-          const idx = elements[0].index;
-          const coord = coords[idx];
-          if (!coord) return;
-
-          if (this.cursorMarker) {
-            this.cursorMarker.setLatLng(coord);
-          } else {
-            this.cursorMarker = L.circleMarker(coord, {
-              radius: 7,
-              fillColor: color,
-              fillOpacity: 1,
-              color: '#fff',
-              weight: 2,
-              className: 'cursor-marker-pulse',
-            }).addTo(this.map);
-          }
-        },
-        scales: {
-          x: { ticks: { maxTicksLimit: 8, font: { size: 11 } }, grid: { display: false } },
-          y: { ticks: { font: { size: 11 } }, title: { display: true, text: 'Elevação (m)', font: { size: 11 } } }
-        }
-      }
+      error: () => {},
     });
   }
 

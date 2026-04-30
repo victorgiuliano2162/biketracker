@@ -17,51 +17,35 @@
       (click)="centerOnUser()" [disabled]="locating">
       <mat-icon>{{ locating ? 'pending' : 'my_location' }}</mat-icon>
     </button>
+
+    <div class="controls-divider"></div>
+
     <button mat-mini-fab matTooltip="Carregar arquivo(s) GPX" (click)="openGpxPicker()">
       <mat-icon>upload_file</mat-icon>
     </button>
-    <button *ngIf="hasGpx" mat-mini-fab color="warn"
-      matTooltip="Limpar tudo" (click)="clearAll()">
-      <mat-icon>delete_outline</mat-icon>
-    </button>
+    @if (hasGpx) {
+      <button mat-mini-fab matTooltip="Salvar rota ativa" color="primary"
+        [disabled]="!gpxStats || savingRouteId !== null"
+        (click)="saveActiveRoute()">
+        @if (savingRouteId !== null) {
+          <mat-spinner diameter="20" />
+        } @else {
+          <mat-icon>cloud_upload</mat-icon>
+        }
+      </button>
+      <button mat-mini-fab color="warn" matTooltip="Limpar tudo" (click)="clearAll()">
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    }
   </div>
 
-  <!-- Painel de stats GPX -->
-  <div class="gpx-stats" [class.expanded]="gpxExpanded" *ngIf="gpxStats">
-    <div class="gpx-stats-header">
-      <span class="gpx-color-dot" [style.background]="getActiveColor()">
-      </span>
-      <mat-icon class="gpx-icon">route</mat-icon>
-      <span class="gpx-name" [matTooltip]="gpxStats.name">{{ gpxStats.name }}</span>
-      <button mat-icon-button class="gpx-expand-btn"
-        [matTooltip]="gpxExpanded ? 'Recolher' : 'Ver perfil de elevação'"
-        (click)="toggleGpxExpand()"
-        [disabled]="gpxStats.loadingElevation || !gpxStats.elevationProfile">
-        <mat-icon>{{ gpxExpanded ? 'expand_more' : 'expand_less' }}</mat-icon>
-      </button>
-    </div>
-    <div class="gpx-stats-body">
-      <div class="gpx-stat-item">
-        <mat-icon>straighten</mat-icon>
-        <span>{{ gpxStats.distanceKm | number:'1.1-1' }} km</span>
-      </div>
-      <div class="gpx-stat-item">
-        <mat-icon>landscape</mat-icon>
-        <span *ngIf="!gpxStats.loadingElevation && gpxStats.elevationGainM !== null">
-          +{{ gpxStats.elevationGainM | number:'1.0-0' }} m
-        </span>
-        <mat-spinner *ngIf="gpxStats.loadingElevation" diameter="16" />
-        <span *ngIf="!gpxStats.loadingElevation && gpxStats.elevationGainM === null">—</span>
-      </div>
-      <div class="gpx-stat-item">
-        <mat-icon>place</mat-icon>
-        <span>{{ gpxStats.points }} pts</span>
-      </div>
-    </div>
-    <div class="gpx-chart-container" *ngIf="gpxExpanded">
-      <canvas id="elevation-chart"></canvas>
-    </div>
-  </div>
+  <!-- Painel de elevação -->
+  @if (gpxStats) {
+    <app-elevation-panel
+      [stats]="gpxStats"
+      [color]="getActiveColor()"
+      (cursorMove)="onCursorMove($event)" />
+  }
 
   <!-- Input oculto — múltiplos arquivos -->
   <input #gpxInput type="file" accept=".gpx" multiple
@@ -69,49 +53,82 @@
 
   <!-- Painel lateral de rotas -->
   <aside class="sidebar" [class.open]="sidebarOpen">
+
     <div class="sidebar-header">
-      <span class="sidebar-title">Rotas</span>
-      <button mat-icon-button matTooltip="Limpar seleção" (click)="clearAll()">
+      <div class="sidebar-header-left">
+        <mat-icon class="sidebar-header-icon">route</mat-icon>
+        <span class="sidebar-title">Rotas</span>
+      </div>
+      <button mat-icon-button matTooltip="Limpar seleção" (click)="clearAll()" class="sidebar-clear-btn">
         <mat-icon>layers_clear</mat-icon>
       </button>
     </div>
 
-    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="route-tree">
+    <div class="sidebar-body">
+      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="route-tree">
 
-      <!-- Nó grupo -->
-      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
-        <button mat-icon-button matTreeNodeToggle>
-          <mat-icon>{{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
-        </button>
-        <span class="group-label">{{ node.name }}</span>
-      </mat-tree-node>
+        <!-- Nó grupo -->
+        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+          <div class="group-row">
+            <button mat-icon-button matTreeNodeToggle class="group-toggle">
+              <mat-icon>{{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+            </button>
+            <span class="group-label">{{ node.name }}</span>
+            <span class="group-count">{{ node.children?.length ?? 0 }}</span>
+          </div>
+        </mat-tree-node>
 
-      <!-- Nó folha -->
-      <mat-tree-node *matTreeNodeDef="let node; when: isLeaf" matTreeNodePadding>
-        <button mat-icon-button disabled></button>
-        <mat-checkbox [checked]="isSelected(node)" (change)="toggleRoute(node)"
-          [style.accent-color]="node.color">
-        </mat-checkbox>
-        <span class="route-dot" [style.background]="node.color"></span>
-        <span class="route-label">{{ node.name }}</span>
+        <!-- Nó folha -->
+        <mat-tree-node *matTreeNodeDef="let node; when: isLeaf" matTreeNodePadding>
+          <div class="route-row" [class.route-row--active]="isSelected(node)">
 
-        <!-- Botão salvar — só aparece em rotas locais -->
-        <button *ngIf="!node.isSaved && node.coordinates"
-          mat-icon-button class="save-btn"
-          matTooltip="Salvar rota"
-          [disabled]="savingRouteId === node.id"
-          (click)="saveRoute(node, $event)">
-          <mat-spinner *ngIf="savingRouteId === node.id" diameter="16" />
-          <mat-icon *ngIf="savingRouteId !== node.id">cloud_upload</mat-icon>
-        </button>
+            <span class="route-color-bar" [style.background]="node.color"></span>
 
-        <!-- Indicador de salva -->
-        <mat-icon *ngIf="node.isSaved" class="saved-icon" matTooltip="Rota salva">
-          cloud_done
-        </mat-icon>
-      </mat-tree-node>
+            <mat-checkbox class="route-checkbox"
+              [checked]="isSelected(node)"
+              (change)="toggleRoute(node)">
+            </mat-checkbox>
 
-    </mat-tree>
+            <span class="route-label" [title]="node.name">{{ node.name }}</span>
+
+            <div class="route-actions">
+              @if (!node.isSaved && node.coordinates) {
+                <button mat-icon-button class="action-btn action-btn--save"
+                  matTooltip="Salvar rota"
+                  [disabled]="savingRouteId === node.id"
+                  (click)="saveRoute(node, $event)">
+                  @if (savingRouteId === node.id) {
+                    <mat-spinner diameter="16" />
+                  } @else {
+                    <mat-icon>cloud_upload</mat-icon>
+                  }
+                </button>
+              }
+
+              @if (node.isSaved) {
+                <mat-icon class="saved-badge" matTooltip="Rota salva">cloud_done</mat-icon>
+              }
+
+              <button mat-icon-button class="action-btn action-btn--delete"
+                matTooltip="Excluir rota"
+                (click)="deleteRoute(node, $event)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+
+          </div>
+        </mat-tree-node>
+
+      </mat-tree>
+
+      @if (dataSource.data.length === 0 || (localRoutes.length === 0 && savedRoutes.length === 0 && regionRoutes.length === 0)) {
+        <div class="sidebar-empty">
+          <mat-icon>map</mat-icon>
+          <span>Nenhuma rota carregada</span>
+        </div>
+      }
+    </div>
+
   </aside>
 
 </div>
