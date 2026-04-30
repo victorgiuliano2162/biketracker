@@ -142,8 +142,8 @@ public class UserService {
     }
 
     @Transactional
-    public User update(String id, User updated) {
-        User existing = findById(id);
+    public User update(User updated) {
+        User existing = findById(updated.getId());
 
         // Verifica conflito de e-mail somente se o e-mail foi alterado
         if (!existing.getEmail().equals(updated.getEmail()) && emailExists(updated.getEmail())) {
