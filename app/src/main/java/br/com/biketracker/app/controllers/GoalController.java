@@ -1,52 +1,58 @@
 package br.com.biketracker.app.controllers;
 
 
-import br.com.biketracker.app.entities.Goal;
-import br.com.biketracker.app.entities.User;
-import br.com.biketracker.app.entities.dtos.GoalResponse;
-import br.com.biketracker.app.repositories.GoalRepository;
+import br.com.biketracker.app.entities.dtos.goal.GoalRequest;
+import br.com.biketracker.app.entities.dtos.goal.GoalResponse;
 import br.com.biketracker.app.services.GoalService;
-import br.com.biketracker.app.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/goal")
+@RequiredArgsConstructor
 public class GoalController {
 
-    private GoalService goalService;
-    private UserService userService;
+    private final GoalService goalService;
 
-    public GoalController(GoalService goalService, UserService userService) {
-        this.goalService = goalService;
-        this.userService = userService;
-    }
-
-    //TODO allowing only jwt requests
     @PostMapping
-    public ResponseEntity<List<Goal>> createGoals(@RequestBody List<Goal> goals) {
-        List<Goal> goalList = new ArrayList<>();
-        if (goals.isEmpty()) return null;
-        User u = userService.findById(goals.get(0).getUser().getId());
-        for (Goal goal : goals) {
-            u.addGoal(goal);
-        }
-
-        return userService.save(u) == u ? ResponseEntity.ok(u.getGoals()) : ResponseEntity.internalServerError().build();
+    public ResponseEntity<List<GoalResponse>> createGoals(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody List<GoalRequest> goals
+    ) {
+        String userId = jwt.getClaimAsString("user_id");
+        return ResponseEntity.ok(goalService.createGoals(userId, goals));
     }
-
 
     @GetMapping
-    public ResponseEntity<List<GoalResponse>> getGoals() {
-        List<Goal> goals = goalService.findAll();
-        List<GoalResponse> goalResponse = goals.stream().map(GoalResponse::from).toList();
-        return ResponseEntity.ok(goalResponse);
+    public ResponseEntity<List<GoalResponse>> getGoals(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        String userId = jwt.getClaimAsString("user_id");
+        return ResponseEntity.ok(goalService.findAllByUser(userId));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GoalResponse> update(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long id,
+            @RequestBody GoalRequest request
+    ) {
+        String userId = jwt.getClaimAsString("user_id");
+        return ResponseEntity.ok(goalService.update(userId, id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long id
+    ) {
+        String userId = jwt.getClaimAsString("user_id");
+        goalService.delete(userId, id);
+        return ResponseEntity.noContent().build();
     }
 }
