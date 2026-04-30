@@ -10,4 +10,6 @@ import java.util.List;
 public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     List<Goal> findByUserIdOrderByCreatedAtDesc(String userId);
+
+    List<Goal> findByUserId(String userId);
 }
