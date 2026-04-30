@@ -1,0 +1,79 @@
+<div class="dialog-wrap">
+  <div class="dialog-header">
+    <mat-icon class="dialog-icon">edit</mat-icon>
+    <div>
+      <h2 mat-dialog-title>Editar meta</h2>
+      <p class="dialog-sub">Atualize os dados da sua meta</p>
+    </div>
+    <button mat-icon-button (click)="cancel()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="form" class="form-grid">
+      <mat-form-field appearance="outline" class="span-2">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.get("name")?.invalid && form.get("name")?.touched) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="span-2">
+        <mat-label>Descrição</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="2"
+          cdkTextareaAutosize
+        ></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Valor alvo</mat-label>
+        <input matInput type="number" formControlName="targetValue" min="0.1" />
+        @if (
+          form.get("targetValue")?.invalid && form.get("targetValue")?.touched
+        ) {
+          <mat-error>Valor inválido</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Unidade</mat-label>
+        <mat-select formControlName="unit">
+          @for (u of units; track u.value) {
+            <mat-option [value]="u.value">{{ u.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="span-2">
+        <mat-label>Prazo</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="deadLine"
+          placeholder="dd/mm/aaaa"
+          [min]="today"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Cancelar</button>
+    <button
+      mat-flat-button
+      color="primary"
+      [disabled]="form.invalid"
+      (click)="confirm()"
+    >
+      <mat-icon>save</mat-icon>
+      Salvar alterações
+    </button>
+  </mat-dialog-actions>
+</div>

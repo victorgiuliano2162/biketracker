@@ -1,0 +1,35 @@
+.dialog-wrap { width: 480px; max-width: 100%; }
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 12px;
+}
+
+.dialog-icon {
+  font-size: 22px; width: 22px; height: 22px;
+  color: var(--mat-sys-primary, #1976d2);
+}
+
+.dialog-header h2 { margin: 0; font-size: 1.05rem; font-weight: 600; padding: 0; }
+.dialog-sub { margin: 2px 0 0; font-size: 0.78rem; opacity: 0.55; }
+.close-btn { margin-left: auto; }
+
+mat-dialog-content { padding: 8px 24px 4px !important; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+  padding-top: 8px;
+}
+
+.span-2 { grid-column: span 2; }
+
+mat-dialog-actions { padding: 12px 20px 20px !important; gap: 8px; }
+
+mat-dialog-actions button[mat-flat-button] mat-icon {
+  font-size: 16px; width: 16px; height: 16px;
+  margin-right: 4px; vertical-align: middle;
+}
