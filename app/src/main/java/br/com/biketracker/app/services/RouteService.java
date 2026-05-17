@@ -111,6 +111,12 @@ public class RouteService {
         return new RouteReplayResponse(routeId, points);
     }
 
+    @Transactional
+    public Route findRouteById(String id) {
+        return routeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + id));
+    }
+
     @Transactional(readOnly = true)
     public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
         var u = userRepository.findByEmail(userId);
