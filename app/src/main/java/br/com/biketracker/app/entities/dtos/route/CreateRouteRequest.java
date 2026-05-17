@@ -1,6 +1,8 @@
 package br.com.biketracker.app.entities.dtos.route;
 
 
+import br.com.biketracker.app.entities.enums.RouteDifficulty;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,5 +15,6 @@ public record CreateRouteRequest(
         String startCity,
         String country,
         boolean isPublic,
+        RouteDifficulty difficulty,
         List<TrackPoint> trackPoints
 ) {}
