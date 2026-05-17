@@ -1,6 +1,7 @@
 package br.com.biketracker.app.entities.dtos.route;
 
 import br.com.biketracker.app.entities.Route;
+import br.com.biketracker.app.entities.enums.RouteDifficulty;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +15,8 @@ public record RouteResponse(
         String startCity,
         String country,
         long activityTimeInSeconds,
-        boolean isPublic
+        boolean isPublic,
+        RouteDifficulty routeDIfficulty
 ) {
     public static RouteResponse from(Route route) {
         return new RouteResponse(
@@ -27,7 +29,8 @@ public record RouteResponse(
                 route.getStartCity(),
                 route.getCountry(),
                 route.getActivityTimeInSeconds(),
-                route.isPublic()
+                route.isPublic(),
+                route.getDifficulty()
         );
     }
 }
