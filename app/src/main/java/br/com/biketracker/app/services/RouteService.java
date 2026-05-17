@@ -61,6 +61,21 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
+    public RouteResponse getRouteById(String userId, String routeId) {
+        User user = userRepository.findByEmail(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada: " + routeId));
+
+        if (!route.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Essa rota não pertence ao usuário");
+        }
+
+        return RouteResponse.from(route);
+    }
+
+    @Transactional(readOnly = true)
     public Page<RouteResponse> listMyRoutes(String userId, Pageable pageable) {
         var u = userRepository.findByEmail(userId);
         return routeRepository
