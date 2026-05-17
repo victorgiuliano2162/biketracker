@@ -30,7 +30,8 @@ public class ActivityImageController {
     }
 
     @GetMapping
-    public ResponseEntity<List<String>> getImageUrls(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID activityId) {
+    public ResponseEntity<List<String>> getImageUrls(@AuthenticationPrincipal Jwt jwt, @PathVariable String activityId) {
+
         List<String> urls = activityImageService.getPresignedUrls(activityId);
         return ResponseEntity.ok(urls);
     }
