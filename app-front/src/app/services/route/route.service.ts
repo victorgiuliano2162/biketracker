@@ -18,7 +18,8 @@ export interface CreateRouteRequest {
   country: string;
   isPublic: boolean;
   trackPoints: TrackPoint[];
-  name: String;
+  name: string;
+  routeDificulty: string;
 }
 
 export interface RouteResponse {
@@ -32,6 +33,7 @@ export interface RouteResponse {
   country: string;
   activityTimeInSeconds: number;
   isPublic: boolean;
+  routeDificulty: string;
 }
 
 export interface RouteReplayResponse {
