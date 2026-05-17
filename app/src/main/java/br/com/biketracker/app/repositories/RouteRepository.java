@@ -95,4 +95,6 @@ ORDER BY (dp).path[1]
             @Param("maxLon") double maxLon,
             @Param("maxLat") double maxLat
     );
+
+    Route findRouteById(String id);
 }
