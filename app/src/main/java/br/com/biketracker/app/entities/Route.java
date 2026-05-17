@@ -1,6 +1,7 @@
 package br.com.biketracker.app.entities;
 
 import br.com.biketracker.app.entities.dtos.route.TrackPoint;
+import br.com.biketracker.app.entities.enums.RouteDifficulty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,9 @@ public class Route {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
+    @Enumerated(EnumType.STRING)
+    private RouteDifficulty difficulty;
 
     private String startCity;
     private String country;
