@@ -29,6 +29,8 @@ public class Route {
     private double distanceInKm;
     private double elevationInMeters;
 
+    private LocalDateTime createdAt;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

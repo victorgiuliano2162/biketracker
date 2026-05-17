@@ -48,6 +48,7 @@ public class RouteService {
         route.setElevationInMeters(request.elevationInMeters());
         route.setStartTime(request.startTime());
         route.setEndTime(request.endTime());
+        route.setCreatedAt(LocalDateTime.now());
         route.setStartCity(request.startCity());
         route.setCountry(request.country());
         route.setPublic(request.isPublic());
