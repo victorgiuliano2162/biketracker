@@ -111,4 +111,13 @@ public class RouteController {
         String userId = jwt.getSubject();
         return ResponseEntity.ok(routeService.toggleVisibility(userId, routeId));
     }
+
+    @GetMapping("/my/{routeId}")
+    public ResponseEntity<RouteResponse> getById(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String routeId
+    ) {
+        String userId = jwt.getSubject();
+        return ResponseEntity.ok(routeService.getRouteById(userId, routeId));
+    }
 }
