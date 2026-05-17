@@ -20,6 +20,12 @@ public class MinioStorageService {
 
     private final MinioClient minioClient;
 
+    @Value("${minio.endpoint}")
+    private String minioEndpoint;
+
+    @Value("${minio.public-endpoint}")
+    private String minioPublicEndpoint;
+
     @Value("${minio.bucket}")
     private String bucket;
 
@@ -59,9 +65,9 @@ public class MinioStorageService {
         return keys;
     }
 
-    // Gera URL temporária (presigned) para acesso à imagem
+
     public String generatePresignedUrl(String objectKey) throws Exception {
-        return minioClient.getPresignedObjectUrl(
+        String url = minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                         .bucket(bucket)
                         .object(objectKey)
@@ -69,6 +75,8 @@ public class MinioStorageService {
                         .expiry(1, TimeUnit.HOURS)
                         .build()
         );
+        // Substitui o host interno pelo endpoint público acessível pelo browser
+        return url.replace(minioEndpoint, minioPublicEndpoint);
     }
 
     // Remove uma imagem
