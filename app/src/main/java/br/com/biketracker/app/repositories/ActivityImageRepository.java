@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ActivityImageRepository extends JpaRepository<ActivityImage, Long> {
-    List<ActivityImage> findByRouteId(UUID routeId);
-    void deleteByRouteId(UUID routeId);
+    List<ActivityImage> findByRouteId( String routeId);
+    void deleteByRouteId(String routeId);
 }

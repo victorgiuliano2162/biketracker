@@ -48,7 +48,7 @@ public class ActivityImageService {
         return keys;
     }
 
-    public List<String> getPresignedUrls(UUID activityId) {
+    public List<String> getPresignedUrls(String activityId) {
         List<ActivityImage> images = activityImageRepository.findByRouteId(activityId);
 
         return images.stream()
@@ -76,7 +76,7 @@ public class ActivityImageService {
     }
 
     @Transactional
-    public void deleteAllActivityImages(UUID activityId) {
+    public void deleteAllActivityImages(String activityId) {
         List<ActivityImage> images = activityImageRepository.findByRouteId(activityId);
 
         images.forEach(image -> {
