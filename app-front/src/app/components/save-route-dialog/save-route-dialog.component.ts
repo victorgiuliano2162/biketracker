@@ -20,7 +20,15 @@ export interface SaveRouteDialogResult {
   name: string;
   country: string;
   isPublic: boolean;
+  routeDifficulty: string;
 }
+
+const dificulties = [
+  {label: "Fácil", value: "FACIL"},
+  {label: "Moderado", value: "MODERADA"},
+  {label: "Difícil", value: "DIFICIL"},
+]
+
  
 export const COUNTRIES: { code: string; name: string; flag: string }[] = [
   { code: 'BR', name: 'Brasil', flag: '🇧🇷' },
@@ -77,6 +85,7 @@ export class SaveRouteDialogComponent implements OnInit {
       name: [this.data.defaultName, [Validators.required, Validators.maxLength(80)]],
       country: ['BR', Validators.required],
       isPublic: [false],
+      dificulty: [Validators.required]
     });
   }
  
