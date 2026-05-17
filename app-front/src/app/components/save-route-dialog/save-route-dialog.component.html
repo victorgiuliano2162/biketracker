@@ -1,4 +1,3 @@
-
 <div class="dialog-wrap">
 
   <!-- Header -->
@@ -7,7 +6,7 @@
       <mat-icon>cloud_upload</mat-icon>
     </div>
     <div class="header-text">
-      <h2 mat-dialog-title>'Sa'lvar rota</h2>
+      <h2 mat-dialog-title>Salvar rota</h2>
       <p class="header-sub">Revise as informações antes de enviar</p>
     </div>
     <button mat-icon-button class="close-btn" (click)="cancel()" matTooltip="Cancelar">
@@ -83,6 +82,59 @@
             Somente você verá esta rota.
           }
         </p>
+      </div>
+
+      <mat-divider class="section-divider" />
+
+      <!-- Image upload -->
+      <div class="image-section">
+        <span class="visibility-label">Fotos da rota <span class="optional-tag">opcional</span></span>
+
+        <!-- Drop zone -->
+        <div
+          class="drop-zone"
+          [class.drag-over]="isDraggingOver"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="fileInput.click()"
+          aria-label="Clique ou arraste imagens aqui"
+        >
+          <mat-icon class="drop-icon">add_photo_alternate</mat-icon>
+          <p class="drop-text">Arraste fotos ou <span class="drop-link">clique para selecionar</span></p>
+          <p class="drop-hint">JPEG, PNG, WebP ou GIF · máx. 10 MB por arquivo</p>
+          <input
+            #fileInput
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            hidden
+            (change)="onFileInputChange($event)"
+          />
+        </div>
+
+        <!-- Preview grid -->
+        @if (previews.length > 0) {
+          <div class="preview-grid">
+            @for (preview of previews; track preview.previewUrl; let i = $index) {
+              <div class="preview-item">
+                <img [src]="preview.previewUrl" [alt]="preview.file.name" class="preview-img" />
+                <button
+                  mat-mini-fab
+                  class="remove-btn"
+                  (click)="removeImage(i)"
+                  [matTooltip]="'Remover ' + preview.file.name"
+                  aria-label="Remover imagem"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
     </form>
