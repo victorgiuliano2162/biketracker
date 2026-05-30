@@ -12,6 +12,11 @@ app-root {
   flex-direction: column;
 }
 
+
 router-outlet + * {
   padding-top: 80px;
+}
+
+router-outlet + app-map {
+  padding-top: 0;
 }
