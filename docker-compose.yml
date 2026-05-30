@@ -1,7 +1,7 @@
 services:
   # Banco de Dados PostgreSQL
   db:
-    image: postgis/postgis:16-3.4-alpine
+    image: postgis/postgis:16-3.4
     container_name: biketracker-db
     environment:
       POSTGRES_USER: postgres
