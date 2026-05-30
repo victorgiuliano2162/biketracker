@@ -59,6 +59,10 @@ export class RouteService {
     );
   }
 
+  getById(routeId: string): Observable<RouteResponse> {
+    return this.http.get<RouteResponse>(`${this.base}/my/${routeId}`);
+  }
+
   save(request: CreateRouteRequest): Observable<RouteResponse> {
     return this.http.post<RouteResponse>(this.base, request);
   }

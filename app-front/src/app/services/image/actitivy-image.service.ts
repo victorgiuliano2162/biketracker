@@ -3,14 +3,14 @@ import { Observable, from, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ActivityImageService {
   private readonly MAX_WIDTH = 1920;
   private readonly QUALITY = 0.82;
- 
+
   constructor(private http: HttpClient) {}
- 
+
   /**
    * Compresses and uploads a list of images for a given route ID.
    * Compression preserves aspect ratio, capping width at 1920px with 82% JPEG quality.
@@ -27,37 +27,44 @@ export class ActivityImageService {
       }),
     );
   }
- 
+
+  getPresignedUrls(routeId: string): Observable<string[]> {
+    return this.http.get<string[]>(`/api/activities/${routeId}/images`);
+  }
+
   // ---------------------------------------------------------------------------
   // Private helpers
   // ---------------------------------------------------------------------------
- 
+
   private compressAll(files: File[]): Promise<File[]> {
     return Promise.all(files.map((f) => this.compress(f)));
   }
- 
+
   private compress(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
- 
+
       img.onload = () => {
         URL.revokeObjectURL(url);
- 
-        const { width, height } = this.dimensions(img.naturalWidth, img.naturalHeight);
- 
+
+        const { width, height } = this.dimensions(
+          img.naturalWidth,
+          img.naturalHeight,
+        );
+
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
- 
+
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           resolve(file); // fallback: return original if canvas unavailable
           return;
         }
- 
+
         ctx.drawImage(img, 0, 0, width, height);
- 
+
         canvas.toBlob(
           (blob) => {
             if (!blob) {
@@ -72,16 +79,16 @@ export class ActivityImageService {
           this.QUALITY,
         );
       };
- 
+
       img.onerror = () => {
         URL.revokeObjectURL(url);
         reject(new Error(`Failed to load image: ${file.name}`));
       };
- 
+
       img.src = url;
     });
   }
- 
+
   /** Returns dimensions preserving aspect ratio, capping width at MAX_WIDTH. */
   private dimensions(
     naturalWidth: number,
@@ -91,6 +98,9 @@ export class ActivityImageService {
       return { width: naturalWidth, height: naturalHeight };
     }
     const ratio = naturalHeight / naturalWidth;
-    return { width: this.MAX_WIDTH, height: Math.round(this.MAX_WIDTH * ratio) };
+    return {
+      width: this.MAX_WIDTH,
+      height: Math.round(this.MAX_WIDTH * ratio),
+    };
   }
 }
