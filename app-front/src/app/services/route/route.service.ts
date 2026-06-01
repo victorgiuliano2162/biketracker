@@ -1,6 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
+import {
+  BoundingBox,
+  PageResponse,
+  RouteResponse,
+} from '../../models/route.model';
+import { shareReplay } from 'rxjs';
 
 export interface TrackPoint {
   latitude: number;
@@ -22,30 +28,23 @@ export interface CreateRouteRequest {
   routeDificulty: string;
 }
 
-export interface RouteResponse {
-  id: string;
-  name: string;
-  distanceInKm: number;
-  elevationInMeters: number;
-  startTime: string;
-  endTime: string;
-  startCity: string;
-  country: string;
-  activityTimeInSeconds: number;
-  isPublic: boolean;
-  routeDificulty: string;
-}
-
 export interface RouteReplayResponse {
   routeId: string;
   points: TrackPoint[];
 }
 
+interface CacheEntry<T> {
+  data$: Observable<T>;
+  expiresAt: number;
+}
+ 
+const CACHE_TTL_MS = 2 * 60 * 1000; // 2min
 @Injectable({
   providedIn: 'root',
 })
 export class RouteService {
   private readonly base = '/api/routes';
+  private cache = new Map<string, CacheEntry<any>>();
 
   constructor(private http: HttpClient) {}
 
@@ -93,5 +92,82 @@ export class RouteService {
       `${this.base}/${routeId}/visibility`,
       {},
     );
+  }
+
+  //svg logic
+  getPublicRoutes(page: number, size: number): Observable<PageResponse<RouteResponse>> {
+    const key = `public:${page}:${size}`;
+    return this.cached(key, () => {
+      const params = new HttpParams()
+        .set('page', page)
+        .set('size', size)
+        .set('sort', 'startTime,desc');
+      return this.http.get<PageResponse<RouteResponse>>(`${this.base}/public`, { params });
+    });
+  }
+ 
+  // ── Listagem pública com bounding box ─────────────────────────────────────
+ 
+  getPublicRoutesInRegion(
+    bbox: BoundingBox,
+    page: number,
+    size: number
+  ): Observable<PageResponse<RouteResponse>> {
+    // Arredonda 4 casas para evitar cache miss por flutuação mínima de GPS
+    const bboxKey = [bbox.minLon, bbox.minLat, bbox.maxLon, bbox.maxLat]
+      .map((n) => n.toFixed(4))
+      .join(':');
+    const key = `region:${bboxKey}:${page}:${size}`;
+ 
+    return this.cached(key, () => {
+      const params = new HttpParams()
+        .set('minLon', bbox.minLon)
+        .set('minLat', bbox.minLat)
+        .set('maxLon', bbox.maxLon)
+        .set('maxLat', bbox.maxLat)
+        .set('page', page)
+        .set('size', size)
+        .set('sort', 'startTime,desc');
+      return this.http.get<PageResponse<RouteResponse>>(
+        `${this.base}/public/search/region`,
+        { params }
+      );
+    });
+  }
+ 
+  // ── Replay (usado no detalhe — não cacheado, payload grande) ──────────────
+ 
+  getRouteReplay(routeId: string): Observable<RouteReplayResponse> {
+    return this.http.get<RouteReplayResponse>(`${this.base}/my/${routeId}/replay`);
+  }
+ 
+  // ── URL do preview SVG (resolvida no template, sem chamada HTTP extra) ─────
+ 
+  getPreviewSvgUrl(routeId: string): string {
+    return `${this.base}/public/${routeId}/preview.svg`;
+  }
+ 
+  // ── Invalida cache público (ex: após toggle de visibilidade) ──────────────
+ 
+  invalidatePublicCache(): void {
+    for (const key of this.cache.keys()) {
+      if (key.startsWith('public:') || key.startsWith('region:')) {
+        this.cache.delete(key);
+      }
+    }
+  }
+ 
+  // ── Helper com TTL ────────────────────────────────────────────────────────
+ 
+  private cached<T>(key: string, factory: () => Observable<T>): Observable<T> {
+    const entry = this.cache.get(key);
+    if (entry && Date.now() < entry.expiresAt) {
+      return entry.data$;
+    }
+    const data$ = factory().pipe(
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+    this.cache.set(key, { data$, expiresAt: Date.now() + CACHE_TTL_MS });
+    return data$;
   }
 }
