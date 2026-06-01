@@ -24,7 +24,6 @@ import { LocationService } from '../../services/location/location.service';
 import {
   RouteService,
   CreateRouteRequest,
-  RouteResponse,
 } from '../../services/route/route.service';
 import { GpxParserService } from '../../services/gpx/gpx-parser.service';
 import {
@@ -39,6 +38,8 @@ import {
   SaveRouteDialogResult,
 } from './../save-route-dialog/save-route-dialog.component';
 import { ActivityImageService } from '../../services/image/actitivy-image.service';
+import { RouteResponse } from '../../models/route.model';
+
 
 const GPX_COLORS = [
   '#e53935',
@@ -133,7 +134,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private elevationService: ElevationService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private activityImageService: ActivityImageService
+    private activityImageService: ActivityImageService,
   ) {}
 
   // ── Tree ─────────────────────────────────────────────────────────────
@@ -573,115 +574,116 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── GPX — salvar no backend ───────────────────────────────────────────
 
   saveRoute(node: FlatRouteNode, event: MouseEvent): void {
-  event.stopPropagation();
-  if (!node.id || !node.coordinates || node.isSaved) return;
- 
-  const coords = node.coordinates;
-  const distanceInKm = this.elevationService.calculateDistanceKm(coords);
-  const elevationInMeters = node.elevations
-    ? this.elevationService.calculateElevationGain(node.elevations)
-    : 0;
- 
-  const stats: import('./map.component').GpxStats =
-    this.gpxStats?.activeId === node.id
-      ? this.gpxStats!
-      : {
-          activeId: node.id,
-          name: node.name,
-          points: coords.length,
-          distanceKm: distanceInKm,
-          elevationGainM: node.elevations
-            ? this.elevationService.calculateElevationGain(node.elevations)
-            : null,
-          loadingElevation: false,
-          elevationProfile: null,
-        };
- 
-  const dialogRef = this.dialog.open<
-    SaveRouteDialogComponent,
-    SaveRouteDialogData,
-    SaveRouteDialogResult
-  >(SaveRouteDialogComponent, {
-    data: { stats, defaultName: node.name },
-    width: '480px',
-    autoFocus: 'dialog',
-  });
- 
-  dialogRef.afterClosed().subscribe((result) => {
-    if (!result) return; // usuário cancelou
- 
-    this.savingRouteId = node.id!;
-    const now = new Date().toISOString();
- 
-    const request: CreateRouteRequest = {
-      name: result.name,
-      distanceInKm,
-      elevationInMeters,
-      startTime: now,
-      endTime: now,
-      startCity: '',
-      country: result.country,
-      isPublic: result.isPublic,
-      routeDificulty: result.routeDifficulty,
-      trackPoints: coords.map((c, i) => ({
-        latitude: c[0],
-        longitude: c[1],
-        altitudeInMeters: node.elevations?.[i] ?? 0,
-        recordedAt: now,
-      })),
-    };
- 
-    this.routeService.save(request).subscribe({
-      next: (saved) => {
-        // ── Atualiza estrutura local ──────────────────────────────────
-        this.localRoutes = this.localRoutes.filter((r) => r.id !== node.id);
-        const savedNode: RouteNode = {
-          id: `saved-${saved.id}`,
-          name: result.name,
-          coordinates: node.coordinates,
-          elevations: node.elevations,
-          color: node.color,
-          isSaved: true,
-          savedId: saved.id,
-        };
-        this.savedRoutes.push(savedNode);
- 
-        const layer = this.layers.get(node.id!);
-        if (layer) {
-          this.layers.delete(node.id!);
-          this.layers.set(`saved-${saved.id}`, layer);
-          layer.bindPopup(`<b>${result.name}</b>`);
-        }
-        this.selectedRouteIds.delete(node.id!);
-        this.selectedRouteIds.add(`saved-${saved.id}`);
- 
-        this.refreshTree();
-        this.savingRouteId = null;
-        this.snackBar.open(`"${result.name}" salva com sucesso!`, '✓', {
-          duration: 3000,
-        });
- 
-        // ── Upload de imagens (opcional — não bloqueia o fluxo) ───────
-        if (result.images.length > 0) {
-          this.activityImageService.uploadImages(saved.id, result.images).subscribe({
-            error: () => {
-              this.snackBar.open(
-                'Rota salva, mas houve um erro ao enviar as fotos.',
-                'OK',
-                { duration: 4000 },
-              );
-            },
-          });
-        }
-      },
-      error: () => {
-        this.savingRouteId = null;
-        this.snackBar.open('Erro ao salvar rota.', 'OK', { duration: 3000 });
-      },
+    event.stopPropagation();
+    if (!node.id || !node.coordinates || node.isSaved) return;
+
+    const coords = node.coordinates;
+    const distanceInKm = this.elevationService.calculateDistanceKm(coords);
+    const elevationInMeters = node.elevations
+      ? this.elevationService.calculateElevationGain(node.elevations)
+      : 0;
+
+    const stats: import('./map.component').GpxStats =
+      this.gpxStats?.activeId === node.id
+        ? this.gpxStats!
+        : {
+            activeId: node.id,
+            name: node.name,
+            points: coords.length,
+            distanceKm: distanceInKm,
+            elevationGainM: node.elevations
+              ? this.elevationService.calculateElevationGain(node.elevations)
+              : null,
+            loadingElevation: false,
+            elevationProfile: null,
+          };
+
+    const dialogRef = this.dialog.open<
+      SaveRouteDialogComponent,
+      SaveRouteDialogData,
+      SaveRouteDialogResult
+    >(SaveRouteDialogComponent, {
+      data: { stats, defaultName: node.name },
+      width: '480px',
+      autoFocus: 'dialog',
     });
-  });
-}
- 
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return; // usuário cancelou
+
+      this.savingRouteId = node.id!;
+      const now = new Date().toISOString();
+
+      const request: CreateRouteRequest = {
+        name: result.name,
+        distanceInKm,
+        elevationInMeters,
+        startTime: now,
+        endTime: now,
+        startCity: '',
+        country: result.country,
+        isPublic: result.isPublic,
+        routeDificulty: result.routeDifficulty,
+        trackPoints: coords.map((c, i) => ({
+          latitude: c[0],
+          longitude: c[1],
+          altitudeInMeters: node.elevations?.[i] ?? 0,
+          recordedAt: now,
+        })),
+      };
+
+      this.routeService.save(request).subscribe({
+        next: (saved) => {
+          // ── Atualiza estrutura local ──────────────────────────────────
+          this.localRoutes = this.localRoutes.filter((r) => r.id !== node.id);
+          const savedNode: RouteNode = {
+            id: `saved-${saved.id}`,
+            name: result.name,
+            coordinates: node.coordinates,
+            elevations: node.elevations,
+            color: node.color,
+            isSaved: true,
+            savedId: saved.id,
+          };
+          this.savedRoutes.push(savedNode);
+
+          const layer = this.layers.get(node.id!);
+          if (layer) {
+            this.layers.delete(node.id!);
+            this.layers.set(`saved-${saved.id}`, layer);
+            layer.bindPopup(`<b>${result.name}</b>`);
+          }
+          this.selectedRouteIds.delete(node.id!);
+          this.selectedRouteIds.add(`saved-${saved.id}`);
+
+          this.refreshTree();
+          this.savingRouteId = null;
+          this.snackBar.open(`"${result.name}" salva com sucesso!`, '✓', {
+            duration: 3000,
+          });
+
+          // ── Upload de imagens (opcional — não bloqueia o fluxo) ───────
+          if (result.images.length > 0) {
+            this.activityImageService
+              .uploadImages(saved.id, result.images)
+              .subscribe({
+                error: () => {
+                  this.snackBar.open(
+                    'Rota salva, mas houve um erro ao enviar as fotos.',
+                    'OK',
+                    { duration: 4000 },
+                  );
+                },
+              });
+          }
+        },
+        error: () => {
+          this.savingRouteId = null;
+          this.snackBar.open('Erro ao salvar rota.', 'OK', { duration: 3000 });
+        },
+      });
+    });
+  }
 
   saveActiveRoute(): void {
     if (!this.gpxStats?.activeId) return;
