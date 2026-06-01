@@ -120,4 +120,16 @@ public class RouteController {
         String userId = jwt.getSubject();
         return ResponseEntity.ok(routeService.getRouteById(userId, routeId));
     }
+
+    @GetMapping("/public/search/region")
+    public ResponseEntity<Page<RouteResponse>> findPublicByRegion(
+            @RequestParam double minLon,
+            @RequestParam double minLat,
+            @RequestParam double maxLon,
+            @RequestParam double maxLat,
+            @PageableDefault(size = 9, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        var bbox = new BoundingBoxRequest(minLon, minLat, maxLon, maxLat);
+        return ResponseEntity.ok(routeService.findPublicRoutesInBoundingBox(bbox, pageable));
+    }
 }

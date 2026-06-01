@@ -97,4 +97,25 @@ ORDER BY (dp).path[1]
     );
 
     Route findRouteById(String id);
+
+    // Rotas públicas paginadas (sem filtro geo — já existia)
+    Page<Route> findAllByIsPublicTrue(Pageable pageable);
+
+    // Rotas públicas dentro de um bounding box
+    @Query("""
+        SELECT r FROM Route r
+        WHERE r.isPublic = true
+          AND function('ST_Within',
+                r.startPoint,
+                function('ST_MakeEnvelope', :minLon, :minLat, :maxLon, :maxLat, 4326)
+              ) = true
+        """)
+    Page<Route> findPublicRoutesInBoundingBox(
+            @Param("minLon") double minLon,
+            @Param("minLat") double minLat,
+            @Param("maxLon") double maxLon,
+            @Param("maxLat") double maxLat,
+            Pageable pageable
+    );
 }
+
