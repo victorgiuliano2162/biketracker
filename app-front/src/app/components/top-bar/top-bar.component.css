@@ -8,8 +8,6 @@ mat-toolbar {
   z-index: 1000;
 }
 
-
-
 .header-brand {
   display: flex;
   align-items: center;
