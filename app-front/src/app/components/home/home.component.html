@@ -1,147 +1,83 @@
-<div class="home-container" *ngIf="stats">
-
-  <!-- ── Boas-vindas ───────────────────────────────────────── -->
-  <div class="welcome-banner">
-    <mat-icon class="welcome-icon">directions_bike</mat-icon>
-    <div>
-      
-      @if (stats.totalRides == 0) {
-        <h1>Bem-vindo!</h1>
-        <p>Você ainda não tem rotas registradas. Vamos começar?</p>
-      } @else if (stats.totalRides == 1) {
-        <h1>Bem-vindo de volta!</h1>
-        <p>Você tem <strong>1</strong> rota registrada. Que tal sair para a próxima?</p>
-      } @else {
-        <h1>Bem-vindo de volta! </h1>
-        <p>Você tem <strong>{{ stats.totalRides }}</strong> rotas registradas. Continue assim!</p>
-      }
+<div class="home-wrapper">
+ 
+      <!-- Header -->
+      <header class="home-header">
+        <div class="header-content">
+          <h1 class="home-title">
+            <mat-icon class="title-icon">route</mat-icon>
+            Rotas Públicas
+          </h1>
+          <p class="home-subtitle">
+            Explore trilhas e percursos compartilhados pela comunidade
+          </p>
+        </div>
+ 
+ 
+        <!-- Controles de localização -->
+        <div class="location-controls">
+          <ng-container *ngIf="!userLocation; else withLocation">
+            <div class="location-cta">
+              <mat-icon>location_off</mat-icon>
+              <span>Exibindo todas as rotas públicas</span>
+              <button mat-stroked-button color="primary" (click)="requestLocation()">
+                <mat-icon>my_location</mat-icon>
+                Usar minha localização
+              </button>
+            </div>
+          </ng-container>
+ 
+          <ng-template #withLocation>
+            <div class="location-active">
+              <div class="location-info">
+                <mat-icon color="primary">location_on</mat-icon>
+                <span>Mostrando rotas em até <strong>{{ radiusKm }} km</strong></span>
+                <button mat-icon-button (click)="clearLocation()" matTooltip="Remover filtro de localização">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <div class="radius-slider">
+                <span class="slider-label">5 km</span>
+                <mat-slider min="5" max="100" step="5" discrete>
+                  <input matSliderThumb [(ngModel)]="radiusKm" (valueChange)="onRadiusChange()" />
+                </mat-slider>
+                <span class="slider-label">100 km</span>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </header>
+ 
+      <!-- Loading -->
+      <div *ngIf="loading" class="loading-state">
+        <mat-spinner diameter="48" />
+        <p>Buscando rotas...</p>
+      </div>
+ 
+      <!-- Empty state -->
+      <div *ngIf="!loading && routes.length === 0" class="empty-state">
+        <mat-icon>explore_off</mat-icon>
+        <h3>Nenhuma rota encontrada</h3>
+        <p *ngIf="userLocation">Tente aumentar o raio de busca ou remover o filtro de localização.</p>
+        <p *ngIf="!userLocation">Ainda não há rotas públicas cadastradas.</p>
+      </div>
+ 
+      <!-- Lista de cards em pilha -->
+      <div *ngIf="!loading && routes.length > 0" class="routes-list">
+        <app-route-card
+          *ngFor="let route of routes"
+          [route]="route"
+          [routerLink]="['/routes', route.id]"
+        />
+      </div>
+ 
+      <!-- Paginação -->
+      <mat-paginator
+        *ngIf="totalElements > PAGE_SIZE"
+        [length]="totalElements"
+        [pageSize]="PAGE_SIZE"
+        [pageIndex]="currentPage"
+        [hidePageSize]="true"
+        (page)="onPageChange($event)"
+      />
+ 
     </div>
-  </div>
-
-  <!-- ── Cards de estatísticas ─────────────────────────────── -->
-  <div class="stats-grid">
-
-    <mat-card appearance="outlined" class="stat-card">
-      <mat-card-content>
-        <mat-icon color="primary">route</mat-icon>
-        <p class="stat-value">{{ stats.totalDistanceKm | number:'1.1-1' }} km</p>
-        <p class="stat-label">Distância total</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card appearance="outlined" class="stat-card">
-      <mat-card-content>
-        <mat-icon color="primary">landscape</mat-icon>
-        <p class="stat-value">{{ stats.totalElevationMeters | number:'1.0-0' }} m</p>
-        <p class="stat-label">Elevação total</p>
-      </mat-card-content>
-    </mat-card>
-    <!--
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content>
-          <mat-icon color="primary">timer</mat-icon>
-          <p class="stat-value">{{ formatDuration(stats.totalActivitySeconds) }}</p>
-          <p class="stat-label">Tempo de atividade</p>
-        </mat-card-content>
-      </mat-card>
-      
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content>
-          <mat-icon color="primary">flag</mat-icon>
-          <p class="stat-value">{{ stats.totalRides }}</p>
-          <p class="stat-label">Pedaladas</p>
-        </mat-card-content>
-      </mat-card>
-      -->
-
-  </div>
-
-  <!-- ── Gráfico semanal + Últimas rides ───────────────────── -->
-  <div class="middle-grid">
-
-    <!-- Gráfico -->
-     @if (false) {
-       <mat-card appearance="outlined" class="chart-card">
-         <mat-card-header>
-           <mat-card-title>Distância — últimos 7 dias</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <ngx-charts-bar-vertical
-          [results]="chartData"
-          [xAxis]="true"
-          [yAxis]="true"
-          [showXAxisLabel]="false"
-          [showYAxisLabel]="true"
-          yAxisLabel="km"
-          [gradient]="false"
-          [roundEdges]="true"
-          scheme="cool"
-          style="display: block; height: 260px">
-        </ngx-charts-bar-vertical>
-      </mat-card-content>
-    </mat-card>
-  }
-
-    <!-- Últimas rides -->
-    <mat-card appearance="outlined" class="rides-card">
-      <mat-card-header>
-        <mat-card-title>Últimas rotas</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-
-        <div *ngIf="stats.recentRides.length === 0" class="empty-state">
-          <mat-icon>pedal_bike</mat-icon>
-          <p>Nenhuma pedalada registrada ainda.</p>
-        </div>
-
-        <div *ngFor="let ride of stats.recentRides" class="ride-item">
-          <mat-icon class="ride-icon">directions_bike</mat-icon>
-          <div class="ride-info">
-            <span class="ride-distance">{{ ride.distanceInKm | number:'1.1-1' }} km</span>
-            <span class="ride-meta">
-              
-              {{ ride.elevationInMeters | number:'1.0-0' }}m elevação &bull;
-              {{ ride.startTime }}
-            </span>
-          </div>
-        </div>
-
-      </mat-card-content>
-    </mat-card>
-
-  </div>
-
-  <!-- ── Metas ativas ───────────────────────────────────────── -->
-  <mat-card appearance="outlined" class="goals-card">
-    <mat-card-header>
-      <mat-card-title>Metas em andamento</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-
-      <div *ngIf="stats.activeGoals.length === 0" class="empty-state">
-        <mat-icon>emoji_events</mat-icon>
-        <p>Nenhuma meta cadastrada ainda.</p>
-      </div>
-
-      <div *ngFor="let goal of stats.activeGoals" class="goal-item">
-        <div class="goal-header">
-          <span class="goal-name">{{ goal.name }}</span>
-          <span class="goal-meta">{{ goal.currentValue }} / {{ goal.targetValue }} {{ goal.unit }} &bull; prazo: {{ goal.deadLine }}</span>
-        </div>
-        <mat-progress-bar
-          mode="determinate"
-          [value]="goal.progressPercent"
-          color="primary">
-        </mat-progress-bar>
-        <span class="goal-percent">{{ goal.progressPercent | number:'1.0-0' }}%</span>
-      </div>
-
-    </mat-card-content>
-  </mat-card>
-
-</div>
-
-<!-- Loading state -->
-<div class="loading-state" *ngIf="!stats">
-  <p>Carregando...</p>
-</div>
