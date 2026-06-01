@@ -1,0 +1,150 @@
+<div class="detail-container">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-wrapper"><mat-spinner diameter="40" /></div>
+  }
+
+  <!-- Error -->
+  @if (!loading && error) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>Não foi possível carregar a rota.</p>
+      <button mat-button (click)="goBack()">Voltar</button>
+    </div>
+  }
+
+  @if (!loading && !error) {
+    <!-- Header -->
+    <div class="detail-header">
+      <button mat-icon-button (click)="goBack()" matTooltip="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="header-info">
+        <h1 class="route-title">{{ route?.name ?? "—" }}</h1>
+        <span class="route-meta">
+          {{ route ? formatDate(route.startTime) : "" }}
+          @if (route?.startCity) {
+            · {{ route!.startCity }}, {{ route!.country }}
+          }
+        </span>
+      </div>
+
+      <div class="header-actions">
+        <mat-chip
+          matTooltip="Baixar GPX da rota"
+          (click)="downloadGpx()"
+          [disabled]="!points.length"
+        >
+          <mat-icon>download</mat-icon>
+          <!-- Baixar GPX -->
+        </mat-chip>
+        <mat-chip
+          [class]="route?.isPublic ? 'chip-public' : 'chip-private'"
+          (click)="togglePrivacy()"
+          matTooltip="Alterar visibilidade"
+        >
+          <mat-icon>{{ route?.isPublic ? "public" : "lock" }}</mat-icon>
+          <!-- {{ route?.isPublic ? "Pública" : "Privada" }} -->
+        </mat-chip>
+
+        <button mat-icon-button [matMenuTriggerFor]="detailMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #detailMenu="matMenu">
+          <button mat-menu-item (click)="deleteRoute()" class="delete-item">
+            <mat-icon>delete</mat-icon>
+            Excluir rota
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <mat-divider />
+
+    <!-- Metrics row -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <mat-icon class="mc-icon">route</mat-icon>
+        <span class="mc-value"
+          >{{ route?.distanceInKm | number: "1.1-1" }} km</span
+        >
+        <span class="mc-label">distância</span>
+      </div>
+      <div class="metric-card">
+        <mat-icon class="mc-icon">terrain</mat-icon>
+        <span class="mc-value"
+          >{{ route?.elevationInMeters | number: "1.0-0" }} m</span
+        >
+        <span class="mc-label">elevação acumulada</span>
+      </div>
+      @if (avgElev !== null) {
+        <div class="metric-card">
+          <mat-icon class="mc-icon">show_chart</mat-icon>
+          <span class="mc-value">{{ avgElev }} m</span>
+          <span class="mc-label">elevação média</span>
+        </div>
+      }
+      @if (route?.activityTimeInSeconds) {
+        <div class="metric-card">
+          <mat-icon class="mc-icon">timer</mat-icon>
+          <span class="mc-value">{{
+            formatDuration(route!.activityTimeInSeconds)
+          }}</span>
+          <span class="mc-label">tempo</span>
+        </div>
+      }
+    </div>
+
+    <mat-divider />
+
+    <!-- Map -->
+    <div class="section">
+      <h2 class="section-title"><mat-icon>map</mat-icon> Mapa</h2>
+      @if (points.length) {
+        <app-route-map
+          [points]="points"
+          [color]="'#185FA5'"
+          [activeIndex]="hoverIndex"
+          (hoverIndex)="onMapHover($event)"
+        />
+      }
+    </div>
+
+    <mat-divider />
+
+    <!-- Photos -->
+    @if (imageUrls.length > 0) {
+      <div class="section">
+        <h2 class="section-title"><mat-icon>photo_library</mat-icon> Fotos</h2>
+        <div class="photo-grid">
+          @for (url of imageUrls; track url; let i = $index) {
+            <div class="photo-item" (click)="openImage(i)">
+              <img
+                [src]="url"
+                alt="Foto da rota"
+                class="photo-img"
+                loading="lazy"
+              />
+              <div class="photo-overlay"><mat-icon>zoom_in</mat-icon></div>
+            </div>
+          }
+        </div>
+      </div>
+      <mat-divider />
+    }
+
+    <!-- Elevation chart -->
+    <div class="section">
+      <h2 class="section-title"><mat-icon>show_chart</mat-icon> Altimetria</h2>
+      <div class="chart-wrap">
+        <canvas
+          #chartCanvas
+          role="img"
+          aria-label="Gráfico de altimetria da rota"
+        ></canvas>
+      </div>
+    </div>
+  }
+</div>
