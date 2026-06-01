@@ -1,23 +1,32 @@
 .map-page {
   position: relative;
-  height: calc(100vh - 80px);
+  margin-top: 64px;
+  height: calc(100vh - 64px);
   overflow: hidden;
 }
 
-.map-container { width: 100%; height: 100%; }
-#leaflet-map { width: 100%; height: 100%; }
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+#leaflet-map {
+  width: 100%;
+  height: 100%;
+}
 
 /* ── Botão sidebar toggle ────────────────────────────────────────── */
 .sidebar-toggle {
   position: absolute;
-  top: 16px; right: 16px;
+  top: 16px;
+  right: 16px;
   z-index: 1000;
 }
 
 /* ── Controles flutuantes ────────────────────────────────────────── */
 .map-controls {
   position: absolute;
-  bottom: 32px; right: 16px;
+  bottom: 32px;
+  right: 16px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -35,7 +44,8 @@
 /* ── Sidebar ─────────────────────────────────────────────────────── */
 .sidebar {
   position: absolute;
-  top: 64px; right: 16px;
+  top: 64px;
+  right: 16px;
   width: 300px;
   max-height: calc(100% - 88px);
   z-index: 999;
@@ -52,7 +62,9 @@
   opacity: 0;
   transform: translateX(16px) scale(0.98);
   pointer-events: none;
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
   transform-origin: top right;
 }
 
@@ -98,7 +110,9 @@
   opacity: 0.5;
   transition: opacity 150ms;
 }
-.sidebar-clear-btn:hover { opacity: 1; }
+.sidebar-clear-btn:hover {
+  opacity: 1;
+}
 
 /* ── Body / scroll ───────────────────────────────────────────────── */
 .sidebar-body {
@@ -107,8 +121,12 @@
   padding: 8px 0;
 }
 
-.sidebar-body::-webkit-scrollbar { width: 4px; }
-.sidebar-body::-webkit-scrollbar-track { background: transparent; }
+.sidebar-body::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-body::-webkit-scrollbar-track {
+  background: transparent;
+}
 .sidebar-body::-webkit-scrollbar-thumb {
   background: var(--mat-sys-outline-variant, #ccc);
   border-radius: 4px;
@@ -239,13 +257,17 @@
   color: var(--mat-sys-primary, #1976d2);
   opacity: 0.8;
 }
-.action-btn--save:hover { opacity: 1; }
+.action-btn--save:hover {
+  opacity: 1;
+}
 
 .action-btn--delete {
   color: var(--mat-sys-error, #c62828);
   opacity: 0.65;
 }
-.action-btn--delete:hover { opacity: 1; }
+.action-btn--delete:hover {
+  opacity: 1;
+}
 
 .saved-badge {
   font-size: 16px;
@@ -280,17 +302,24 @@
 /* ── Stats GPX ───────────────────────────────────────────────────── */
 .gpx-stats {
   position: absolute;
-  bottom: 32px; left: 16px;
+  bottom: 32px;
+  left: 16px;
   z-index: 1000;
   background: var(--mat-sys-surface-container, #f4f4f4);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   padding: 10px 14px;
-  min-width: 200px; max-width: 200px;
-  transition: max-width 300ms ease, min-width 300ms ease;
+  min-width: 200px;
+  max-width: 200px;
+  transition:
+    max-width 300ms ease,
+    min-width 300ms ease;
 }
 
-.gpx-stats.expanded { min-width: 480px; max-width: 560px; }
+.gpx-stats.expanded {
+  min-width: 480px;
+  max-width: 560px;
+}
 
 .gpx-stats-header {
   display: flex;
@@ -301,36 +330,85 @@
   padding-bottom: 6px;
 }
 
-.gpx-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.gpx-expand-btn { margin-left: auto; width: 28px; height: 28px; line-height: 28px; }
-.gpx-expand-btn mat-icon { font-size: 18px; }
-.gpx-icon { font-size: 18px; width: 18px; height: 18px; color: #e53935; flex-shrink: 0; }
+.gpx-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.gpx-expand-btn {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+}
+.gpx-expand-btn mat-icon {
+  font-size: 18px;
+}
+.gpx-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #e53935;
+  flex-shrink: 0;
+}
 
 .gpx-name {
-  font-size: 0.8rem; font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   max-width: 110px;
   color: var(--mat-sys-on-surface, #1a1a1a);
 }
 
-.gpx-stats-body { display: flex; flex-direction: column; gap: 4px; }
+.gpx-stats-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 .gpx-stat-item {
-  display: flex; align-items: center; gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.85rem;
   color: var(--mat-sys-on-surface-variant, #555);
 }
 
-.gpx-stat-item mat-icon { font-size: 16px; width: 16px; height: 16px; }
+.gpx-stat-item mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
 
-.gpx-chart-container { margin-top: 12px; height: 180px; width: 100%; }
-.gpx-chart-container canvas { width: 100% !important; height: 100% !important; }
+.gpx-chart-container {
+  margin-top: 12px;
+  height: 180px;
+  width: 100%;
+}
+.gpx-chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
 
 /* ── Marcador pulsante no mapa ───────────────────────────────────── */
-.cursor-marker-pulse { animation: pulse 1s ease-in-out infinite; }
+.cursor-marker-pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
 
 @keyframes pulse {
-  0%   { transform: scale(1);   opacity: 1; }
-  50%  { transform: scale(1.4); opacity: 0.7; }
-  100% { transform: scale(1);   opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
