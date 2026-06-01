@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, publicGuard } from './guards/Auth.guard';
+import { routeDetailResolver } from './resolvers/route-detail.resolver';
 
 export const routes: Routes = [
   {
@@ -31,6 +32,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/my-routes/my-routes.component').then((m) => m.MyRoutesComponent),
     canActivate: [authGuard],
+    resolve: {
+      data: routeDetailResolver,   // dados disponíveis antes da ativação
+    },
   },
   {
     path: 'routes/:id',
@@ -50,7 +54,15 @@ export const routes: Routes = [
       import('./components/goal/goal.component').then((m) => m.GoalComponent),
     canActivate: [authGuard],
   },
-
+  {
+    path: 'status',
+    loadComponent: () =>
+      import('./components/status/status.component').then((m) => m.StatusComponent),
+    canActivate: [authGuard],
+  },
+  {
+    
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
 ];
