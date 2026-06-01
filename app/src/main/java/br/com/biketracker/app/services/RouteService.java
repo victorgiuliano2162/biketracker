@@ -84,7 +84,7 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
+    public Page<RouteResponse> listPublicRoutesNOUSAGE(Pageable pageable) {
         return routeRepository
                 .findByIsPublicTrueOrderByStartTimeDesc(pageable)
                 .map(RouteResponse::from);
@@ -177,5 +177,23 @@ public class RouteService {
 
         route.setPublic(!route.isPublic());
         return RouteResponse.from(routeRepository.save(route));
+    }
+
+    public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
+        return routeRepository.findAllByIsPublicTrue(pageable)
+                .map(RouteResponse::from);
+    }
+
+    // -------------------------------------------------------------------------
+// Rotas públicas filtradas por bounding box (NOVO)
+// -------------------------------------------------------------------------
+    public Page<RouteResponse> findPublicRoutesInBoundingBox(BoundingBoxRequest bbox, Pageable pageable) {
+        return routeRepository.findPublicRoutesInBoundingBox(
+                bbox.minLon(),
+                bbox.minLat(),
+                bbox.maxLon(),
+                bbox.maxLat(),
+                pageable
+        ).map(RouteResponse::from);
     }
 }
