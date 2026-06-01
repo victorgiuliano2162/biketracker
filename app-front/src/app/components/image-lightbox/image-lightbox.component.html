@@ -1,1 +1,23 @@
-<p>image-lightbox works!</p>
+    <div class="lightbox-wrap">
+      <button mat-icon-button class="lb-close" (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+ 
+      @if (data.urls.length > 1) {
+        <button mat-icon-button class="lb-nav lb-prev" (click)="prev()" [disabled]="current === 0">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+      }
+ 
+      <div class="lb-image-wrap">
+        <img [src]="data.urls[current]" class="lb-image" alt="Foto da rota" />
+      </div>
+ 
+      @if (data.urls.length > 1) {
+        <button mat-icon-button class="lb-nav lb-next" (click)="next()" [disabled]="current === data.urls.length - 1">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+ 
+        <div class="lb-counter">{{ current + 1 }} / {{ data.urls.length }}</div>
+      }
+    </div>
