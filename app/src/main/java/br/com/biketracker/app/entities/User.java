@@ -27,6 +27,9 @@ public class User {
     @Size(min = 3, max = 100, message = "Nome deve ter entre 3 e 100 caracteres")
     private String name;
 
+    @NotBlank(message = "Username é obrigatório")
+    private String userName;
+
     @NotBlank(message = "E-mail é obrigatório")
     @Email(message = "E-mail inválido")
     @Column(unique = true)
