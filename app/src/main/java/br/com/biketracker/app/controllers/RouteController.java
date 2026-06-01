@@ -132,4 +132,16 @@ public class RouteController {
         var bbox = new BoundingBoxRequest(minLon, minLat, maxLon, maxLat);
         return ResponseEntity.ok(routeService.findPublicRoutesInBoundingBox(bbox, pageable));
     }
+
+
+    @GetMapping(value = "/public/{routeId}/preview.svg", produces = "image/svg+xml")
+    public ResponseEntity<String> getPublicRouteSvgPreview(@PathVariable String routeId) {
+        String svg = routeService.buildSvgPreview(routeId);
+        if (svg == null) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok()
+                // Cache de 7 dias no browser e CDN — o traçado de uma rota nunca muda
+                .header("Cache-Control", "public, max-age=604800, immutable")
+                .body(svg);
+    }
 }

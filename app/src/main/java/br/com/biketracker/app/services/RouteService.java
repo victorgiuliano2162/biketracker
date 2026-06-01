@@ -196,4 +196,71 @@ public class RouteService {
                 pageable
         ).map(RouteResponse::from);
     }
+
+
+    //SVG for front end
+    public String buildSvgPreview(String routeId) {
+        return routeRepository.findById(routeId)
+                .filter(Route::isPublic)
+                .map(route -> renderSvg(route.getPath()))
+                .orElse(null);
+    }
+
+    private String renderSvg(org.locationtech.jts.geom.LineString path) {
+        if (path == null || path.getNumPoints() < 2) return fallbackSvg();
+
+        org.locationtech.jts.geom.Coordinate[] coords = path.getCoordinates();
+
+        // Bounding box do traçado
+        double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
+        for (org.locationtech.jts.geom.Coordinate c : coords) {
+            if (c.x < minX) minX = c.x;
+            if (c.x > maxX) maxX = c.x;
+            if (c.y < minY) minY = c.y;
+            if (c.y > maxY) maxY = c.y;
+        }
+
+        double rangeX = maxX - minX;
+        double rangeY = maxY - minY;
+        if (rangeX == 0 || rangeY == 0) return fallbackSvg();
+
+        // ViewBox com padding de 5%
+        int W = 400, H = 300;
+        double pad = 0.05;
+        double scaleX = W * (1 - 2 * pad) / rangeX;
+        double scaleY = H * (1 - 2 * pad) / rangeY;
+
+        // Normaliza coordenadas para o SVG (Y invertido)
+        StringBuilder points = new StringBuilder();
+        for (org.locationtech.jts.geom.Coordinate c : coords) {
+            double px = W * pad + (c.x - minX) * scaleX;
+            double py = H - (H * pad + (c.y - minY) * scaleY); // inverte Y
+            if (!points.isEmpty()) points.append(" ");
+            points.append(String.format("%.1f,%.1f", px, py));
+        }
+
+        return """
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d">
+          <rect width="%d" height="%d" fill="#f1f8e9"/>
+          <polyline
+            points="%s"
+            fill="none"
+            stroke="#2e7d32"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        """.formatted(W, H, W, H, W, H, points.toString());
+    }
+
+    private String fallbackSvg() {
+        return """
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+          <rect width="400" height="300" fill="#f5f5f5"/>
+          <text x="200" y="155" text-anchor="middle" font-size="14" fill="#bdbdbd">sem traçado</text>
+        </svg>
+        """;
+    }
 }
