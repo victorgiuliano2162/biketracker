@@ -17,7 +17,8 @@ public record RouteResponse(
         String country,
         long activityTimeInSeconds,
         boolean isPublic,
-        RouteDifficulty routeDIfficulty
+        RouteDifficulty routeDifficulty,
+        String userName   // <-- adicionado
 ) {
     public static RouteResponse from(Route route) {
         return new RouteResponse(
@@ -26,13 +27,14 @@ public record RouteResponse(
                 route.getDistanceInKm(),
                 route.getElevationInMeters(),
                 route.getStartTime(),
-                route.getCreatedAt(),
                 route.getEndTime(),
+                route.getCreatedAt(),
                 route.getStartCity(),
                 route.getCountry(),
                 route.getActivityTimeInSeconds(),
                 route.isPublic(),
-                route.getDifficulty()
+                route.getDifficulty(),
+                route.getUser() != null ? route.getUser().getUserName() : null  // <-- adicionado
         );
     }
 }
