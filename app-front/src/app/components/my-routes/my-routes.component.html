@@ -13,118 +13,56 @@
   }
 
   @for (route of routes; track route.id) {
-    <mat-card
-      class="route-card"
-      [class.expanded]="expandedRouteId === route.id"
-      (click)="toggleRoute(route.id)"
-    >
+    <mat-card class="route-card">
       <mat-card-content>
-        <div class="route-summary">
-          <div class="route-left">
-            <div class="route-name">{{ route.name }}</div>
-            <div class="route-sub">
-              {{ formatDate(route.startTime) }} ·
-              {{ formatTime(route.startTime) }} &nbsp;·&nbsp;
-              {{ route.startCity }}, {{ route.country }}
+        <div class="route-row">
+
+          <!-- Left: name + date -->
+          <div class="route-main">
+            <a class="route-name" (click)="openDetail(route.id)">{{ route.name }}</a>
+            <span class="route-date">{{ formatDate(route.startTime) }}</span>
+          </div>
+
+          <!-- Center: metrics -->
+          <div class="route-metrics">
+            <div class="metric">
+              <mat-icon class="metric-icon">route</mat-icon>
+              <span class="metric-value">{{ route.distanceInKm | number:'1.1-1' }} km</span>
+            </div>
+            <div class="metric">
+              <mat-icon class="metric-icon">terrain</mat-icon>
+              <span class="metric-value">{{ route.elevationInMeters | number:'1.0-0' }} m</span>
             </div>
           </div>
 
-          <div class="route-right">
-            <div class="dist-big">
-              {{ route.distanceInKm | number: "1.1-1" }}
-              <span class="dist-unit">km</span>
-            </div>
+          <!-- Right: visibility chip + menu -->
+          <div class="route-actions">
+            <mat-chip
+              [class]="route.isPublic ? 'chip-public' : 'chip-private'"
+              (click)="togglePrivacy(route, $event)"
+              matTooltip="Alterar visibilidade"
+            >
+              <mat-icon>{{ route.isPublic ? 'public' : 'lock' }}</mat-icon>
+              {{ route.isPublic ? 'Pública' : 'Privada' }}
+            </mat-chip>
 
-            <div class="metrics-col">
-              <div class="rm">
-                <mat-icon>terrain</mat-icon>
-                <span
-                  ><strong
-                    >{{ route.elevationInMeters | number: "1.0-0" }} m</strong
-                  >
-                  elev.</span
-                >
-              </div>
-              <div class="rm">
-                <mat-icon>show_chart</mat-icon>
-                @if (avgElevCache.has(route.id)) {
-                  <span
-                    ><strong>{{ avgElevCache.get(route.id) }} m</strong> elev.
-                    méd.</span
-                  >
-                } @else {
-                  <span class="muted">— elev. méd.</span>
-                }
-              </div>
-              @if (false) {
-                <!-- 
-                review later
-                maybe its not necessary show route time 
-                -->
-                <div class="rm">
-                  <mat-icon>timer</mat-icon>
-                  <span>{{ formatDuration(route.activityTimeInSeconds) }}</span>
-                </div>
-              }
-            </div>
+            <button mat-icon-button [matMenuTriggerFor]="routeMenu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
 
-            <div class="route-footer">
-              <mat-chip
-                [class]="route.isPublic ? 'chip-public' : 'chip-private'"
-                (click)="togglePrivacy(route, $event)"
-                matTooltip="Alterar visibilidade"
-              >
-                <mat-icon>{{ route.isPublic ? "public" : "lock" }}</mat-icon>
-                {{ route.isPublic ? "Pública" : "Privada" }}
-              </mat-chip>
-
-              @if (replayCache.has(route.id)) {
-                <button
-                  mat-icon-button
-                  matTooltip="Baixar GPX"
-                  (click)="downloadGpx(route, $event)"
-                >
-                  <mat-icon>download</mat-icon>
-                </button>
-              }
-
-              <button
-                mat-icon-button
-                matTooltip="Excluir rota"
-                (click)="deleteRoute(route, $event)"
-              >
-                <mat-icon>delete</mat-icon>
+            <mat-menu #routeMenu="matMenu">
+              <button mat-menu-item (click)="openDetail(route.id)">
+                <mat-icon>open_in_new</mat-icon>
+                Ver detalhes
               </button>
-            </div>
+              <button mat-menu-item (click)="deleteRoute(route, $event)">
+                <mat-icon>delete</mat-icon>
+                Excluir
+              </button>
+            </mat-menu>
           </div>
-        </div>
 
-        @if (expandedRouteId === route.id) {
-          <div class="expand-area">
-            @if (replayLoading) {
-              <div class="chart-loading"><mat-spinner diameter="28" /></div>
-            } @else {
-              <div class="chart-wrap">
-                <canvas
-                  [id]="'chart-' + route.id"
-                  #chartCanvas
-                  role="img"
-                  [attr.aria-label]="'Altimetria da rota ' + route.name"
-                >
-                </canvas>
-              </div>
-              @if (replayCache.has(route.id)) {
-                <app-route-map
-                  [points]="replayCache.get(route.id)!"
-                  [color]="'#185FA5'"
-                  [activeIndex]="hoverIndexMap.get(route.id) ?? null"
-                  (hoverIndex)="onChartHover(route.id, $event)"
-                >
-                </app-route-map>
-              }
-            }
-          </div>
-        }
+        </div>
       </mat-card-content>
     </mat-card>
   }
