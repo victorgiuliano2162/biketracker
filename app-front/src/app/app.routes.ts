@@ -32,15 +32,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/my-routes/my-routes.component').then((m) => m.MyRoutesComponent),
     canActivate: [authGuard],
-    resolve: {
-      data: routeDetailResolver,   // dados disponíveis antes da ativação
-    },
   },
   {
     path: 'routes/:id',
     loadComponent: () =>
       import('./components/route-detail/route-detail.component').then((m) => m.RouteDetailComponent),
     canActivate: [authGuard],
+     resolve: {
+      data: routeDetailResolver,   // dados disponíveis antes da ativação
+    },
   },
   {
     path: 'goals',
