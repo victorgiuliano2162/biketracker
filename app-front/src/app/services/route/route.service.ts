@@ -6,7 +6,7 @@ import {
   PageResponse,
   RouteResponse,
 } from '../../models/route.model';
-import { shareReplay } from 'rxjs';
+import { catchError, map, of, shareReplay } from 'rxjs';
 
 export interface TrackPoint {
   latitude: number;
@@ -94,7 +94,9 @@ export class RouteService {
     );
   }
 
-  //svg logic
+ 
+  // ── Listagem pública sem filtro geo ───────────────────────────────────────
+ 
   getPublicRoutes(page: number, size: number): Observable<PageResponse<RouteResponse>> {
     const key = `public:${page}:${size}`;
     return this.cached(key, () => {
@@ -106,14 +108,13 @@ export class RouteService {
     });
   }
  
-  // ── Listagem pública com bounding box ─────────────────────────────────────
+  // ── Listagem pública com bounding box ────────────────────────────────────
  
   getPublicRoutesInRegion(
     bbox: BoundingBox,
     page: number,
     size: number
   ): Observable<PageResponse<RouteResponse>> {
-    // Arredonda 4 casas para evitar cache miss por flutuação mínima de GPS
     const bboxKey = [bbox.minLon, bbox.minLat, bbox.maxLon, bbox.maxLat]
       .map((n) => n.toFixed(4))
       .join(':');
@@ -135,6 +136,7 @@ export class RouteService {
     });
   }
  
+ 
   // ── Replay (usado no detalhe — não cacheado, payload grande) ──────────────
  
   getRouteReplay(routeId: string): Observable<RouteReplayResponse> {
@@ -146,8 +148,42 @@ export class RouteService {
   getPreviewSvgUrl(routeId: string): string {
     return `${this.base}/public/${routeId}/preview.svg`;
   }
+
+    // ── Preview MinIO ─────────────────────────────────────────────────────────
  
-  // ── Invalida cache público (ex: após toggle de visibilidade) ──────────────
+  /**
+   * Verifica se já existe preview no MinIO.
+   * Retorna a URL pública (string) se existir, ou null se ainda não foi gerado (204).
+   */
+  checkPreview(routeId: string): Observable<string | null> {
+    return this.http
+      .get(`${this.base}/public/${routeId}/preview`, { responseType: 'text' })
+      .pipe(
+        map((url) => url ?? null),
+        catchError((err) => {
+          // 204 No Content — ainda não foi gerado
+          if (err.status === 204) return of(null);
+          // Qualquer outro erro — trata como "não disponível"
+          return of(null);
+        })
+      );
+  }
+
+  /**
+   * Envia o PNG gerado pelo Leaflet para o backend salvar no MinIO.
+   */
+  uploadPreview(routeId: string, pngBuffer: ArrayBuffer): Observable<string> {
+    return this.http.post(
+      `${this.base}/public/${routeId}/preview`,
+      pngBuffer,
+      {
+        headers: { 'Content-Type': 'application/octet-stream' },
+        responseType: 'text',
+      }
+    );
+  }
+ 
+  // ── Invalidação de cache ──────────────────────────────────────────────────
  
   invalidatePublicCache(): void {
     for (const key of this.cache.keys()) {
@@ -171,3 +207,4 @@ export class RouteService {
     return data$;
   }
 }
+
