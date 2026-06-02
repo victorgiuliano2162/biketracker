@@ -144,4 +144,38 @@ public class RouteController {
                 .header("Cache-Control", "public, max-age=604800, immutable")
                 .body(svg);
     }
+
+    /**
+     * Verifica se já existe preview gerado para a rota.
+     * Retorna 200 com a URL pública ou 204 se ainda não foi gerado.
+     * Não requer autenticação — rotas públicas.
+     */
+    @GetMapping("/public/{routeId}/preview")
+    public ResponseEntity<String> getPreviewUrl(@PathVariable String routeId) {
+        String url = routeService.getPreviewUrl(routeId);
+        if (url == null) return ResponseEntity.noContent().build(); // 204 → frontend precisa gerar
+        return ResponseEntity.ok(url);
+    }
+
+    /**
+     * Recebe o PNG gerado pelo Leaflet no frontend e persiste no MinIO.
+     * Requer autenticação para evitar uploads arbitrários.
+     */
+    @PostMapping("/public/{routeId}/preview")
+    public ResponseEntity<String> uploadPreview(
+            @PathVariable String routeId,
+            @RequestBody byte[] pngBytes
+    ) {
+        if (pngBytes == null || pngBytes.length == 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        // Limite de 2MB para o PNG
+        if (pngBytes.length > 3 * 1024 * 1024) {
+            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
+        }
+        String url = routeService.savePreview(routeId, pngBytes);
+        return ResponseEntity.status(HttpStatus.CREATED).body(url);
+    }
+
+
 }

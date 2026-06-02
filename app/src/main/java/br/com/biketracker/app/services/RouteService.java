@@ -37,6 +37,7 @@ public class RouteService {
     private final UserRepository userRepository;
     private final GeometryFactory geometryFactory =
             new GeometryFactory(new PrecisionModel(), 4326);
+    private final MinioStorageService minioStorageService;
 
     @Transactional
     public RouteResponse createRoute(String userId, CreateRouteRequest request) {
@@ -179,32 +180,18 @@ public class RouteService {
         return RouteResponse.from(routeRepository.save(route));
     }
 
-    public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
-        return routeRepository.findAllByIsPublicTrue(pageable)
-                .map(RouteResponse::from);
-    }
 
     // -------------------------------------------------------------------------
-// Rotas públicas filtradas por bounding box (NOVO)
-// -------------------------------------------------------------------------
-    public Page<RouteResponse> findPublicRoutesInBoundingBox(BoundingBoxRequest bbox, Pageable pageable) {
-        return routeRepository.findPublicRoutesInBoundingBox(
-                bbox.minLon(),
-                bbox.minLat(),
-                bbox.maxLon(),
-                bbox.maxLat(),
-                pageable
-        ).map(RouteResponse::from);
-    }
-
 
     //SVG for front end
+    //SVG strateggy was deprecated thus ugly images
     public String buildSvgPreview(String routeId) {
         return routeRepository.findById(routeId)
                 .filter(Route::isPublic)
                 .map(route -> renderSvg(route.getPath()))
                 .orElse(null);
     }
+
 
     private String renderSvg(org.locationtech.jts.geom.LineString path) {
         if (path == null || path.getNumPoints() < 2) return fallbackSvg();
@@ -262,5 +249,52 @@ public class RouteService {
           <text x="200" y="155" text-anchor="middle" font-size="14" fill="#bdbdbd">sem traçado</text>
         </svg>
         """;
+    }
+
+    /**
+            * Verifica se já existe preview para a rota e retorna a URL,
+ * ou retorna null se ainda não foi gerado.
+ * Usado pelo frontend para decidir se precisa renderizar o Leaflet.
+            */
+    public String getPreviewUrl(String routeId) {
+        // Verifica se a rota existe e é pública antes de consultar MinIO
+        routeRepository.findById(routeId)
+                .filter(Route::isPublic)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Rota não encontrada: " + routeId));
+
+        return minioStorageService.getRoutePreviewUrl(routeId);
+    }
+
+    /**
+     * Recebe o PNG gerado pelo Leaflet no frontend e persiste no MinIO.
+     * Retorna a URL pública da imagem salva.
+     */
+    public String savePreview(String routeId, byte[] pngBytes) {
+        routeRepository.findById(routeId)
+                .filter(Route::isPublic)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Rota não encontrada: " + routeId));
+
+        try {
+            return minioStorageService.uploadRoutePreview(routeId, pngBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao salvar preview da rota " + routeId, e);
+        }
+    }
+
+    public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
+        return routeRepository.findAllByIsPublicTrue(pageable)
+                .map(RouteResponse::from);
+    }
+
+    public Page<RouteResponse> findPublicRoutesInBoundingBox(BoundingBoxRequest bbox, Pageable pageable) {
+        // Passa Pageable sem sort — a ordenação está fixada na query nativa (ORDER BY r.start_time DESC)
+        Pageable unsorted = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+        return routeRepository.findPublicRoutesInBoundingBox(
+                bbox.minLon(),
+                bbox.minLat(),
+                bbox.maxLon(),
+                bbox.maxLat(),
+                unsorted
+        ).map(RouteResponse::from);
     }
 }

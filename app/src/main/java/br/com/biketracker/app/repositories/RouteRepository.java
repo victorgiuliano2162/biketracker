@@ -18,6 +18,8 @@ public interface RouteRepository extends JpaRepository<Route, String> {
     // Lista rotas do usuário, mais recentes primeiro
     Page<Route> findByUserIdOrderByStartTimeDesc(String userId, Pageable pageable);
 
+    // Rotas públicas paginadas (sem filtro geo — já existia)
+    Page<Route> findAllByIsPublicTrue(Pageable pageable);
     void deleteRouteById(String id);
 
     boolean existsByIdAndUserId(String id, String userId);
@@ -98,18 +100,25 @@ ORDER BY (dp).path[1]
 
     Route findRouteById(String id);
 
-    // Rotas públicas paginadas (sem filtro geo — já existia)
-    Page<Route> findAllByIsPublicTrue(Pageable pageable);
-
-    // Rotas públicas dentro de um bounding box
-    @Query("""
-        SELECT r FROM Route r
-        WHERE r.isPublic = true
-          AND function('ST_Within',
-                r.startPoint,
-                function('ST_MakeEnvelope', :minLon, :minLat, :maxLon, :maxLat, 4326)
-              ) = true
-        """)
+    // Rotas públicas dentro de um bounding box — SQL nativo para suportar cast geography → geometry
+    @Query(value = """
+        SELECT * FROM routes r
+        WHERE r.is_public = true
+          AND ST_Within(
+                r.start_point::geometry,
+                ST_MakeEnvelope(:minLon, :minLat, :maxLon, :maxLat, 4326)
+              )
+        ORDER BY r.start_time DESC
+        """,
+            countQuery = """
+        SELECT COUNT(*) FROM routes r
+        WHERE r.is_public = true
+          AND ST_Within(
+                r.start_point::geometry,
+                ST_MakeEnvelope(:minLon, :minLat, :maxLon, :maxLat, 4326)
+              )
+        """,
+            nativeQuery = true)
     Page<Route> findPublicRoutesInBoundingBox(
             @Param("minLon") double minLon,
             @Param("minLat") double minLat,
