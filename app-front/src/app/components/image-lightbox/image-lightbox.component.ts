@@ -16,8 +16,8 @@ export interface LightboxData {
 @Component({
   selector: 'app-image-lightbox',
   imports: [CommonModule, MatDialogModule, MatIconModule, MatButtonModule],
-  template: './image-lightbox.component.html',
-  styles: './image-lightbox.component.css',
+  templateUrl: './image-lightbox.component.html',
+  styleUrls: ['./image-lightbox.component.css'],
 })
 export class ImageLightboxComponent {
   current: number;
