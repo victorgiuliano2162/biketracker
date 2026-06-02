@@ -1,61 +1,81 @@
+<!-- src/app/components/route-card/route-card.component.html -->
+
 <mat-card class="route-card">
-      <div class="card-inner">
- 
-        <!-- Preview SVG: lazy nativo do browser, sem JS extra -->
-        <div class="map-thumbnail">
-          <img
-            [src]="previewUrl"
-            [alt]="'Traçado de ' + route.name"
-            class="preview-img"
-            loading="lazy"
-            (error)="imgError = true"
-            [style.display]="imgError ? 'none' : 'block'"
-          />
-          <div *ngIf="imgError" class="img-fallback">
-            <mat-icon>map</mat-icon>
-          </div>
-        </div>
- 
-        <!-- Conteúdo -->
-        <mat-card-content class="card-content">
- 
-          <div class="card-header">
-            <a class="route-name"
-               [routerLink]="['/routes', route.id]"
-               [title]="route.name"
-               (click)="$event.stopPropagation()">
-              {{ route.name }}
-            </a>
-            <span class="difficulty-badge" [style.background]="difficultyColor">
-              {{ difficultyLabel }}
-            </span>
-          </div>
- 
-          <div class="route-meta">
-            <mat-icon class="meta-icon">person</mat-icon>
-            <span>{{ route.userName ?? 'Anônimo' }}</span>
-            <ng-container *ngIf="route.startCity">
-              <span class="meta-sep">·</span>
-              <mat-icon class="meta-icon">location_on</mat-icon>
-              <span>{{ route.startCity }}{{ route.country ? ', ' + route.country : '' }}</span>
-            </ng-container>
-          </div>
- 
-          <div class="metrics">
-            <div class="metric">
-              <mat-icon class="meta-icon">straighten</mat-icon>
-              <span>{{ route.distanceInKm | number:'1.1-1' }} km</span>
-            </div>
-            <div class="metric">
-              <mat-icon class="meta-icon">terrain</mat-icon>
-              <span>{{ route.elevationInMeters | number:'1.0-0' }} m</span>
-            </div>
-            <div class="metric">
-              <mat-icon class="meta-icon">schedule</mat-icon>
-              <span>{{ duration }}</span>
-            </div>
-          </div>
- 
-        </mat-card-content>
+  <div class="card-inner">
+
+    <!-- Área da miniatura -->
+    <div class="map-thumbnail">
+
+      <!-- Carregando (verificando MinIO ou aguardando Leaflet) -->
+      <div *ngIf="state === 'loading' || state === 'rendering'" class="thumb-placeholder">
+        <mat-spinner diameter="28" />
+        <span class="thumb-label">
+          {{ state === 'rendering' ? 'Gerando mapa...' : 'Carregando...' }}
+        </span>
       </div>
-    </mat-card>
+
+      <!-- Preview pronto (URL do MinIO ou dataURL do canvas) -->
+      <img
+        *ngIf="state === 'ready' && previewUrl"
+        [src]="previewUrl"
+        [alt]="'Traçado de ' + route.name"
+        class="preview-img"
+      />
+
+      <!-- Container oculto onde o Leaflet renderiza antes de exportar -->
+      <div
+        #leafletContainer
+        class="leaflet-render-target"
+        [class.active]="state === 'rendering'"
+      ></div>
+
+      <!-- Erro -->
+      <div *ngIf="state === 'error'" class="thumb-placeholder thumb-error">
+        <mat-icon>map</mat-icon>
+      </div>
+
+    </div>
+
+    <!-- Conteúdo -->
+    <mat-card-content class="card-content">
+
+      <div class="card-header">
+        <a class="route-name"
+           [routerLink]="['/routes', route.id]"
+           [title]="route.name"
+           (click)="$event.stopPropagation()">
+          {{ route.name }}
+        </a>
+        <span class="difficulty-badge" [style.background]="difficultyColor">
+          {{ difficultyLabel }}
+        </span>
+      </div>
+
+      <div class="route-meta">
+        <mat-icon class="meta-icon">person</mat-icon>
+        <span>{{ route.userName ?? 'Anônimo' }}</span>
+        <ng-container *ngIf="route.startCity">
+          <span class="meta-sep">·</span>
+          <mat-icon class="meta-icon">location_on</mat-icon>
+          <span>{{ route.startCity }}{{ route.country ? ', ' + route.country : '' }}</span>
+        </ng-container>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <mat-icon class="meta-icon">straighten</mat-icon>
+          <span>{{ route.distanceInKm | number:'1.1-1' }} km</span>
+        </div>
+        <div class="metric">
+          <mat-icon class="meta-icon">terrain</mat-icon>
+          <span>{{ route.elevationInMeters | number:'1.0-0' }} m</span>
+        </div>
+        <div class="metric">
+          <mat-icon class="meta-icon">schedule</mat-icon>
+          <span>{{ duration }}</span>
+        </div>
+      </div>
+
+    </mat-card-content>
+  </div>
+</mat-card>

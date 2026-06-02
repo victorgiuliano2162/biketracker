@@ -7,18 +7,17 @@ import {
   ElementRef,
   ViewChild,
   inject,
-  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import * as L from 'leaflet';
 import { RouteResponse } from '../../models/route.model';
 import { RouteService } from '../../services/route/route.service';
 import { formatDuration } from '../../utils/geo.utils';
 
+import * as L from 'leaflet';
 declare const leafletImage: any;
 
 const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
@@ -45,13 +44,12 @@ type PreviewState = 'loading' | 'ready' | 'rendering' | 'error';
 })
 export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input({ required: true }) route!: RouteResponse;
+  @ViewChild('leafletContainer')
+  leafletContainerRef?: ElementRef<HTMLDivElement>;
 
   private routeService = inject(RouteService);
-  private cdr = inject(ChangeDetectorRef);
   private intersectionObserver?: IntersectionObserver;
-  private mapInstance?: L.Map;
-  // Container fora da tela onde o Leaflet renderiza antes de exportar
-  private offscreenContainer?: HTMLDivElement;
+  private mapInstance?: any;
 
   state: PreviewState = 'loading';
   previewUrl: string | null = null;
@@ -74,6 +72,7 @@ export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
+    // Adia todo o trabalho pesado até o card entrar na viewport
     this.intersectionObserver = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -83,50 +82,55 @@ export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       { threshold: 0.1 },
     );
+
+    // Observa o host element do componente
     this.intersectionObserver.observe(
-      document.querySelector(`app-route-card`) ?? document.body,
+      this.leafletContainerRef?.nativeElement ?? document.body,
     );
   }
 
   ngOnDestroy(): void {
     this.intersectionObserver?.disconnect();
     this.mapInstance?.remove();
-    this.offscreenContainer?.remove();
   }
+
+  // ── Passo 1: verifica se já existe preview no MinIO ───────────────────────
 
   private checkAndLoadPreview(): void {
     this.routeService.checkPreview(this.route.id).subscribe({
       next: (url) => {
         if (url) {
+          // Já existe — exibe direto
           this.previewUrl = url;
           this.state = 'ready';
-          this.cdr.markForCheck();
         } else {
+          // Não existe — precisa gerar via Leaflet
           this.state = 'rendering';
-          this.cdr.markForCheck();
           this.generatePreview();
         }
       },
       error: () => {
         this.state = 'error';
-        this.cdr.markForCheck();
       },
     });
   }
+
+  // ── Passo 2: busca replay, renderiza Leaflet, exporta PNG ─────────────────
 
   private generatePreview(): void {
     this.routeService.getRouteReplay(this.route.id).subscribe({
       next: (replay) => {
         if (!replay.points?.length) {
           this.state = 'error';
-          this.cdr.markForCheck();
           return;
         }
-        this.renderLeafletAndExport(replay.points);
+
+        // Aguarda o ViewChild do container Leaflet estar disponível no DOM
+        // (só existe quando state === 'rendering')
+        setTimeout(() => this.renderLeafletAndExport(replay.points), 50);
       },
       error: () => {
         this.state = 'error';
-        this.cdr.markForCheck();
       },
     });
   }
@@ -134,18 +138,11 @@ export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
   private renderLeafletAndExport(
     points: { latitude: number; longitude: number }[],
   ): void {
-    // Container posicionado fora da área visível — o Leaflet carrega tiles normalmente
-    const container = document.createElement('div');
-    container.style.cssText = `
-      position: fixed;
-      left: -9999px;
-      top: 0;
-      width: 400px;
-      height: 300px;
-      z-index: -1;
-    `;
-    document.body.appendChild(container);
-    this.offscreenContainer = container;
+    const container = this.leafletContainerRef?.nativeElement;
+    if (!container) {
+      this.state = 'error';
+      return;
+    }
 
     const latlngs = points.map(
       (p) => [p.latitude, p.longitude] as [number, number],
@@ -172,44 +169,40 @@ export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.mapInstance = map;
 
-    map.once('tilesloaded', () => {
-      // Pequeno delay para garantir que o canvas foi pintado
-      setTimeout(() => {
-        leafletImage(map, (err: any, canvas: HTMLCanvasElement) => {
-          map.remove();
-          container.remove();
-          this.mapInstance = undefined;
-          this.offscreenContainer = undefined;
+    // Aguarda todos os tiles carregarem antes de exportar
+    const doExport = () => {
+      leafletImage(map, (err: any, canvas: HTMLCanvasElement) => {
+        map.remove();
+        this.mapInstance = undefined;
 
-          if (err) {
-            console.warn('leafletImage error:', err);
-            this.state = 'error';
-            this.cdr.markForCheck();
-            return;
-          }
+        if (err) {
+          this.state = 'error';
+          return;
+        }
 
-          this.previewUrl = canvas.toDataURL('image/png');
-          this.state = 'ready';
-          this.cdr.markForCheck();
+        this.previewUrl = canvas.toDataURL('image/png');
+        this.state = 'ready';
 
-          // Envia para o backend salvar no MinIO (fire and forget)
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) return;
-              blob.arrayBuffer().then((buffer) => {
-                this.routeService
-                  .uploadPreview(this.route.id, buffer)
-                  .subscribe({
-                    next: (url) => console.log('Preview salvo no MinIO:', url),
-                    error: (e) => console.warn('Falha ao salvar preview:', e),
-                  });
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return;
+            blob.arrayBuffer().then((buffer) => {
+              this.routeService.uploadPreview(this.route.id, buffer).subscribe({
+                error: (e) =>
+                  console.warn('Falha ao salvar preview no MinIO:', e),
               });
-            },
-            'image/png',
-            0.9,
-          );
-        });
-      }, 200);
-    });
+            });
+          },
+          'image/png',
+          0.9,
+        );
+      });
+    };
+    map.on('tilesloaded', () =>
+      console.log('tilesloaded disparou para', this.route.id),
+    );
+    map.on('load', () => console.log('load disparou para', this.route.id));
+    // tilesloaded dispara quando todos os tiles visíveis foram carregados
+    map.once('tilesloaded', doExport);
   }
 }
