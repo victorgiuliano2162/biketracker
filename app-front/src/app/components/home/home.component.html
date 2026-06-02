@@ -12,41 +12,43 @@
           </p>
         </div>
  
- 
-        <!-- Controles de localização -->
-        <div class="location-controls">
-          <ng-container *ngIf="!userLocation; else withLocation">
-            <div class="location-cta">
-              <mat-icon>location_off</mat-icon>
-              <span>Exibindo todas as rotas públicas</span>
-              <button mat-stroked-button color="primary" (click)="requestLocation()">
-                <mat-icon>my_location</mat-icon>
-                Usar minha localização
-              </button>
-            </div>
-          </ng-container>
- 
-          <ng-template #withLocation>
-            <div class="location-active">
-              <div class="location-info">
-                <mat-icon color="primary">location_on</mat-icon>
-                <span>Mostrando rotas em até <strong>{{ radiusKm }} km</strong></span>
-                <button mat-icon-button (click)="clearLocation()" matTooltip="Remover filtro de localização">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-              <div class="radius-slider">
-                <span class="slider-label">5 km</span>
-                <mat-slider min="5" max="100" step="5" discrete>
-                  <input matSliderThumb [(ngModel)]="radiusKm" (valueChange)="onRadiusChange()" />
-                </mat-slider>
-                <span class="slider-label">100 km</span>
-              </div>
-            </div>
-          </ng-template>
+ @if (false) {
+
+   <!-- Controles de localização -->
+   <div class="location-controls">
+     <ng-container *ngIf="!userLocation; else withLocation">
+       <div class="location-cta">
+         <mat-icon>location_off</mat-icon>
+         <span>Exibindo todas as rotas públicas</span>
+         <button mat-stroked-button color="primary" (click)="requestLocation()">
+           <mat-icon>my_location</mat-icon>
+           Usar minha localização
+          </button>
         </div>
-      </header>
- 
+      </ng-container>
+      
+      <ng-template #withLocation>
+        <div class="location-active">
+          <div class="location-info">
+            <mat-icon color="primary">location_on</mat-icon>
+            <span>Mostrando rotas em até <strong>{{ radiusKm }} km</strong></span>
+            <button mat-icon-button (click)="clearLocation()" matTooltip="Remover filtro de localização">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div class="radius-slider">
+            <span class="slider-label">5 km</span>
+            <mat-slider min="5" max="100" step="5" discrete>
+              <input matSliderThumb [(ngModel)]="radiusKm" (valueChange)="onRadiusChange()" />
+            </mat-slider>
+            <span class="slider-label">100 km</span>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  }
+  </header>
+  
       <!-- Loading -->
       <div *ngIf="loading" class="loading-state">
         <mat-spinner diameter="48" />
