@@ -275,7 +275,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .catch(() => {});
 
-    this.map.on('moveend', () => this.onMapMoveEnd());
+    //this.map.on('moveend', () => this.onMapMoveEnd());
   }
 
   // ── Localização ──────────────────────────────────────────────────────
