@@ -33,7 +33,8 @@ export const routeDetailResolver: ResolveFn<RouteDetailData | null> = (
       route,
       points: replay.points,
     })),
-    catchError(() => {
+    catchError((err) => {
+      console.error('Resolver falhou:', err);
       router.navigate(['/routes']);
       return of(null);
     })
