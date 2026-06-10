@@ -241,6 +241,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.refreshTree();
     this.loadSavedRoutes();
+    this.centerOnUser();
   }
 
   ngAfterViewInit(): void {
