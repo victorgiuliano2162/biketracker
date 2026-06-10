@@ -2,6 +2,7 @@ package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.ActivityImage;
 import br.com.biketracker.app.repositories.ActivityImageRepository;
+import br.com.biketracker.app.repositories.RouteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class ActivityImageService {
 
     private final MinioStorageService minioStorageService;
     private final ActivityImageRepository activityImageRepository;
-    private final RouteService routeService;
+    private final RouteRepository routeRepository;
 
     @Transactional
     public List<String> uploadImages(UUID activityId, List<MultipartFile> files) {
@@ -30,7 +31,7 @@ public class ActivityImageService {
 
             try {
                 String objectKey = minioStorageService.uploadActivityImage(activityId, file);
-                var route = routeService.findRouteById(activityId.toString());
+                var route = routeRepository.findRouteById(activityId.toString());
                 ActivityImage image = new ActivityImage();
                 image.setObjectKey(objectKey);
                 image.setOriginalFilename(file.getOriginalFilename());
@@ -72,6 +73,15 @@ public class ActivityImageService {
             activityImageRepository.delete(image);
         } catch (Exception e) {
             throw new RuntimeException("Erro ao deletar imagem: " + image.getObjectKey(), e);
+        }
+    }
+
+    @Transactional
+    public void deleteImageByRouteId(String routeId) {
+        List<ActivityImage> image = activityImageRepository.findByRouteId(routeId);
+        for (ActivityImage activityImage : image) {
+            activityImageRepository.deleteByRouteId(activityImage.getRoute().getId());
+            minioStorageService.deleteImage(activityImage.getObjectKey());
         }
     }
 
