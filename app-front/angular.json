@@ -13,6 +13,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+  "@tensorflow/tfjs"
+],
             "outputPath": "dist/app-front",
             "index": "src/index.html",
             "browser": "src/main.ts",
