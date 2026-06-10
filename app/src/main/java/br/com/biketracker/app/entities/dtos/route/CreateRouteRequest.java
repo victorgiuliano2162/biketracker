@@ -16,5 +16,6 @@ public record CreateRouteRequest(
         String country,
         boolean isPublic,
         RouteDifficulty difficulty,
-        List<TrackPoint> trackPoints
+        List<TrackPoint> trackPoints,
+        String description
 ) {}
