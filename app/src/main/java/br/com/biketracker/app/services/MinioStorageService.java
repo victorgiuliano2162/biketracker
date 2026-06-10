@@ -92,13 +92,19 @@ public class MinioStorageService {
     }
 
     // Remove uma imagem
-    public void deleteImage(String objectKey) throws Exception {
-        minioClient.removeObject(
-                RemoveObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectKey)
-                        .build()
-        );
+    public void deleteImage(String objectKey) {
+
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectKey)
+                            .build()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private String getExtension(String filename) {
