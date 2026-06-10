@@ -38,6 +38,7 @@ public class RouteService {
     private final GeometryFactory geometryFactory =
             new GeometryFactory(new PrecisionModel(), 4326);
     private final MinioStorageService minioStorageService;
+    private final ActivityImageService activityImageService;
 
     @Transactional
     public RouteResponse createRoute(String userId, CreateRouteRequest request) {
@@ -159,7 +160,7 @@ public class RouteService {
         // garante que a rota pertence ao usuário antes de deletar
         boolean owns = routeRepository.existsByIdAndUserId(routeId, userId);
         if (!owns) return false;
-
+        activityImageService.deleteImageByRouteId(routeId);
         routeRepository.deleteById(routeId);
         return true;
     }
