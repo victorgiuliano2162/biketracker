@@ -116,18 +116,22 @@
           />
         </div>
 
-        <!-- Preview grid -->
-        @if (previews.length > 0) {
-          <div class="preview-grid">
-            @for (preview of previews; track preview.previewUrl; let i = $index) {
-              <div class="preview-item">
-                <img [src]="preview.previewUrl" [alt]="preview.file.name" class="preview-img" />
+        <!-- Avisos de imagens rejeitadas pelo modelo NSFW -->
+        @if (rejectedImages.length > 0) {
+          <div class="nsfw-warnings">
+            @for (rejected of rejectedImages; track rejected.fileName; let i = $index) {
+              <div class="nsfw-warning-item">
+                <mat-icon class="nsfw-warning-icon">warning</mat-icon>
+                <div class="nsfw-warning-text">
+                  <span class="nsfw-warning-filename">{{ rejected.fileName }}</span>
+                  <span class="nsfw-warning-reason">{{ rejected.reason }}</span>
+                </div>
                 <button
-                  mat-mini-fab
-                  class="remove-btn"
-                  (click)="removeImage(i)"
-                  [matTooltip]="'Remover ' + preview.file.name"
-                  aria-label="Remover imagem"
+                  mat-icon-button
+                  class="nsfw-dismiss-btn"
+                  (click)="dismissRejected(i)"
+                  matTooltip="Fechar aviso"
+                  aria-label="Fechar aviso"
                 >
                   <mat-icon>close</mat-icon>
                 </button>
@@ -135,6 +139,38 @@
             }
           </div>
         }
+
+        <!-- Preview grid -->
+        @if (previews.length > 0) {
+          <div class="preview-grid">
+            @for (preview of previews; track preview.previewUrl; let i = $index) {
+              <div class="preview-item" [class.preview-validating]="preview.validating">
+                <img [src]="preview.previewUrl" [alt]="preview.file.name" class="preview-img" />
+
+                <!-- Overlay de validação em andamento -->
+                @if (preview.validating) {
+                  <div class="validating-overlay">
+                    <mat-spinner diameter="28" />
+                  </div>
+                }
+
+                <!-- Botão de remover (oculto durante validação) -->
+                @if (!preview.validating) {
+                  <button
+                    mat-mini-fab
+                    class="remove-btn"
+                    (click)="removeImage(i)"
+                    [matTooltip]="'Remover ' + preview.file.name"
+                    aria-label="Remover imagem"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+
       </div>
 
     </form>
@@ -143,10 +179,18 @@
   <!-- Actions -->
   <mat-dialog-actions align="end">
     <button mat-button (click)="cancel()">Cancelar</button>
-    <button mat-flat-button color="primary"
-      [disabled]="form.invalid"
-      (click)="confirm()">
-      <mat-icon>cloud_upload</mat-icon>
+    <button
+      mat-flat-button
+      color="primary"
+      [disabled]="form.invalid || isValidating"
+      (click)="confirm()"
+      [matTooltip]="isValidating ? 'Aguarde a validação das fotos' : ''"
+    >
+      @if (isValidating) {
+        <mat-spinner diameter="16" />
+      } @else {
+        <mat-icon>cloud_upload</mat-icon>
+      }
       Salvar rota
     </button>
   </mat-dialog-actions>

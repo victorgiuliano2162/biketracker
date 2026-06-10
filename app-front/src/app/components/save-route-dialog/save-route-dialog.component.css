@@ -301,3 +301,85 @@ mat-dialog-actions button[mat-flat-button] mat-icon {
 .preview-item:hover .remove-btn {
   opacity: 1;
 }
+
+/* ── Cole este bloco no final do save-route-dialog.component.css existente ── */
+
+/* Overlay de validação sobre o thumbnail */
+.preview-validating {
+  pointer-events: none;
+}
+
+.validating-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+  z-index: 2;
+}
+
+/* Avisos de imagens rejeitadas */
+.nsfw-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nsfw-warning-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--mat-sys-error, #b00020) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error, #b00020) 30%, transparent);
+}
+
+.nsfw-warning-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--mat-sys-error, #b00020);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.nsfw-warning-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nsfw-warning-filename {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nsfw-warning-reason {
+  font-size: 0.77rem;
+  color: var(--mat-sys-error, #b00020);
+  opacity: 0.9;
+}
+
+.nsfw-dismiss-btn {
+  flex-shrink: 0;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  line-height: 24px !important;
+}
+
+.nsfw-dismiss-btn mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
