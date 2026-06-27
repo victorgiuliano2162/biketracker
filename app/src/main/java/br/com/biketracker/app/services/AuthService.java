@@ -1,8 +1,8 @@
 package br.com.biketracker.app.services;
 
-import br.com.biketracker.app.entities.dtos.authDto.LoginRequest;
-import br.com.biketracker.app.entities.dtos.authDto.LoginResponse;
-import br.com.biketracker.app.entities.dtos.authDto.RefreshRequest;
+import br.com.biketracker.app.entities.dtos.auth.LoginRequest;
+import br.com.biketracker.app.entities.dtos.auth.LoginResponse;
+import br.com.biketracker.app.entities.dtos.auth.RefreshRequest;
 import br.com.biketracker.app.exceptions.ex.UnauthorizedException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 @Service
 public class AuthService {

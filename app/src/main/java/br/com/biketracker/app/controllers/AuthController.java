@@ -1,6 +1,6 @@
 package br.com.biketracker.app.controllers;
 
-import br.com.biketracker.app.entities.dtos.authDto.*;
+import br.com.biketracker.app.entities.dtos.auth.*;
 import br.com.biketracker.app.services.AuthService;
 import br.com.biketracker.app.services.PasswordResetService;
 import org.springframework.http.ResponseEntity;
