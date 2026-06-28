@@ -1,8 +1,26 @@
 # Trakker
 
-Trakker é nasce como um aplicativo web destinado a atletas amadores que desejam compartilhar suas experiências em trilhas/trajetos abrindo o caminho para que a comunidade possa descobrir novos lugares. O sistema oferece mapas responsivos, cálculos automáticos de distância e altimetria, visibilidade pública/privada.
+# Trakker
 
-O uso do usuário se dá majoritariamente através da interação com arquivos .gpx, imagens e comentários a respeito da rota.
+![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-brightgreen?logo=spring)
+![Angular](https://img.shields.io/badge/Angular-19-red?logo=angular)
+![Docker](https://img.shields.io/badge/Docker-Container-blue?logo=docker)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+Trakker nasce como um aplicativo web destinado a atletas amadores que desejam compartilhar suas experiências em trilhas/trajetos abrindo o caminho para que a comunidade possa descobrir novos lugares. O sistema oferece mapas responsivos, cálculos automáticos de distância e altimetria, visibilidade pública/privada.
+
+O uso do usuário se dá majoritariamente através da interação com arquivos `.gpx`, imagens e comentários a respeito da rota.
+
+---
+## Funcionalidades
+
+- Upload e processamento de arquivos `.gpx`
+- Cálculo automático de distância e altimetria das rotas
+- Mapas interativos e responsivos
+- Upload de imagens vinculadas a atividades, com verificação automática via TensorFlow.js
+- Controle de visibilidade pública/privada das rotas
+- Busca de rotas públicas
 
 ---
 ## Estrutura da aplicação
@@ -84,11 +102,27 @@ Foi utlizado como repositório para as fotos e miniaturas geradas pela aplicaç�
 
 # Requisitos para execução:
 Para a execução do programa se faz necessário:
-- máquina com 4gb de ram e a engine do docker instalada
-- será necessário que as chaves pem sejam geradas, há um passo a passo no arquivo [certificados.md](CERTIFICADOS.MD), ou seguir o passo a passo no [Linux][1] ou [Windows][2]
+- Máquina com 4gb de ram e a engine do docker instalada
+- Chaves PEM, há um passo a passo no arquivo [certificados.md](CERTIFICADOS.MD), ou seguir o passo a passo no [Linux][1] ou [Windows][2]
 
 
-Após isso será necessário executar um ```docker compose up --build``` na raiz do projeto.
+Após isso, execute na raiz do projeto:
+
+```bash
+docker compose up --build
+```
+
+### Variáveis de ambiente
+
+<!-- Sugestão: liste aqui as variáveis necessárias, por exemplo: -->
+
+| Variável | Descrição | Exemplo |
+|---|---|---|
+| `POSTGRES_USER` | Usuário do banco de dados | `trakker` |
+| `POSTGRES_PASSWORD` | Senha do banco de dados | `********` |
+| `MINIO_ROOT_USER` | Usuário do Minio | `trakker` |
+| `MINIO_ROOT_PASSWORD` | Senha do Minio | `********` |
+| `JWT_SECRET` | Segredo usado na geração de tokens OAuth2 | `********` |
 
 # Principais EndPoints
 
@@ -97,37 +131,50 @@ Cada endpoint desses também presume rotas filhas para tratar de atividade espec
 ### Backend
 Caso seja necessário realizar verificações no endpoints do backend todas as chamadas para  são iniciadas pelo préfixo ```api```, sem necessidade de explicitar a porta.
 
-- ```/api/user``` para criação de usuários
-- ```/api/health``` verificar integridade da api
-- ```/api/auth``` autenticação
-- ```/api/activities/{activityId}/images``` imagens referentes a cada atividade
-- ```/api/routes``` rotas
+| Método | Rota | Autenticação | Descrição |
+|---|---|---|---|
+| post | `/api/user` | Não | Criação de usuários |
+| post | `/api/auth/login` | Não | Login |
+| post | `/api/auth/refresh` | Não | Refresh de token |
+| post | `/api/auth/forgot-password` | Não | Solicitação de recuperação de senha |
+| post | `/api/auth/reset-password` | Não | Redefinição de senha |
+| get | `/api/health/**` | Não | Verificação de integridade da API |
+| get | `/api/routes/public/**` | Não | Rotas públicas |
+| get | `/api/routes/public/search/**` | Não | Busca de rotas públicas |
+| post | `/api/routes` | Sim | Gerenciamento de rotas do usuário |
+| get | `/api/activities/{activityId}/images` | Sim | Imagens referentes a cada atividade |
 
-No backend estás rotas estão expostas:
 
-- ```/api/user```
-- ```/api/user```
-- ```/api/auth/login```
-- ```/api/auth/refresh```
-- ```/api/routes/public/**```
-- ```/api/routes/public/search/**```
-- ```/api/health/**```
-- ```/api/auth/forgot-password```
-- ```/api/auth/reset-password```
 
 
 ### Frontend
 
 Aqui ignora-se prefixo. O naming para cada endpoint é simples e elucida sua função, contudo somente os 4 primeiros não exigem um usuário autenticado.
 
-- ```/login```
-- ```/subscribe ```
-- ```/forgot-password ```
-- ```/reset-password```
-- ```/home```
-- ```/map```
-- ```/routes```
-- ```/status```
+| Rota | Autenticação necessária |
+|---|---|
+| `/login` | Não |
+| `/subscribe` | Não |
+| `/forgot-password` | Não |
+| `/reset-password` | Não |
+| `/home` | Sim |
+| `/map` | Sim |
+| `/routes` | Sim |
+| `/status` | Sim |
+
+## Como contribuir
+
+<!-- Sugestão: descreva o fluxo de contribuição, por exemplo: -->
+
+1. Faça um fork do repositório
+2. Crie uma branch a partir de `main`: `git checkout -b feature/minha-feature`
+3. Faça commit das alterações seguindo o padrão de mensagens do projeto
+4. Abra um Pull Request descrevendo a mudança
+
+---
+
+## Licença
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 
 
