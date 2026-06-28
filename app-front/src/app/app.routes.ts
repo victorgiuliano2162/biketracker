@@ -67,7 +67,7 @@ export const routes: Routes = [
     canActivate: [publicGuard],
   },
   {
-    path: 'reset-password/',
+    path: 'reset-password',
     loadComponent: () =>
       import('./components/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
     canActivate: [publicGuard],
