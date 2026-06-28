@@ -1,5 +1,6 @@
 package br.com.biketracker.app.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RouteService {
@@ -154,7 +155,7 @@ public class RouteService {
 
     @Transactional
     public boolean deleteRoute(String routeId, String userId) {
-        logger.info("Tentando deletar routeId={} userId={}", routeId, userId);
+        log.info("Tentando deletar routeId={} userId={}", routeId, userId);
         logger.info("Exists check: {}", routeRepository.existsByIdAndUserId(routeId, userId));
 
         // garante que a rota pertence ao usuário antes de deletar
