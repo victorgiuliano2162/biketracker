@@ -67,7 +67,7 @@ public class Route {
         this.activityTimeInSeconds = duration.toSeconds();
     }
 
-    public void buildPath(GeometryFactory factory, List<TrackPoint> trackPoints) {
+    public void buildPathWithoutZDimension(GeometryFactory factory, List<TrackPoint> trackPoints) {
         CoordinateXYZM[] coords = trackPoints.stream()
                 .map(tp -> new CoordinateXYZM(
                         tp.longitude(),
@@ -78,6 +78,24 @@ public class Route {
                 .toArray(CoordinateXYZM[]::new);
         Coordinate startCoord = new Coordinate(coords[0].x, coords[0].y);
         Coordinate endCoord   = new Coordinate(coords[coords.length - 1].x, coords[coords.length - 1].y);
+
+        this.startPoint = factory.createPoint(startCoord);
+        this.endPoint   = factory.createPoint(endCoord);
+        this.path = factory.createLineString(coords);
+
+    }
+
+    public void buildPath(GeometryFactory factory, List<TrackPoint> trackPoints) {
+        CoordinateXYZM[] coords = trackPoints.stream()
+                .map(tp -> new CoordinateXYZM(
+                        tp.longitude(),
+                        tp.latitude(),
+                        tp.altitudeInMeters(),
+                        tp.recordedAt().toEpochSecond(ZoneOffset.UTC)
+                ))
+                .toArray(CoordinateXYZM[]::new);
+        Coordinate startCoord = new Coordinate(coords[0].x, coords[0].y, coords[0].z);
+        Coordinate endCoord = new Coordinate(coords[coords.length - 1].x, coords[coords.length - 1].y, coords[coords.length - 1].z);
 
         this.startPoint = factory.createPoint(startCoord);
         this.endPoint   = factory.createPoint(endCoord);
