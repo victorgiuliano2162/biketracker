@@ -3,6 +3,9 @@ package br.com.biketracker.app.services;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +45,7 @@ public class RouteService {
     private final ActivityImageService activityImageService;
 
     @Transactional
+
     public RouteResponse createRoute(String userId, CreateRouteRequest request) {
         User user = userRepository.findByEmail(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -57,15 +61,16 @@ public class RouteService {
         route.setPublic(request.isPublic());
         route.setUser(user);
         route.setName(request.name());
-        route.buildPath(geometryFactory, request.trackPoints());
+        route.buildPathWithoutZDimension(geometryFactory, request.trackPoints()); ;
         route.calculateActivityTime();
 
         return RouteResponse.from(routeRepository.save(route));
     }
 
     @Transactional(readOnly = true)
+
     public RouteResponse getRouteById(String userId, String routeId) {
-        User user = userRepository.findByEmail(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         Route route = routeRepository.findById(routeId)
@@ -79,6 +84,7 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
+
     public Page<RouteResponse> listMyRoutes(String userId, Pageable pageable) {
         var u = userRepository.findByEmail(userId);
         return routeRepository
@@ -94,11 +100,14 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
+
     public RouteStatsResponse getStats(String userId) {
         return routeRepository.findStatsByUserId(userId);
     }
 
+
     @Transactional(readOnly = true)
+
     public RouteReplayResponse getRouteReplay(String userId, String routeId) {
         var u = userRepository.findByEmail(userId);
         List<Object[]> rows = routeRepository.findRoutePointsByRouteId(routeId, u.get().getId());
@@ -130,14 +139,16 @@ public class RouteService {
         return new RouteReplayResponse(routeId, points);
     }
 
+
     @Transactional
     public Route findRouteById(String id) {
         return routeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + id));
     }
 
+
     @Transactional(readOnly = true)
-    public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
+     public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
         var u = userRepository.findByEmail(userId);
         List<String> ids = routeRepository.findIdsByUserAndBoundingBox(
                 u.get().getId(),
@@ -154,6 +165,7 @@ public class RouteService {
     }
 
     @Transactional
+
     public boolean deleteRoute(String routeId, String userId) {
         log.info("Tentando deletar routeId={} userId={}", routeId, userId);
         logger.info("Exists check: {}", routeRepository.existsByIdAndUserId(routeId, userId));
@@ -166,9 +178,11 @@ public class RouteService {
         return true;
     }
 
+
     @Transactional
+
     public RouteResponse toggleVisibility(String userId, String routeId) {
-        User user = userRepository.findByEmail(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         Route route = routeRepository.findById(routeId)
@@ -176,10 +190,13 @@ public class RouteService {
 
         if (!route.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("Essa rota não pertence ao usuário");
+
+        } else {
+            route.setPublic(!route.isPublic());
+            return RouteResponse.from(routeRepository.save(route));
         }
 
-        route.setPublic(!route.isPublic());
-        return RouteResponse.from(routeRepository.save(route));
+
     }
 
 
@@ -283,12 +300,14 @@ public class RouteService {
         }
     }
 
-    public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
+
+     public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
         return routeRepository.findAllByIsPublicTrue(pageable)
                 .map(RouteResponse::from);
     }
 
-    public Page<RouteResponse> findPublicRoutesInBoundingBox(BoundingBoxRequest bbox, Pageable pageable) {
+
+     public Page<RouteResponse> findPublicRoutesInBoundingBox(BoundingBoxRequest bbox, Pageable pageable) {
         // Passa Pageable sem sort — a ordenação está fixada na query nativa (ORDER BY r.start_time DESC)
         Pageable unsorted = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
         return routeRepository.findPublicRoutesInBoundingBox(

@@ -4,6 +4,7 @@ import br.com.biketracker.app.config.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
@@ -11,6 +12,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @SpringBootApplication
 @EnableConfigurationProperties(JwtProperties.class)
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
+@EnableCaching
 public class AppApplication {
 
     public static void main(String[] args) {
