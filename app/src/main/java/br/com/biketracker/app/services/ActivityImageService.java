@@ -6,6 +6,7 @@ import br.com.biketracker.app.repositories.RouteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +49,7 @@ public class ActivityImageService {
 
         return keys;
     }
+
 
     public List<String> getPresignedUrls(String activityId) {
         List<ActivityImage> images = activityImageRepository.findByRouteId(activityId);
