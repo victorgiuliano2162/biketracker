@@ -108,7 +108,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId
     ) {
-        String userId = jwt.getSubject();
+        String userId = jwt.getClaimAsString("user_id");
         return ResponseEntity.ok(routeService.toggleVisibility(userId, routeId));
     }
 
@@ -117,7 +117,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId
     ) {
-        String userId = jwt.getSubject();
+        String userId = jwt.getClaimAsString("user_id");
         return ResponseEntity.ok(routeService.getRouteById(userId, routeId));
     }
 
