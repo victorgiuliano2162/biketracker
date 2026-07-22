@@ -33,6 +33,8 @@ public class Route {
 
     private LocalDateTime createdAt;
 
+
+    //as datas são persistidas seguindo o padrão UTC
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
