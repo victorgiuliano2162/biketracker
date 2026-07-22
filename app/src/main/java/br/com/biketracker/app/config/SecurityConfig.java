@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/routes/public/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/routes/public/search/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/health/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/auth/forgot-password", "/api/auth/reset-password").permitAll()
                         .requestMatchers("/error").permitAll()
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
