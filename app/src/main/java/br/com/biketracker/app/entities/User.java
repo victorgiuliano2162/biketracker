@@ -18,6 +18,7 @@ import java.util.List;
 @Table(name = "users")
 public class User {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36, columnDefinition = "VARCHAR(36)")
@@ -27,8 +28,6 @@ public class User {
     @Size(min = 3, max = 100, message = "Nome deve ter entre 3 e 100 caracteres")
     private String name;
 
-    @NotBlank(message = "Username é obrigatório")
-    private String userName;
 
     @NotBlank(message = "E-mail é obrigatório")
     @Email(message = "E-mail inválido")
@@ -86,6 +85,21 @@ public class User {
     public void addGoal(Goal goal) {
         this.goals.add(goal);
         goal.setUser(this);
+    }
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", tipoSanguineo=" + tipoSanguineo +
+                ", createdAt=" + createdAt +
+                ", bornAt=" + bornAt +
+                ", weight=" + weight +
+                ", age=" + age +
+                ", password='" + password + '\'' +
+                '}';
     }
 
 }

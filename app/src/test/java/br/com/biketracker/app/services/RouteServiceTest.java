@@ -57,7 +57,7 @@ public class RouteServiceTest {
             testUser = new User();
             testUser.setId(userId);
             testUser.setEmail(userEmail);
-            testUser.setUserName("ciclista_pro");
+            //testUser.setUserName("ciclista_pro");
 
             testRoute = new Route();
             testRoute.setId(routeId);

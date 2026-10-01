@@ -25,7 +25,6 @@ public class UserController {
     @PostMapping()
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
         try {
-
         User user = new User(
                 request.name(),
                 request.email(),

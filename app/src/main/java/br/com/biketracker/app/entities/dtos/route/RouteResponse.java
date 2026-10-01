@@ -18,7 +18,7 @@ public record RouteResponse(
         long activityTimeInSeconds,
         boolean isPublic,
         RouteDifficulty routeDifficulty,
-        String userName,   // <-- adicionado
+        //String userName,   // <-- adicionado
         String description
 ) {
     public static RouteResponse from(Route route) {
@@ -35,7 +35,7 @@ public record RouteResponse(
                 route.getActivityTimeInSeconds(),
                 route.isPublic(),
                 route.getDifficulty(),
-                route.getUser() != null ? route.getUser().getUserName() : null,  // <-- adicionado
+                //route.getUser() != null ? route.getUser().getUserName() : null,  // <-- adicionado
                 route.getDescription()
         );
     }

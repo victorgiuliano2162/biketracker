@@ -99,7 +99,7 @@ class RouteServiceIntegrationTest {
                 "Victor BikeTracker", "victor@teste.com", "senha123",
                 26, 75.0, LocalDateTime.of(1998, 3, 19, 0, 0), TipoSanguineo.O_POSITIVO
         );
-        user.setUserName("victor_endurance");
+        //user.setUserName("victor_endurance");
         savedUser = userRepository.save(user);
     }
 
