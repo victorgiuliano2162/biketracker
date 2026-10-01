@@ -48,6 +48,8 @@ public class Route {
 
     private boolean isPublic;
 
+    //UPDATE routes SET isPulic = false WHERE route.id = ?id
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -64,6 +66,7 @@ public class Route {
     @Column(columnDefinition = "geography(LineStringZM, 4326)")
     private LineString path;
 
+    @Deprecated
     public void calculateActivityTime() {
         Duration duration = Duration.between(startTime, endTime);
         this.activityTimeInSeconds = duration.toSeconds();
@@ -88,6 +91,11 @@ public class Route {
     }
 
     public void buildPath(GeometryFactory factory, List<TrackPoint> trackPoints) {
+        if (trackPoints == null || trackPoints.isEmpty()) {
+            throw new IllegalArgumentException("A lista de track points não pode ser vazia.");
+        }
+
+        // 1. Mapeia todos os pontos com 4 dimensões (X, Y, Z, M)
         CoordinateXYZM[] coords = trackPoints.stream()
                 .map(tp -> new CoordinateXYZM(
                         tp.longitude(),
@@ -96,12 +104,15 @@ public class Route {
                         tp.recordedAt().toEpochSecond(ZoneOffset.UTC)
                 ))
                 .toArray(CoordinateXYZM[]::new);
-        Coordinate startCoord = new Coordinate(coords[0].x, coords[0].y, coords[0].z);
-        Coordinate endCoord = new Coordinate(coords[coords.length - 1].x, coords[coords.length - 1].y, coords[coords.length - 1].z);
 
+        // 2. Extrai início e fim preservando apenas X, Y, Z para as colunas PointZ
+        Coordinate startCoord = new Coordinate(coords[0].x, coords[0].y, coords[0].z);
+        Coordinate endCoord   = new Coordinate(coords[coords.length - 1].x, coords[coords.length - 1].y, coords[coords.length - 1].z);
+
+        // 3. Cria as geometrias com a factory (garantindo SRID 4326)
         this.startPoint = factory.createPoint(startCoord);
         this.endPoint   = factory.createPoint(endCoord);
-        this.path = factory.createLineString(coords);
-
+        this.path       = factory.createLineString(coords);
     }
+
 }
