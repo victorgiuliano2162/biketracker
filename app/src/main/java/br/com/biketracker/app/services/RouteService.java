@@ -61,7 +61,7 @@ public class RouteService {
         route.setPublic(request.isPublic());
         route.setUser(user);
         route.setName(request.name());
-        route.buildPathWithoutZDimension(geometryFactory, request.trackPoints()); ;
+        route.buildPath(geometryFactory, request.trackPoints()); ;
         route.calculateActivityTime();
 
         return RouteResponse.from(routeRepository.save(route));
@@ -92,6 +92,7 @@ public class RouteService {
                 .map(RouteResponse::from);
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
     public Page<RouteResponse> listPublicRoutesNOUSAGE(Pageable pageable) {
         return routeRepository
@@ -100,14 +101,12 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
-
     public RouteStatsResponse getStats(String userId) {
         return routeRepository.findStatsByUserId(userId);
     }
 
 
     @Transactional(readOnly = true)
-
     public RouteReplayResponse getRouteReplay(String userId, String routeId) {
         var u = userRepository.findByEmail(userId);
         List<Object[]> rows = routeRepository.findRoutePointsByRouteId(routeId, u.get().getId());
