@@ -5,6 +5,8 @@ import io.minio.http.Method;
 import io.minio.messages.Item;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,11 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MinioStorageService {
+
+    //private static final Logger log = LoggerFactory.getLogger(MinioStorageService.class);
 
     private final MinioClient minioClient;
 
@@ -34,12 +40,57 @@ public class MinioStorageService {
     @PostConstruct
     public void init() {
         try {
-            ensurePreviewBucketExists();
+            // 1. Bucket Principal Privado (fotos de atividades, uploads de usuários)
+            ensureBucketExists(bucket, false);
+
+            // 2. Bucket Público (previews PNG de rotas acessíveis diretamente por Nginx/Browser)
+            ensureBucketExists(PREVIEW_BUCKET, true);
+
+            log.info("Buckets do MinIO inicializados com sucesso: ['{}', '{}']", bucket, PREVIEW_BUCKET);
         } catch (Exception e) {
-            throw new RuntimeException("Falha ao inicializar bucket de previews no MinIO", e);
+            log.error("Falha ao inicializar buckets no MinIO: {}", e.getMessage(), e);
+            throw new RuntimeException("Falha ao inicializar buckets no MinIO", e);
         }
     }
 
+    private void ensureBucketExists(String bucketName, boolean makePublic) throws Exception {
+        boolean exists = minioClient.bucketExists(
+                BucketExistsArgs.builder().bucket(bucketName).build()
+        );
+
+        if (!exists) {
+            log.info("Criando bucket no MinIO: {}", bucketName);
+            minioClient.makeBucket(
+                    MakeBucketArgs.builder().bucket(bucketName).build()
+            );
+
+            if (makePublic) {
+                applyPublicReadPolicy(bucketName);
+            }
+        }
+    }
+
+    private void applyPublicReadPolicy(String bucketName) throws Exception {
+        String policy = """
+        {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Action": ["s3:GetObject"],
+            "Resource": ["arn:aws:s3:::%s/*"]
+          }]
+        }
+        """.formatted(bucketName);
+
+        minioClient.setBucketPolicy(
+                SetBucketPolicyArgs.builder()
+                        .bucket(bucketName)
+                        .config(policy)
+                        .build()
+        );
+        log.info("Política de leitura pública aplicada ao bucket: {}", bucketName);
+    }
 
     // Faz upload de uma imagem e retorna o object key
     public String uploadActivityImage(UUID activityId, MultipartFile file) throws Exception {
@@ -111,43 +162,9 @@ public class MinioStorageService {
         if (filename == null || !filename.contains(".")) return "";
         return filename.substring(filename.lastIndexOf("."));
     }
-    // Chamar no @PostConstruct ou na inicialização do serviço,
-// junto com a criação dos outros buckets
-    private void ensurePreviewBucketExists() throws Exception {
-        boolean exists = minioClient.bucketExists(
-                io.minio.BucketExistsArgs.builder().bucket(PREVIEW_BUCKET).build()
-        );
-        if (!exists) {
-            minioClient.makeBucket(
-                    io.minio.MakeBucketArgs.builder().bucket(PREVIEW_BUCKET).build()
-            );
-            // Política pública de leitura para que o Nginx/browser acesse sem autenticação
-            String policy = """
-            {
-              "Version": "2012-10-17",
-              "Statement": [{
-                "Effect": "Allow",
-                "Principal": {"AWS": ["*"]},
-                "Action": ["s3:GetObject"],
-                "Resource": ["arn:aws:s3:::%s/*"]
-              }]
-            }
-            """.formatted(PREVIEW_BUCKET);
-            minioClient.setBucketPolicy(
-                    io.minio.SetBucketPolicyArgs.builder()
-                            .bucket(PREVIEW_BUCKET)
-                            .config(policy)
-                            .build()
-            );
-        }
-    }
 
-    /**
-     * Salva o PNG de preview de uma rota no bucket de previews.
-     * Retorna a URL pública da imagem.
-     */
+
     public String uploadRoutePreview(String routeId, byte[] pngBytes) throws Exception {
-        ensurePreviewBucketExists();
 
         String objectKey = "previews/" + routeId + ".png";
 
@@ -166,27 +183,27 @@ public class MinioStorageService {
         return minioPublicEndpoint + "/" + PREVIEW_BUCKET + "/" + objectKey;
     }
 
-    /**
-     * Retorna a URL pública do preview se ele existir, ou null caso contrário.
-     */
+
+     //Retorna a URL pública do preview se ele existir, ou null caso contrário.
+
     public String getRoutePreviewUrl(String routeId) {
         String objectKey = "previews/" + routeId + ".png";
         try {
-            // Verifica se o objeto existe — lança exceção se não existir
             minioClient.statObject(
-                    io.minio.StatObjectArgs.builder()
+                    StatObjectArgs.builder()
                             .bucket(PREVIEW_BUCKET)
                             .object(objectKey)
                             .build()
             );
             return minioPublicEndpoint + "/" + PREVIEW_BUCKET + "/" + objectKey;
         } catch (io.minio.errors.ErrorResponseException e) {
-            // Objeto não existe
-            return null;
+            if ("NoSuchKey".equals(e.errorResponse().code()) || "NoSuchBucket".equals(e.errorResponse().code())) {
+                return null;
+            }
+            throw new RuntimeException("Erro MinIO ao verificar preview da rota " + routeId, e);
         } catch (Exception e) {
             throw new RuntimeException("Erro ao verificar preview no MinIO", e);
         }
-
     }
 
 }
