@@ -1,85 +1,99 @@
 <div class="home-wrapper">
- 
-      <!-- Header -->
-      <header class="home-header">
-        <div class="header-content">
-          <h1 class="home-title">
-            <mat-icon class="title-icon">route</mat-icon>
-            Rotas Públicas
-          </h1>
-          <p class="home-subtitle">
-            Explore trilhas e percursos compartilhados pela comunidade
-          </p>
-        </div>
- 
- @if (false) {
+  <!-- Header -->
+  <header class="home-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="home-title">Explorar rotas públicas</h1>
+        <p class="home-subtitle">
+          Percursos de ciclismo compartilhados pela comunidade com telemetria verificada.
+        </p>
+      </div>
 
-   <!-- Controles de localização -->
-   <div class="location-controls">
-     <ng-container *ngIf="!userLocation; else withLocation">
-       <div class="location-cta">
-         <mat-icon>location_off</mat-icon>
-         <span>Exibindo todas as rotas públicas</span>
-         <button mat-stroked-button color="primary" (click)="requestLocation()">
-           <mat-icon>my_location</mat-icon>
-           Usar minha localização
-          </button>
+      @if (totalElements > 0) {
+        <div class="routes-count-pill font-mono-tabular">
+          <span class="pulse-dot"></span>
+          <span>{{ totalElements }} rotas disponíveis</span>
         </div>
-      </ng-container>
-      
-      <ng-template #withLocation>
-        <div class="location-active">
-          <div class="location-info">
-            <mat-icon color="primary">location_on</mat-icon>
-            <span>Mostrando rotas em até <strong>{{ radiusKm }} km</strong></span>
-            <button mat-icon-button (click)="clearLocation()" matTooltip="Remover filtro de localização">
-              <mat-icon>close</mat-icon>
+      }
+    </div>
+
+    @if (false) {
+      <!-- Controles de localização -->
+      <div class="location-controls">
+        <ng-container *ngIf="!userLocation; else withLocation">
+          <div class="location-cta">
+            <mat-icon>location_off</mat-icon>
+            <span>Exibindo todas as rotas públicas</span>
+            <button mat-stroked-button color="primary" (click)="requestLocation()">
+              <mat-icon>my_location</mat-icon>
+              Usar minha localização
             </button>
           </div>
-          <div class="radius-slider">
-            <span class="slider-label">5 km</span>
-            <mat-slider min="5" max="100" step="5" discrete>
-              <input matSliderThumb [(ngModel)]="radiusKm" (valueChange)="onRadiusChange()" />
-            </mat-slider>
-            <span class="slider-label">100 km</span>
+        </ng-container>
+
+        <ng-template #withLocation>
+          <div class="location-active">
+            <div class="location-info">
+              <mat-icon color="primary">location_on</mat-icon>
+              <span>Mostrando rotas em até <strong class="font-mono-tabular">{{ radiusKm }} km</strong></span>
+              <button mat-icon-button (click)="clearLocation()" matTooltip="Remover filtro de localização">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <div class="radius-slider">
+              <span class="slider-label font-mono-tabular">5 km</span>
+              <mat-slider min="5" max="100" step="5" discrete>
+                <input matSliderThumb [(ngModel)]="radiusKm" (valueChange)="onRadiusChange()" />
+              </mat-slider>
+              <span class="slider-label font-mono-tabular">100 km</span>
+            </div>
           </div>
-        </div>
-      </ng-template>
-    </div>
-  }
+        </ng-template>
+      </div>
+    }
   </header>
-  
-      <!-- Loading -->
-      <div *ngIf="loading" class="loading-state">
-        <mat-spinner diameter="48" />
-        <p>Buscando rotas...</p>
+
+  <!-- Loading Skeleton Grid -->
+  <div *ngIf="loading" class="routes-grid" aria-busy="true" aria-label="Buscando rotas">
+    @for (item of [1, 2, 3, 4]; track item) {
+      <div class="skeleton-card">
+        <div class="skeleton-shimmer skeleton-thumb"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-shimmer skeleton-title"></div>
+          <div class="skeleton-shimmer skeleton-meta"></div>
+          <div class="skeleton-shimmer skeleton-metrics"></div>
+        </div>
       </div>
- 
-      <!-- Empty state -->
-      <div *ngIf="!loading && routes.length === 0" class="empty-state">
-        <mat-icon>explore_off</mat-icon>
-        <h3>Nenhuma rota encontrada</h3>
-        <p *ngIf="userLocation">Tente aumentar o raio de busca ou remover o filtro de localização.</p>
-        <p *ngIf="!userLocation">Ainda não há rotas públicas cadastradas.</p>
-      </div>
- 
-      <!-- Lista de cards em pilha -->
-      <div *ngIf="!loading && routes.length > 0" class="routes-list">
-        <app-route-card
-          *ngFor="let route of routes"
-          [route]="route"
-          [routerLink]="['/routes', route.id]"
-        />
-      </div>
- 
-      <!-- Paginação -->
-      <mat-paginator
-        *ngIf="totalElements > PAGE_SIZE"
-        [length]="totalElements"
-        [pageSize]="PAGE_SIZE"
-        [pageIndex]="currentPage"
-        [hidePageSize]="true"
-        (page)="onPageChange($event)"
-      />
- 
+    }
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && routes.length === 0" class="empty-state">
+    <div class="empty-icon-wrap">
+      <mat-icon>explore_off</mat-icon>
     </div>
+    <h3>Nenhuma rota encontrada</h3>
+    <p *ngIf="userLocation">Tente aumentar o raio de busca ou remover o filtro de localização.</p>
+    <p *ngIf="!userLocation">Ainda não há rotas públicas cadastradas.</p>
+  </div>
+
+  <!-- Grid de 2 colunas no desktop -->
+  <div *ngIf="!loading && routes.length > 0" class="routes-grid">
+    <app-route-card
+      *ngFor="let route of routes"
+      [route]="route"
+      [routerLink]="['/routes', route.id]"
+    />
+  </div>
+
+  <!-- Paginação -->
+  <div class="paginator-wrap" *ngIf="totalElements > PAGE_SIZE">
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="PAGE_SIZE"
+      [pageIndex]="currentPage"
+      [hidePageSize]="true"
+      (page)="onPageChange($event)"
+    />
+  </div>
+</div>

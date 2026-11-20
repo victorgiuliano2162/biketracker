@@ -1,85 +1,139 @@
-<mat-toolbar color="primary">
-  <!-- Brand -->
-  <span class="header-brand" routerLink="login"> Tracker </span>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <a class="brand-lockup" routerLink="login">
+        <span class="brand-badge">
+          <mat-icon>directions_bike</mat-icon>
+        </span>
+        <span class="brand-name">Tracker</span>
+      </a>
 
-  <span></span>
+      @if (authService.isAuthenticated()) {
+        <nav class="desktop-nav" aria-label="Navegação principal">
+          @if (false) {
+            <button mat-button [matMenuTriggerFor]="menuAtividades" class="nav-item">
+              Atividades
+              <mat-icon iconPositionEnd>expand_more</mat-icon>
+            </button>
+            <mat-menu #menuAtividades="matMenu">
+              <button mat-menu-item (click)="onAtividade('cross-country')">
+                <mat-icon>terrain</mat-icon>
+                Cross Country
+              </button>
+              <button mat-menu-item (click)="onAtividade('enduro')">
+                <mat-icon>electric_bolt</mat-icon>
+                Enduro
+              </button>
+              <button mat-menu-item (click)="onAtividade('downhill')">
+                <mat-icon>moving</mat-icon>
+                Downhill
+              </button>
+            </mat-menu>
+          }
 
-  @if (authService.isAuthenticated()) {
-    <!-- Menus — lado esquerdo -->
-    <nav class="header-nav">
-      @if (false) {
-        <button mat-button [matMenuTriggerFor]="menuAtividades">
-          Atividades
-          <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+          <a class="nav-link" routerLink="login">Home</a>
+
+          <button type="button" class="nav-link nav-dropdown" [matMenuTriggerFor]="menuMapas">
+            <span>Mapas</span>
+            <mat-icon>expand_more</mat-icon>
+          </button>
+          <mat-menu #menuMapas="matMenu">
+            <button mat-menu-item routerLink="map">
+              <mat-icon>add_location_alt</mat-icon>
+              <span>Visualizar rota</span>
+            </button>
+            <button mat-menu-item routerLink="routes">
+              <mat-icon>map</mat-icon>
+              <span>Minhas Rotas</span>
+            </button>
+          </mat-menu>
+
+          <button type="button" class="nav-link nav-dropdown" [matMenuTriggerFor]="menuMetas">
+            <span>Status</span>
+            <mat-icon>expand_more</mat-icon>
+          </button>
+          <mat-menu #menuMetas="matMenu">
+            <button mat-menu-item routerLink="goal">
+              <mat-icon>flag</mat-icon>
+              <span>Criar metas</span>
+            </button>
+            <button mat-menu-item routerLink="goals">
+              <mat-icon>checklist</mat-icon>
+              <span>Minhas metas</span>
+            </button>
+            <button mat-menu-item routerLink="status">
+              <mat-icon>leaderboard</mat-icon>
+              <span>Estatísticas</span>
+            </button>
+          </mat-menu>
+        </nav>
+      }
+    </div>
+
+    <div class="topbar-right">
+      @if (!authService.isAuthenticated()) {
+        <a mat-flat-button color="primary" class="btn-signup" routerLink="/subscribe">
+          Inscrever-se gratuitamente
+        </a>
+      } @else {
+        <div class="desktop-user-actions">
+          <button type="button" class="user-btn-ghost" (click)="onPerfil()">
+            <mat-icon>person_outline</mat-icon>
+            <span>Perfil</span>
+          </button>
+          <button type="button" class="user-btn-outline" (click)="onLogout()">
+            <mat-icon>logout</mat-icon>
+            <span>Sair</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="mobile-menu-btn"
+          [matMenuTriggerFor]="mobileMenu"
+          aria-label="Abrir menu de navegação"
+        >
+          <mat-icon>menu</mat-icon>
+          <span>Menu</span>
         </button>
-        <mat-menu #menuAtividades="matMenu">
-          <button mat-menu-item (click)="onAtividade('cross-country')">
-            <mat-icon>terrain</mat-icon>
-            Cross Country
+
+        <mat-menu #mobileMenu="matMenu">
+          <button mat-menu-item routerLink="login">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
           </button>
-          <button mat-menu-item (click)="onAtividade('enduro')">
-            <mat-icon>electric_bolt</mat-icon>
-            Enduro
+          <button mat-menu-item routerLink="map">
+            <mat-icon>add_location_alt</mat-icon>
+            <span>Estúdio GPX</span>
           </button>
-          <button mat-menu-item (click)="onAtividade('downhill')">
-            <mat-icon>moving</mat-icon>
-            Downhill
+          <button mat-menu-item routerLink="routes">
+            <mat-icon>map</mat-icon>
+            <span>Minhas Rotas</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item routerLink="goals">
+            <mat-icon>checklist</mat-icon>
+            <span>Minhas metas</span>
+          </button>
+          <button mat-menu-item routerLink="goal">
+            <mat-icon>flag</mat-icon>
+            <span>Criar metas</span>
+          </button>
+          <button mat-menu-item routerLink="status">
+            <mat-icon>leaderboard</mat-icon>
+            <span>Estatísticas</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="onPerfil()">
+            <mat-icon>person_outline</mat-icon>
+            <span>Perfil</span>
+          </button>
+          <button mat-menu-item (click)="onLogout()">
+            <mat-icon>logout</mat-icon>
+            <span>Sair</span>
           </button>
         </mat-menu>
       }
-
-      <button mat-button routerLink="login">Home</button>
-      <button mat-button [matMenuTriggerFor]="menuMapas">
-        Mapas
-        <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
-      </button>
-      <mat-menu #menuMapas="matMenu">
-        <button mat-menu-item routerLink="map">
-          <mat-icon>add_location_alt</mat-icon>
-          Vizualizar rota
-        </button>
-        <button mat-menu-item routerLink="routes">
-          <mat-icon>map</mat-icon>
-          Minhas Rotas
-        </button>
-      </mat-menu>
-
-      <button mat-button [matMenuTriggerFor]="menuMetas">
-        Status
-        <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
-      </button>
-      <mat-menu #menuMetas="matMenu">
-        <button mat-menu-item routerLink="goal">
-          <mat-icon>rewarded_ads</mat-icon>
-          Criar metas
-        </button>
-        <button mat-menu-item routerLink="goals">
-          <mat-icon>bookmark_flag</mat-icon>
-          Minhas metas
-        </button>
-        <button mat-menu-item routerLink="status">
-          Estatisticas
-          <mat-icon>leaderboard</mat-icon>
-        </button>
-      </mat-menu>
-    </nav>
-  }
-
-  <span class="spacer"></span>
-
-  <!-- Lado direito -->
-  @if (!authService.isAuthenticated()) {
-    <button mat-flat-button class="btn-signup" routerLink="/subscribe">
-      Inscrever-se gratuitamente
-    </button>
-  } @else {
-    <div class="user-controls-container">
-      <button mat-button (click)="onPerfil()" style="color: white">
-        <mat-icon>person</mat-icon> Perfil
-      </button>
-      <button mat-button (click)="onLogout()" style="color: white">
-        <mat-icon>logout</mat-icon> Sair
-      </button>
     </div>
-  }
-</mat-toolbar>
+  </div>
+</header>

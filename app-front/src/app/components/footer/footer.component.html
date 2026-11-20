@@ -1,22 +1,20 @@
-
 @if (!showFooter()) {
+  <footer class="tracker-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-brand">
+          <mat-icon>directions_bike</mat-icon>
+          <span>TRACKER TELEMETRIA ESPORTIVA</span>
+        </span>
+        <span class="footer-sep">·</span>
+        <span class="footer-copy">© 2026 Tracker Precision Cartography</span>
+      </div>
 
-  <mat-toolbar class="footer">
-    <span class="footer-brand">
-      <mat-icon>directions_bike</mat-icon>
-      BikeTraker
-  </span>
-
-  <span class="spacer"></span>
-
-  <span class="footer-copy">© 2026 BikeTrakker. Todos os direitos reservados.</span>
-
-  <span class="spacer"></span>
-
-  <div class="footer-links">
-    <a mat-button href="#" (click)="$event.preventDefault()">Termos de uso</a>
-    <a mat-button href="#" (click)="$event.preventDefault()">Privacidade</a>
-    <a mat-button href="#" (click)="$event.preventDefault()">Suporte</a>
-  </div>
-</mat-toolbar>
+      <nav class="footer-links" aria-label="Links institucionais">
+        <a href="#" (click)="$event.preventDefault()">Termos de uso</a>
+        <a href="#" (click)="$event.preventDefault()">Privacidade</a>
+        <a href="#" (click)="$event.preventDefault()">Suporte</a>
+      </nav>
+    </div>
+  </footer>
 }
