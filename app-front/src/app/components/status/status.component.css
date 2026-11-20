@@ -1,105 +1,263 @@
-.home-container {
-  max-width: 1200px;
+:host {
+  display: block;
+  width: 100%;
+}
+
+.status-container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 48px 56px;
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* ── Boas-vindas ──────────────────────────────────── */
-.welcome-banner {
+.page-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding: 20px 24px;
-  background: linear-gradient(135deg, #1a6b3c, #2e9e5b);
-  border-radius: 12px;
-  color: white;
+  flex-wrap: wrap;
 }
 
-.welcome-banner h1 {
-  margin: 0 0 4px;
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
-.welcome-banner p {
+.page-title {
   margin: 0;
-  opacity: 0.9;
-  font-size: 0.9rem;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
 }
 
-.welcome-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  opacity: 0.9;
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-muted);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
-/* ── Cards de estatísticas ────────────────────────── */
-.stats-grid {
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: var(--accent-primary);
+}
+
+.bento-row-top {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: 7fr 5fr;
+  gap: 24px;
+  align-items: stretch;
 }
 
-.stat-card mat-card-content {
+.welcome-banner {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-left: 4px solid var(--accent-primary);
+  border-radius: var(--radius-card);
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px 16px !important;
-  text-align: center;
-  gap: 4px;
+  justify-content: center;
 }
 
-.stat-card mat-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
-  margin-bottom: 8px;
+.welcome-content {
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 52ch;
+  }
 }
 
-.stat-value {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin: 0;
-  color: #111827;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* ── Gráfico + Rides ──────────────────────────────── */
-.middle-grid {
-  display: flexbox;
-  grid-template-columns: 1.5fr 1fr;
+.kpi-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
-.chart-card mat-card-content,
-.rides-card mat-card-content {
-  padding: 16px !important;
+.kpi-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* ── Rides ────────────────────────────────────────── */
+.kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kpi-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.kpi-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background-color: var(--bg-muted);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.kpi-value {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+
+  small {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bento-row-bottom {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.bento-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  padding: 24px;
+}
+
+.panel-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-hairline);
+  margin-bottom: 8px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.panel-sub {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.divider-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &:last-child { border-bottom: none; padding-bottom: 4px; }
+}
+
+.goal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.goal-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.goal-ratio {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+
+  small { color: var(--text-muted); }
+}
+
+.goal-footer {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 .ride-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-hairline);
+
+  &:last-child { border-bottom: none; padding-bottom: 4px; }
 }
 
-.ride-item:last-child {
-  border-bottom: none;
+.ride-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.ride-icon {
-  color: #1a6b3c;
+.ride-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: var(--bg-muted);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .ride-info {
@@ -109,87 +267,57 @@
 }
 
 .ride-distance {
+  font-size: 0.9375rem;
   font-weight: 600;
-  font-size: 0.95rem;
-  color: #111827;
+  color: var(--text-primary);
 }
 
-.ride-meta {
-  font-size: 0.78rem;
-  color: #6b7280;
+.ride-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
-/* ── Metas ────────────────────────────────────────── */
-.goals-card mat-card-content {
-  padding: 16px !important;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.goal-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.goal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.goal-name {
+.ride-elev {
+  font-size: 0.875rem;
   font-weight: 600;
-  font-size: 0.95rem;
-  color: #111827;
+  color: var(--accent-primary);
 }
 
-.goal-meta {
-  font-size: 0.78rem;
-  color: #6b7280;
-}
-
-.goal-percent {
-  font-size: 0.78rem;
-  color: #1a6b3c;
-  font-weight: 600;
-  text-align: right;
-}
-
-/* ── Empty states ─────────────────────────────────── */
 .empty-state {
+  padding: 36px 16px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px;
-  color: #9ca3af;
-  gap: 8px;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+
+  p { margin: 0; }
 }
 
-.empty-state mat-icon {
-  font-size: 40px;
-  width: 40px;
-  height: 40px;
+.empty-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  background-color: var(--bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ── Responsividade ───────────────────────────────── */
-@media (max-width: 900px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.sk-title { height: 40px; width: 320px; }
+.sk-banner { height: 160px; }
+.sk-kpi { height: 160px; }
+.sk-panel { height: 280px; }
 
-  .middle-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 1023px) {
+  .status-container { padding: 24px 32px 48px; }
+  .bento-row-top, .bento-row-bottom { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .home-container {
-    padding: 16px;
-  }
+@media (max-width: 767px) {
+  .status-container { padding: 20px 16px 40px; gap: 16px; }
+  .kpi-pair { grid-template-columns: 1fr; }
+  .welcome-banner, .panel-card, .kpi-card { padding: 16px; }
 }

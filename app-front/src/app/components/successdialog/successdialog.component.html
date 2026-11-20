@@ -1,10 +1,12 @@
 <div class="dialog-container">
-      <mat-icon class="success-icon">check_circle</mat-icon>
-      <h2 mat-dialog-title>Cadastro realizado!</h2>
-      <mat-dialog-content>
-        <p>Sua conta foi criada com sucesso.<br>Você será redirecionado para a página de login.</p>
-      </mat-dialog-content>
-      <mat-dialog-actions>
-        <button mat-flat-button (click)="close()">OK</button>
-      </mat-dialog-actions>
-    </div>
+  <div class="success-badge">
+    <mat-icon class="success-icon">check_circle</mat-icon>
+  </div>
+  <h2 mat-dialog-title class="dialog-title">Cadastro realizado!</h2>
+  <mat-dialog-content class="dialog-body">
+    <p>Sua conta foi criada com sucesso.<br>Você será redirecionado para a página de login.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-flat-button color="primary" class="confirm-btn" (click)="close()">OK</button>
+  </mat-dialog-actions>
+</div>

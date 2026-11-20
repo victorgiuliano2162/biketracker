@@ -1,30 +1,41 @@
 <div class="list-page">
-  <div class="page-header">
+  <header class="page-header">
     <div class="header-text">
+      <div class="kicker-pill font-mono-tabular">
+        <span class="kicker-dot"></span>
+        <span>CICLO DE TREINAMENTO</span>
+      </div>
       <h1 class="page-title">Minhas metas</h1>
-      <p class="page-sub">Acompanhe seu progresso</p>
+      <p class="page-sub">Acompanhe seu progresso de distância e altimetria</p>
     </div>
-    <a mat-flat-button color="primary" routerLink="/goals/new">
-      <mat-icon>add</mat-icon>
-      Nova meta
-    </a>
-  </div>
 
-  <!-- Loading -->
+    <a mat-flat-button color="primary" class="new-goal-btn" routerLink="/goals/new">
+      <mat-icon>add</mat-icon>
+      <span>Nova meta</span>
+    </a>
+  </header>
+
+  <!-- Loading Skeleton -->
   @if (loading) {
-    <div class="state-center">
-      <mat-spinner diameter="40" />
+    <div class="table-wrap">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <div class="skeleton-row">
+          <div class="skeleton-shimmer sk-name"></div>
+          <div class="skeleton-shimmer sk-prog"></div>
+          <div class="skeleton-shimmer sk-date"></div>
+        </div>
+      }
     </div>
   }
 
-  <!-- Tabela -->
+  <!-- Tabela (Desktop/Tablet) -> Card-Stack (Mobile < 768px) -->
   @if (!loading && goals.length > 0) {
-    <div class="table-wrap mat-elevation-z1">
+    <div class="table-wrap">
       <table mat-table [dataSource]="goals" class="goals-table">
         <!-- Nome -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Meta</th>
-          <td mat-cell *matCellDef="let g">
+          <th mat-header-cell *matHeaderCellDef>Meta e Descrição</th>
+          <td mat-cell *matCellDef="let g" data-label="Meta">
             <div class="goal-name-cell">
               <span class="goal-name">{{ g.name }}</span>
               <span class="goal-desc">{{ g.description }}</span>
@@ -35,7 +46,7 @@
         <!-- Progresso -->
         <ng-container matColumnDef="progress">
           <th mat-header-cell *matHeaderCellDef>Progresso</th>
-          <td mat-cell *matCellDef="let g">
+          <td mat-cell *matCellDef="let g" data-label="Progresso">
             <div class="progress-cell">
               <div class="progress-bar-wrap">
                 <div
@@ -44,11 +55,9 @@
                   [class.progress-bar-fill--done]="g.progressPercent >= 100"
                 ></div>
               </div>
-              <span class="progress-label">
+              <span class="progress-label font-mono-tabular">
                 {{ g.currentValue }} / {{ g.targetValue }} {{ g.unit }}
-                <span class="progress-pct"
-                  >({{ g.progressPercent | number: "1.0-0" }}%)</span
-                >
+                <span class="progress-pct">({{ g.progressPercent | number: '1.0-0' }}%)</span>
               </span>
             </div>
           </td>
@@ -57,27 +66,28 @@
         <!-- Prazo -->
         <ng-container matColumnDef="deadLine">
           <th mat-header-cell *matHeaderCellDef>Prazo</th>
-          <td mat-cell *matCellDef="let g">
-            <span [class.deadline-expired]="isExpired(g.deadLine)">
-              {{ g.deadLine | date: "dd/MM/yyyy" }}
+          <td mat-cell *matCellDef="let g" data-label="Prazo">
+            <span class="deadline-text font-mono-tabular" [class.deadline-expired]="isExpired(g.deadLine)">
+              {{ g.deadLine | date: 'dd/MM/yyyy' }}
             </span>
           </td>
         </ng-container>
 
         <!-- Ações -->
         <ng-container matColumnDef="actions" stickyEnd>
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let g">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let g" class="actions-td">
             <div class="action-cell">
-              <button mat-icon-button matTooltip="Editar" (click)="edit(g)">
+              <button mat-icon-button class="action-icon-btn" matTooltip="Editar" (click)="edit(g)" aria-label="Editar meta">
                 <mat-icon>edit</mat-icon>
               </button>
               <button
                 mat-icon-button
-                color="warn"
+                class="action-icon-btn action-icon-btn--danger"
                 matTooltip="Excluir"
                 [disabled]="deletingId === g.id"
                 (click)="delete(g)"
+                aria-label="Excluir meta"
               >
                 @if (deletingId === g.id) {
                   <mat-spinner diameter="18" />
@@ -101,10 +111,13 @@
 
   <!-- Estado vazio -->
   @if (!loading && goals.length === 0) {
-    <div class="state-center state-empty">
-      <mat-icon>emoji_events</mat-icon>
-      <span>Nenhuma meta criada ainda.</span>
-      <a mat-stroked-button routerLink="/goals/new">Criar primeira meta</a>
+    <div class="state-empty">
+      <div class="empty-icon-wrap">
+        <mat-icon>emoji_events</mat-icon>
+      </div>
+      <h3>Nenhuma meta criada ainda</h3>
+      <p>Defina objetivos de distância ou elevação para acompanhar sua evolução.</p>
+      <a mat-flat-button color="primary" class="new-goal-btn" routerLink="/goals/new">Criar primeira meta</a>
     </div>
   }
 </div>

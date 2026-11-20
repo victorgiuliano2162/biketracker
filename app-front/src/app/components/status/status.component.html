@@ -1,130 +1,167 @@
-<div class="home-container" *ngIf="stats">
+@if (stats) {
+  <div class="status-container">
+    <header class="page-header">
+      <h1 class="page-title">Estatísticas &amp; Performance</h1>
+      <div class="sync-pill font-mono-tabular">
+        <span class="pulse-dot"></span>
+        <span>TELEMETRIA ATIVA</span>
+      </div>
+    </header>
 
-  <!-- ── Boas-vindas ───────────────────────────────────────── -->
-  <div class="welcome-banner">
-    <mat-icon class="welcome-icon">directions_bike</mat-icon>
-    <div>
-      
-      @if (stats.totalRides == 0) {
-        <h1>Bem-vindo!</h1>
-        <p>Você ainda não tem rotas registradas. Vamos começar?</p>
-      } @else if (stats.totalRides == 1) {
-        <h1>Bem-vindo de volta!</h1>
-        <p>Você tem <strong>1</strong> rota registrada. Que tal sair para a próxima?</p>
-      } @else {
-        <h1>Bem-vindo de volta! </h1>
-        <p>Você tem <strong>{{ stats.totalRides }}</strong> rotas registradas. Continue assim!</p>
-      }
-    </div>
-  </div>
+    <!-- Faixa 1: Bento Assimétrico (7fr Boas-vindas + 5fr KPIs) -->
+    <section class="bento-row-top">
+      <div class="welcome-banner">
+        <div class="welcome-content">
+          @if (stats.totalRides == 0) {
+            <h2>Bem-vindo!</h2>
+            <p>Você ainda não tem rotas registradas. Importe seu primeiro GPX para começar.</p>
+          } @else if (stats.totalRides == 1) {
+            <h2>Bem-vindo de volta!</h2>
+            <p>Você tem <strong class="font-mono-tabular">1</strong> rota registrada. Que tal sair para a próxima?</p>
+          } @else {
+            <h2>Bem-vindo de volta!</h2>
+            <p>Você tem <strong class="font-mono-tabular">{{ stats.totalRides }}</strong> rotas registradas no Tracker. Continue assim!</p>
+          }
+        </div>
+      </div>
 
-  <!-- ── Cards de estatísticas ─────────────────────────────── -->
-  <div class="stats-grid">
-
-    <mat-card appearance="outlined" class="stat-card">
-      <mat-card-content>
-        <mat-icon color="primary">route</mat-icon>
-        <p class="stat-value">{{ stats.totalDistanceKm | number:'1.1-1' }} km</p>
-        <p class="stat-label">Distância total</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card appearance="outlined" class="stat-card">
-      <mat-card-content>
-        <mat-icon color="primary">landscape</mat-icon>
-        <p class="stat-value">{{ stats.totalElevationMeters | number:'1.0-0' }} m</p>
-        <p class="stat-label">Elevação total</p>
-      </mat-card-content>
-    </mat-card>
-
-  </div>
-
-  <!-- ── Gráfico semanal + Últimas rides ───────────────────── -->
-  <div class="middle-grid">
-
-    <!-- Gráfico -->
-     @if (false) {
-       <mat-card appearance="outlined" class="chart-card">
-         <mat-card-header>
-           <mat-card-title>Distância — últimos 7 dias</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <ngx-charts-bar-vertical
-          [results]="chartData"
-          [xAxis]="true"
-          [yAxis]="true"
-          [showXAxisLabel]="false"
-          [showYAxisLabel]="true"
-          yAxisLabel="km"
-          [gradient]="false"
-          [roundEdges]="true"
-          scheme="cool"
-          style="display: block; height: 260px">
-        </ngx-charts-bar-vertical>
-      </mat-card-content>
-    </mat-card>
-  }
-
-    <!-- Últimas rides -->
-    <mat-card appearance="outlined" class="rides-card">
-      <mat-card-header>
-        <mat-card-title>Últimas rotas</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-
-        <div *ngIf="stats.recentRides.length === 0" class="empty-state">
-          <mat-icon>pedal_bike</mat-icon>
-          <p>Nenhuma pedalada registrada ainda.</p>
+      <div class="kpi-pair">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label font-mono-tabular">DISTÂNCIA TOTAL</span>
+            <span class="kpi-icon-box">
+              <mat-icon>route</mat-icon>
+            </span>
+          </div>
+          <div class="kpi-value font-mono-tabular">
+            {{ stats.totalDistanceKm | number:'1.1-1' }} <small>km</small>
+          </div>
+          <span class="kpi-sub font-mono-tabular">{{ stats.totalRides }} atividades registradas</span>
         </div>
 
-        <div *ngFor="let ride of stats.recentRides" class="ride-item">
-          <mat-icon class="ride-icon">directions_bike</mat-icon>
-          <div class="ride-info">
-            <span class="ride-distance">{{ ride.distanceInKm | number:'1.1-1' }} km</span>
-            <span class="ride-meta">
-              
-              {{ ride.elevationInMeters | number:'1.0-0' }}m elevação &bull;
-              {{ ride.startTime }}
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label font-mono-tabular">ELEVAÇÃO TOTAL</span>
+            <span class="kpi-icon-box">
+              <mat-icon>landscape</mat-icon>
             </span>
+          </div>
+          <div class="kpi-value font-mono-tabular">
+            {{ stats.totalElevationMeters | number:'1.0-0' }} <small>m</small>
+          </div>
+          <span class="kpi-sub font-mono-tabular">Ganho altimétrico acumulado</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Faixa 2: Bento Assimétrico (7fr Metas + Gráfico / 5fr Últimas rotas) -->
+    <section class="bento-row-bottom">
+      <div class="bento-left-col">
+        @if (false) {
+          <div class="panel-card chart-card">
+            <div class="panel-header">
+              <h2>Distância — últimos 7 dias</h2>
+            </div>
+            <ngx-charts-bar-vertical
+              [results]="chartData"
+              [xAxis]="true"
+              [yAxis]="true"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="true"
+              yAxisLabel="km"
+              [gradient]="false"
+              [roundEdges]="true"
+              scheme="cool"
+              style="display: block; height: 260px">
+            </ngx-charts-bar-vertical>
+          </div>
+        }
+
+        <!-- Metas em andamento -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div>
+              <h2>Metas em andamento</h2>
+              <p class="panel-sub">Objetivos ativos sincronizados com suas rotas</p>
+            </div>
+          </div>
+
+          <div *ngIf="stats.activeGoals.length === 0" class="empty-state">
+            <div class="empty-icon-wrap">
+              <mat-icon>emoji_events</mat-icon>
+            </div>
+            <p>Nenhuma meta cadastrada ainda.</p>
+          </div>
+
+          <div class="divider-list">
+            <div *ngFor="let goal of stats.activeGoals" class="goal-item">
+              <div class="goal-header">
+                <span class="goal-name">{{ goal.name }}</span>
+                <span class="goal-ratio font-mono-tabular">
+                  {{ goal.currentValue }} / {{ goal.targetValue }} {{ goal.unit }}
+                  <small>· {{ goal.progressPercent | number:'1.0-0' }}%</small>
+                </span>
+              </div>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="goal.progressPercent"
+                color="primary"
+              ></mat-progress-bar>
+              <div class="goal-footer font-mono-tabular">
+                <span>Prazo: {{ goal.deadLine }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Últimas rotas -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2>Últimas rotas</h2>
+            <p class="panel-sub font-mono-tabular">FEED CRONOLÓGICO GPX</p>
           </div>
         </div>
 
-      </mat-card-content>
-    </mat-card>
-
-  </div>
-
-  <!-- ── Metas ativas ───────────────────────────────────────── -->
-  <mat-card appearance="outlined" class="goals-card">
-    <mat-card-header>
-      <mat-card-title>Metas em andamento</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-
-      <div *ngIf="stats.activeGoals.length === 0" class="empty-state">
-        <mat-icon>emoji_events</mat-icon>
-        <p>Nenhuma meta cadastrada ainda.</p>
-      </div>
-
-      <div *ngFor="let goal of stats.activeGoals" class="goal-item">
-        <div class="goal-header">
-          <span class="goal-name">{{ goal.name }}</span>
-          <span class="goal-meta">{{ goal.currentValue }} / {{ goal.targetValue }} {{ goal.unit }} &bull; prazo: {{ goal.deadLine }}</span>
+        <div *ngIf="stats.recentRides.length === 0" class="empty-state">
+          <div class="empty-icon-wrap">
+            <mat-icon>pedal_bike</mat-icon>
+          </div>
+          <p>Nenhuma pedalada registrada ainda.</p>
         </div>
-        <mat-progress-bar
-          mode="determinate"
-          [value]="goal.progressPercent"
-          color="primary">
-        </mat-progress-bar>
-        <span class="goal-percent">{{ goal.progressPercent | number:'1.0-0' }}%</span>
+
+        <div class="divider-list">
+          <div *ngFor="let ride of stats.recentRides" class="ride-item">
+            <div class="ride-left">
+              <span class="ride-icon-box">
+                <mat-icon>directions_bike</mat-icon>
+              </span>
+              <div class="ride-info">
+                <span class="ride-distance font-mono-tabular">{{ ride.distanceInKm | number:'1.1-1' }} km</span>
+                <span class="ride-date font-mono-tabular">{{ ride.startTime }}</span>
+              </div>
+            </div>
+            <span class="ride-elev font-mono-tabular">+{{ ride.elevationInMeters | number:'1.0-0' }} m</span>
+          </div>
+        </div>
       </div>
-
-    </mat-card-content>
-  </mat-card>
-
-</div>
-
-<!-- Loading state -->
-<div class="loading-state" *ngIf="!stats">
-  <p>Carregando...</p>
-</div>
+    </section>
+  </div>
+} @else {
+  <!-- Skeleton Bento Loading -->
+  <div class="status-container">
+    <div class="skeleton-shimmer sk-title"></div>
+    <div class="bento-row-top">
+      <div class="skeleton-shimmer sk-banner"></div>
+      <div class="kpi-pair">
+        <div class="skeleton-shimmer sk-kpi"></div>
+        <div class="skeleton-shimmer sk-kpi"></div>
+      </div>
+    </div>
+    <div class="bento-row-bottom">
+      <div class="skeleton-shimmer sk-panel"></div>
+      <div class="skeleton-shimmer sk-panel"></div>
+    </div>
+  </div>
+}
