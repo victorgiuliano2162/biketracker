@@ -10,7 +10,7 @@
 nginx/certs/*.pem
 nginx/certs/*.key
 nginx/certs/*.crt
-
+.agents
 # Logs e arquivos temporários do sistema
 *.log
 .DS_Store
