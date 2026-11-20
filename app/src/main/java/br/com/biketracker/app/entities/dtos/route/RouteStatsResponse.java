@@ -4,5 +4,4 @@ public interface RouteStatsResponse {
     Long getTotalRoutes();
     Double getTotalDistanceInKm();
     Double getTotalElevationInMeters();
-    Long getTotalActivityTimeInSeconds();
 }

@@ -60,7 +60,7 @@ public class User {
     @JsonManagedReference
     private List<Goal> goals;
 
-    @OneToMany
+    @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<Route> routes;
 

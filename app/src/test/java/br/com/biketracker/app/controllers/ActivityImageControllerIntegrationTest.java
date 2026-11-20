@@ -68,7 +68,7 @@ class ActivityImageControllerIntegrationTest {
         MockMultipartFile file2 = new MockMultipartFile("files", "image2.jpg", MediaType.IMAGE_JPEG_VALUE, "file2-content".getBytes());
 
         List<String> mockKeys = List.of("key-1", "key-2");
-        when(activityImageService.uploadImages(eq(activityId), any())).thenReturn(mockKeys);
+        when(activityImageService.uploadImages(eq(activityId), any(), any())).thenReturn(mockKeys);
 
         mockMvc.perform(multipart("/api/activities/{activityId}/images", activityId)
                         .file(file1)
@@ -84,7 +84,7 @@ class ActivityImageControllerIntegrationTest {
         String activityId = UUID.randomUUID().toString();
         List<String> mockUrls = List.of("https://s3.url/img1.png", "https://s3.url/img2.jpg");
 
-        when(activityImageService.getPresignedUrls(activityId)).thenReturn(mockUrls);
+        when(activityImageService.getPresignedUrls(eq(activityId), any())).thenReturn(mockUrls);
 
         mockMvc.perform(get("/api/activities/{activityId}/images", activityId))
                 .andExpect(status().isOk())
@@ -98,7 +98,7 @@ class ActivityImageControllerIntegrationTest {
         UUID activityId = UUID.randomUUID();
         MockMultipartFile file = new MockMultipartFile("files", "img.png", MediaType.IMAGE_PNG_VALUE, "x".getBytes());
 
-        when(activityImageService.uploadImages(eq(activityId), any()))
+        when(activityImageService.uploadImages(eq(activityId), any(), any()))
                 .thenThrow(new RuntimeException("Falha no MinIO"));
 
         assertThrows(jakarta.servlet.ServletException.class, () ->

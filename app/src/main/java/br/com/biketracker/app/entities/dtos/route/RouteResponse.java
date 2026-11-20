@@ -15,7 +15,6 @@ public record RouteResponse(
         LocalDateTime createdAt,
         String startCity,
         String country,
-        long activityTimeInSeconds,
         boolean isPublic,
         RouteDifficulty routeDifficulty,
         //String userName,   // <-- adicionado
@@ -32,7 +31,6 @@ public record RouteResponse(
                 route.getCreatedAt(),
                 route.getStartCity(),
                 route.getCountry(),
-                route.getActivityTimeInSeconds(),
                 route.isPublic(),
                 route.getDifficulty(),
                 //route.getUser() != null ? route.getUser().getUserName() : null,  // <-- adicionado

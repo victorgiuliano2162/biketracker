@@ -47,13 +47,13 @@ class ActivityImageControllerTest {
         List<MultipartFile> files = List.of(file);
         List<String> expectedKeys = List.of("key-1");
 
-        when(activityImageService.uploadImages(eq(activityId), any())).thenReturn(expectedKeys);
+        when(activityImageService.uploadImages(eq(activityId), any(), any())).thenReturn(expectedKeys);
 
         ResponseEntity<List<String>> response = controller.upload(fakeJwt, activityId, files);
 
         assertThat(response.getStatusCode().value()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(expectedKeys);
-        verify(activityImageService).uploadImages(activityId, files);
+        verify(activityImageService).uploadImages(eq(activityId), eq(files), any());
     }
 
     @Test
@@ -62,7 +62,7 @@ class ActivityImageControllerTest {
         String activityId = UUID.randomUUID().toString();
         List<String> expectedUrls = List.of("https://s3.url/img1.png");
 
-        when(activityImageService.getPresignedUrls(activityId)).thenReturn(expectedUrls);
+        when(activityImageService.getPresignedUrls(eq(activityId), any())).thenReturn(expectedUrls);
 
         ResponseEntity<List<String>> response = controller.getImageUrls(fakeJwt, activityId);
 
@@ -76,7 +76,7 @@ class ActivityImageControllerTest {
         UUID activityId = UUID.randomUUID();
         List<MultipartFile> files = List.of(new MockMultipartFile("files", "img.png", "image/png", "x".getBytes()));
 
-        when(activityImageService.uploadImages(eq(activityId), any()))
+        when(activityImageService.uploadImages(eq(activityId), any(), any()))
                 .thenThrow(new RuntimeException("Erro ao enviar para o MinIO"));
 
         org.junit.jupiter.api.Assertions.assertThrows(

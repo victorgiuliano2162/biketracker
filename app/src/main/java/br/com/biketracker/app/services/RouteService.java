@@ -61,8 +61,8 @@ public class RouteService {
         route.setPublic(request.isPublic());
         route.setUser(user);
         route.setName(request.name());
-        route.buildPath(geometryFactory, request.trackPoints()); ;
-        route.calculateActivityTime();
+        route.setDifficulty(request.difficulty());
+        route.buildPath(geometryFactory, request.trackPoints());
 
         return RouteResponse.from(routeRepository.save(route));
     }
@@ -71,6 +71,7 @@ public class RouteService {
 
     public RouteResponse getRouteById(String userId, String routeId) {
         User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         Route route = routeRepository.findById(routeId)
@@ -182,6 +183,7 @@ public class RouteService {
 
     public RouteResponse toggleVisibility(String userId, String routeId) {
         User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         Route route = routeRepository.findById(routeId)

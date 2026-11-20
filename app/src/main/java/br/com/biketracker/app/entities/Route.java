@@ -44,8 +44,6 @@ public class Route {
     private String startCity;
     private String country;
 
-    private long activityTimeInSeconds;
-
     private boolean isPublic;
 
     //UPDATE routes SET isPulic = false WHERE route.id = ?id
@@ -65,12 +63,6 @@ public class Route {
 
     @Column(columnDefinition = "geography(LineStringZM, 4326)")
     private LineString path;
-
-    @Deprecated
-    public void calculateActivityTime() {
-        Duration duration = Duration.between(startTime, endTime);
-        this.activityTimeInSeconds = duration.toSeconds();
-    }
 
     public void buildPathWithoutZDimension(GeometryFactory factory, List<TrackPoint> trackPoints) {
         CoordinateXYZM[] coords = trackPoints.stream()

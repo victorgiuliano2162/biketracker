@@ -76,7 +76,6 @@ public class HomeServiceTest {
             RouteStatsResponse statsMock = mock(RouteStatsResponse.class);
             when(statsMock.getTotalDistanceInKm()).thenReturn(150.5);
             when(statsMock.getTotalElevationInMeters()).thenReturn(1200.0);
-            when(statsMock.getTotalActivityTimeInSeconds()).thenReturn(18000L); // 5 horas
             when(statsMock.getTotalRoutes()).thenReturn(4L);
             when(routeRepository.findStatsByUserId(USER_ID)).thenReturn(statsMock);
             var uuid_routeID = UUID.randomUUID().toString();
@@ -85,7 +84,6 @@ public class HomeServiceTest {
             route.setId(uuid_routeID);
             route.setDistanceInKm(35.0);
             route.setElevationInMeters(300.0);
-            route.setActivityTimeInSeconds(3600L);
             route.setStartTime(LocalDateTime.now());
             when(routeRepository.findTop5ByUserIdOrderByStartTimeDesc(USER_ID)).thenReturn(List.of(route));
 

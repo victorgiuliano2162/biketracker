@@ -12,4 +12,17 @@ public record UserRequest(
         double weight,
         LocalDateTime bornAt,
         TipoSanguineo tipoSanguineo
-) {}
+) {
+    @Override
+    public String toString() {
+        return "UserRequest{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='[PROTECTED]'" +
+                ", age=" + age +
+                ", weight=" + weight +
+                ", bornAt=" + bornAt +
+                ", tipoSanguineo=" + tipoSanguineo +
+                '}';
+    }
+}

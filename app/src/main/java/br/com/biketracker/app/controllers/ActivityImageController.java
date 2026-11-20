@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/activities/{activityId}/images")
+@RequestMapping("/api/activities/{activityId}/images")
 @RequiredArgsConstructor
 public class ActivityImageController {
 
-    private final ActivityImageService activityImageService ;
+    private final ActivityImageService activityImageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<String>> upload(
@@ -25,14 +25,18 @@ public class ActivityImageController {
             @PathVariable UUID activityId,
             @RequestParam("files") List<MultipartFile> files) {
 
-        List<String> keys = activityImageService.uploadImages(activityId, files);
+        String userId = jwt != null ? jwt.getClaimAsString("user_id") : null;
+        List<String> keys = activityImageService.uploadImages(activityId, files, userId);
         return ResponseEntity.ok(keys);
     }
 
     @GetMapping
-    public ResponseEntity<List<String>> getImageUrls(@AuthenticationPrincipal Jwt jwt, @PathVariable String activityId) {
+    public ResponseEntity<List<String>> getImageUrls(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String activityId) {
 
-        List<String> urls = activityImageService.getPresignedUrls(activityId);
+        String userId = jwt != null ? jwt.getClaimAsString("user_id") : null;
+        List<String> urls = activityImageService.getPresignedUrls(activityId, userId);
         return ResponseEntity.ok(urls);
     }
 }

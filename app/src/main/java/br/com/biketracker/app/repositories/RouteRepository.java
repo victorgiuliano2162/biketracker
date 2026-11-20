@@ -27,8 +27,7 @@ public interface RouteRepository extends JpaRepository<Route, String> {
         SELECT
             COUNT(r)                      AS totalRoutes,
             SUM(r.distanceInKm)           AS totalDistanceInKm,
-            SUM(r.elevationInMeters)      AS totalElevationInMeters,
-            SUM(r.activityTimeInSeconds)  AS totalActivityTimeInSeconds
+            SUM(r.elevationInMeters)      AS totalElevationInMeters
         FROM Route r WHERE r.user.id = :userId
         """)
     RouteStatsResponse findStatsByUserId(@Param("userId") String userId);

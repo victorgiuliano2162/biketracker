@@ -197,7 +197,7 @@ public class MinioStorageService {
             );
             return minioPublicEndpoint + "/" + PREVIEW_BUCKET + "/" + objectKey;
         } catch (io.minio.errors.ErrorResponseException e) {
-            if ("NoSuchKey".equals(e.errorResponse().code()) || "NoSuchBucket".equals(e.errorResponse().code())) {
+            if (e.errorResponse() == null || "NoSuchKey".equals(e.errorResponse().code()) || "NoSuchBucket".equals(e.errorResponse().code())) {
                 return null;
             }
             throw new RuntimeException("Erro MinIO ao verificar preview da rota " + routeId, e);

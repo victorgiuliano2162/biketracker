@@ -40,7 +40,6 @@ public class HomeService {
 
         double totalDistance  = stats != null && stats.getTotalDistanceInKm()          != null ? stats.getTotalDistanceInKm()          : 0.0;
         double totalElevation = stats != null && stats.getTotalElevationInMeters()      != null ? stats.getTotalElevationInMeters()      : 0.0;
-        long   totalTime      = stats != null && stats.getTotalActivityTimeInSeconds()  != null ? stats.getTotalActivityTimeInSeconds()  : 0L;
         long   totalRoutes    = stats != null && stats.getTotalRoutes()                 != null ? stats.getTotalRoutes()                 : 0L;
 
         // ── Últimas 5 rotas ──────────────────────────────────────────────
@@ -53,7 +52,6 @@ public class HomeService {
                         r.getId(),
                         r.getDistanceInKm(),
                         r.getElevationInMeters(),
-                        r.getActivityTimeInSeconds(),
                         r.getStartTime().format(formatter)
                 ))
                 .toList();
@@ -98,7 +96,6 @@ public class HomeService {
         return new HomeStatsResponse(
                 totalDistance,
                 totalElevation,
-                totalTime,
                 (int) totalRoutes,
                 recentRides,
                 weeklyChart,

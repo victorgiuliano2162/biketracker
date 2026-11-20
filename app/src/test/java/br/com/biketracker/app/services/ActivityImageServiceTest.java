@@ -2,6 +2,7 @@ package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.ActivityImage;
 import br.com.biketracker.app.entities.Route;
+import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.repositories.ActivityImageRepository;
 import br.com.biketracker.app.repositories.RouteRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -86,6 +88,25 @@ public class ActivityImageServiceTest {
         }
 
         @Test
+        @DisplayName("Deve lançar AccessDeniedException quando usuário tentar fazer upload em rota de outro usuário")
+        void uploadImages_UsuarioNaoAutorizado_Erro() {
+            UUID activityId = UUID.randomUUID();
+            MockMultipartFile file = new MockMultipartFile("files", "foto.jpg", "image/jpeg", "conteudo".getBytes());
+
+            User owner = new User();
+            owner.setId("owner-uuid");
+
+            Route route = new Route();
+            route.setUser(owner);
+
+            when(routeRepository.findById(activityId.toString())).thenReturn(Optional.of(route));
+
+            assertThatThrownBy(() -> activityImageService.uploadImages(activityId, List.of(file), "outro-usuario-uuid"))
+                    .isInstanceOf(AccessDeniedException.class)
+                    .hasMessageContaining("Você não tem permissão");
+        }
+
+        @Test
         @DisplayName("Deve lançar exceção quando o arquivo exceder o tamanho máximo")
         void uploadImages_TamanhoExcedido_Erro() {
             UUID activityId = UUID.randomUUID();
@@ -114,6 +135,25 @@ public class ActivityImageServiceTest {
             List<String> urls = activityImageService.getPresignedUrls(activityId);
 
             assertThat(urls).hasSize(1).contains("http://mockurl.com/key1");
+        }
+
+        @Test
+        @DisplayName("Deve lançar AccessDeniedException quando tentar buscar imagens de rota privada de outro usuário")
+        void getPresignedUrls_RotaPrivada_Erro() {
+            String activityId = "route-uuid";
+
+            User owner = new User();
+            owner.setId("owner-uuid");
+
+            Route route = new Route();
+            route.setPublic(false);
+            route.setUser(owner);
+
+            when(routeRepository.findById(activityId)).thenReturn(Optional.of(route));
+
+            assertThatThrownBy(() -> activityImageService.getPresignedUrls(activityId, "outro-uuid"))
+                    .isInstanceOf(AccessDeniedException.class)
+                    .hasMessageContaining("Essa rota é privada");
         }
     }
 

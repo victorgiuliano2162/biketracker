@@ -1,6 +1,5 @@
 package br.com.biketracker.app.controllers;
 
-
 import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.entities.dtos.user.UserRequest;
 import br.com.biketracker.app.entities.dtos.user.UserResponse;
@@ -8,8 +7,10 @@ import br.com.biketracker.app.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -17,14 +18,12 @@ public class UserController {
 
     private final UserService userService;
 
-
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
-        try {
         User user = new User(
                 request.name(),
                 request.email(),
@@ -37,18 +36,18 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(UserResponse.from(userService.save(user)));
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage()+"/n"+request.toString(), ex);
-        }
-
     }
 
-    //TODO allow only authenticated requests to acesses this method
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
+    public ResponseEntity<UserResponse> getUser(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String id
+    ) {
+        String authUserId = jwt.getClaimAsString("user_id");
+        if (authUserId == null || !authUserId.equals(id)) {
+            throw new AccessDeniedException("Acesso não permitido aos dados deste usuário");
+        }
         User user = userService.findById(id);
-        return user != null ? ResponseEntity.ok(UserResponse.from(user)) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(UserResponse.from(user));
     }
-
-
 }

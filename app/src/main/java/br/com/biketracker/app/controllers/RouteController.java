@@ -16,7 +16,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +35,6 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody CreateRouteRequest request
     ) {
-        System.out.println(jwt);
-        System.out.println(jwt.getSubject());
         String userId = jwt.getSubject();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(routeService.createRoute(userId, request));
@@ -56,9 +53,9 @@ public class RouteController {
     // Stats do usuário autenticado
     @GetMapping("/my/stats")
     public ResponseEntity<RouteStatsResponse> stats(
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        String userId = userDetails.getUsername();
+        String userId = jwt.getClaimAsString("user_id");
         return ResponseEntity.ok(routeService.getStats(userId));
     }
 

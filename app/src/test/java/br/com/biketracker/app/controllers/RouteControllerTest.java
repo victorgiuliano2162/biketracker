@@ -48,6 +48,7 @@ public class RouteControllerTest {
         @BeforeEach
         void setUp() {
             lenient().when(jwt.getSubject()).thenReturn(userId);
+            lenient().when(jwt.getClaimAsString("user_id")).thenReturn(userId);
         }
 
         @Test
@@ -82,11 +83,11 @@ public class RouteControllerTest {
         @Test
         @DisplayName("stats() deve retornar 200 com as estatísticas do usuário")
         void stats_ReturnsStats() {
-            when(userDetails.getUsername()).thenReturn(userId);
+            when(jwt.getClaimAsString("user_id")).thenReturn(userId);
             RouteStatsResponse stats = mock(RouteStatsResponse.class);
             when(routeService.getStats(userId)).thenReturn(stats);
 
-            ResponseEntity<RouteStatsResponse> result = controller.stats(userDetails);
+            ResponseEntity<RouteStatsResponse> result = controller.stats(jwt);
 
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(result.getBody()).isEqualTo(stats);
