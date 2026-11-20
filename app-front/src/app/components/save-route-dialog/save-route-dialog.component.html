@@ -48,7 +48,6 @@
             <mat-select formControlName="country">
               @for (c of countries; track c.code) {
                 <mat-option [value]="c.code">
-                  <span class="flag font-mono-tabular">{{ c.code }}</span>
                   {{ c.name }}
                 </mat-option>
               }

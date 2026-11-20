@@ -605,7 +605,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       SaveRouteDialogResult
     >(SaveRouteDialogComponent, {
       data: { stats, defaultName: node.name },
-      width: '480px',
+      width: '580px',
+      maxWidth: '95vw',
       autoFocus: 'dialog',
     });
 
