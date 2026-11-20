@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { SuccessdialogComponent } from './successdialog.component';
 
@@ -8,7 +9,13 @@ describe('SuccessdialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SuccessdialogComponent]
+      imports: [SuccessdialogComponent],
+      providers: [
+        {
+          provide: MatDialogRef,
+          useValue: { close: jasmine.createSpy('close') }
+        }
+      ]
     })
     .compileComponents();
 

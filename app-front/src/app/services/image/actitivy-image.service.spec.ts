@@ -1,13 +1,21 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { ActitivyImageService } from './actitivy-image.service';
+import { ActivityImageService } from './actitivy-image.service';
 
-describe('ActitivyImageService', () => {
-  let service: ActitivyImageService;
+describe('ActivityImageService', () => {
+  let service: ActivityImageService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(ActitivyImageService);
+    TestBed.configureTestingModule({
+      providers: [
+        ActivityImageService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ]
+    });
+    service = TestBed.inject(ActivityImageService);
   });
 
   it('should be created', () => {

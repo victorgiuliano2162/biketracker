@@ -1,14 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { ResolveFn } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { routeDetailResolver } from './route-detail.resolver';
+import { routeDetailResolver, RouteDetailData } from './route-detail.resolver';
 
 describe('routeDetailResolver', () => {
-  const executeResolver: ResolveFn<boolean> = (...resolverParameters) => 
+  const executeResolver: ResolveFn<RouteDetailData | null> = (...resolverParameters) => 
       TestBed.runInInjectionContext(() => routeDetailResolver(...resolverParameters));
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ]
+    });
   });
 
   it('should be created', () => {

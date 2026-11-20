@@ -6,7 +6,10 @@
     "outDir": "./out-tsc/spec",
     "types": [
       "jasmine"
-    ]
+    ],
+    "paths": {
+      "nsfwjs": ["./src/testing/mock-nsfwjs.ts"]
+    }
   },
   "include": [
     "src/**/*.spec.ts",
