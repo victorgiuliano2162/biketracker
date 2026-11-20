@@ -186,12 +186,6 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  formatDuration(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    return h > 0 ? `${h}h ${m}min` : `${m}min`;
-  }
-
   // ── Private helpers ────────────────────────────────────────────────────────
 
   private buildChartData(pts: TrackPoint[]): ChartPoint[] {

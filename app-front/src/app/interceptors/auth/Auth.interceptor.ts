@@ -10,11 +10,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const publicRoutes = [
     '/api/auth/login', 
     '/api/auth/refresh',
-    '/api/user'
-];
-  const isPublic = publicRoutes.some(route => req.url.includes(route));
+    '/api/auth/forgot-password',
+    '/api/auth/reset-password'
+  ];
+  const isAuthPublic = publicRoutes.some(route => req.url.includes(route));
+  const isUserRegistration = (req.url.endsWith('/api/user') || req.url.endsWith('/api/user/')) && req.method === 'POST';
 
-  if (isPublic) {
+  if (isAuthPublic || isUserRegistration) {
     return next(req);
   }
 

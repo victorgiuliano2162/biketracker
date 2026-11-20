@@ -624,7 +624,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         startCity: '',
         country: result.country,
         isPublic: result.isPublic,
-        routeDificulty: result.routeDifficulty,
+        difficulty: result.routeDifficulty,
         trackPoints: coords.map((c, i) => ({
           latitude: c[0],
           longitude: c[1],

@@ -6,7 +6,6 @@ export interface RideSummary {
   id: number;
   distanceInKm: number;
   elevationInMeters: number;
-  activityTimeInSeconds: number;
   startTime: string;
 }
  
@@ -29,7 +28,6 @@ export interface GoalSummary {
 export interface HomeStats {
   totalDistanceKm: number;
   totalElevationMeters: number;
-  totalActivitySeconds: number;
   totalRides: number;
   recentRides: RideSummary[];
   weeklyChart: DailyDistance[];

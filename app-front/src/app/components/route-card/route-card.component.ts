@@ -15,7 +15,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouteResponse } from '../../models/route.model';
 import { RouteService } from '../../services/route/route.service';
-import { formatDuration } from '../../utils/geo.utils';
 
 import * as L from 'leaflet';
 declare const leafletImage: any;
@@ -63,10 +62,6 @@ export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get difficultyColor(): string {
     return DIFFICULTY_LABELS[this.route.routeDifficulty]?.color ?? '#9e9e9e';
-  }
-
-  get duration(): string {
-    return formatDuration(this.route.activityTimeInSeconds);
   }
 
   ngOnInit(): void {}

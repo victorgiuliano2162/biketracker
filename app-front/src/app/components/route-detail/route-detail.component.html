@@ -86,15 +86,6 @@
           <span class="mc-label">elevação média</span>
         </div>
       }
-      @if (route?.activityTimeInSeconds) {
-        <div class="metric-card">
-          <mat-icon class="mc-icon">timer</mat-icon>
-          <span class="mc-value">{{
-            formatDuration(route!.activityTimeInSeconds)
-          }}</span>
-          <span class="mc-label">tempo</span>
-        </div>
-      }
     </div>
 
     <mat-divider />

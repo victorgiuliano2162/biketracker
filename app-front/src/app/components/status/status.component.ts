@@ -41,10 +41,4 @@ export class StatusComponent implements OnInit {
       error: (err) => console.error('Erro ao carregar stats:', err)
     });
   }
-
-   formatDuration(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-  }
 }

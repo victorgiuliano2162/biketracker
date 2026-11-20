@@ -25,7 +25,7 @@ export interface CreateRouteRequest {
   isPublic: boolean;
   trackPoints: TrackPoint[];
   name: string;
-  routeDificulty: string;
+  difficulty: string;
 }
 
 export interface RouteReplayResponse {

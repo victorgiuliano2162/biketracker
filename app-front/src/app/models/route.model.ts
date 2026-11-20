@@ -12,7 +12,6 @@ export interface RouteResponse {
   createdAt: string;
   startCity: string;
   country: string;
-  activityTimeInSeconds: number;
   isPublic: boolean;
   routeDifficulty: RouteDifficulty;
   userName: string;
