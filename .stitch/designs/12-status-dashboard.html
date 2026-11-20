@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tracker — Minhas Metas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#FAFAFA',
+            surface: {
+              DEFAULT: '#FFFFFF',
+              recessed: '#F4F4F5',
+            },
+            obsidian: '#18181B',
+            graphite: '#52525B',
+            steel: '#71717A',
+            hairline: '#E4E4E7',
+            pine: {
+              DEFAULT: '#1B6B53',
+              deep: '#145340',
+              tint: '#EFF7F4',
+            },
+            status: {
+              emerald: '#15803D',
+              emeraldBg: '#ECFDF3',
+              ochre: '#B45309',
+              ochreBg: '#FEF3C7',
+              burntClay: '#C2410C',
+              burntClayBg: '#FFF7ED',
+              crimson: '#C93B3B',
+              crimsonBg: '#FEF2F2',
+              slate: '#475569',
+              slateBg: '#F1F5F9',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .tabular-numbers {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+<meta content="web_standard" name="shell-type"/></head>
+<body class="bg-[#FAFAFA] text-obsidian font-sans antialiased min-h-screen flex flex-col selection:bg-pine/10 selection:text-pine">
+<!-- Sticky Global TopBar (64px height, Pure Surface #FFFFFF, 1px bottom border Hairline Zinc #E4E4E7) -->
+<header class="sticky top-0 z-50 bg-surface border-b border-hairline h-16 w-full px-6 lg:px-12 flex items-center justify-between">
+<div class="flex items-center gap-10">
+<!-- Brand Logo & Wordmark -->
+<a class="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-pine rounded-md py-1" href="#">
+<svg class="w-6 h-6 text-pine" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<circle cx="5.5" cy="17.5" r="3.5"></circle>
+<circle cx="18.5" cy="17.5" r="3.5"></circle>
+<path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 3 3h4"></path>
+</svg>
+<span class="text-xl font-bold tracking-tight text-obsidian">Tracker</span>
+</a>
+<!-- Horizontal Menu -->
+<nav aria-label="Navegação Global" class="hidden md:flex items-center gap-1">
+<a class="px-3.5 py-1.5 text-sm font-medium text-graphite hover:text-obsidian transition-colors rounded-lg hover:bg-surface-recessed" href="#">
+          Home
+        </a>
+<button class="group flex items-center gap-1 px-3.5 py-1.5 text-sm font-medium text-graphite hover:text-obsidian transition-colors rounded-lg hover:bg-surface-recessed" type="button">
+<span>Mapas</span>
+<svg class="w-4 h-4 text-steel group-hover:text-obsidian transition-colors" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+</button>
+<!-- Active Status Nav item -->
+<div class="relative">
+<button class="flex items-center gap-1 px-3.5 py-1.5 text-sm font-semibold text-pine transition-colors" type="button">
+<span>Status</span>
+<svg class="w-4 h-4 text-pine" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+</button>
+<div class="absolute -bottom-[19px] left-3.5 right-3.5 h-[2px] bg-pine rounded-full"></div>
+</div>
+</nav>
+</div>
+<!-- Right User Area -->
+<div class="flex items-center gap-3">
+<a class="px-4 py-2 text-sm font-medium text-graphite hover:text-obsidian transition-colors rounded-lg hover:bg-surface-recessed" href="#">
+        Perfil
+      </a>
+<a class="px-4 py-2 text-sm font-medium text-graphite hover:text-obsidian border border-hairline rounded-lg hover:bg-surface-recessed transition-colors" href="#">
+        Sair
+      </a>
+</div>
+</header>
+<!-- Main Content Container -->
+<main class="flex-1 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-10"><div class="flex flex-col w-full gap-8"><div class="flex flex-col md:flex-row md:items-center justify-between gap-4"><div><h1 class="text-[36px] font-bold tracking-[-0.025em] text-[#18181B]">Estatísticas &amp; Performance</h1></div><div class="flex items-center gap-2.5 self-start md:self-auto bg-[#F4F4F5] px-3 py-1.5 rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1B6B53] opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-[#1B6B53]"></span></span><span class="font-mono text-[#52525B] text-xs font-medium">Atualizado em 19/11/2026 · 08:42 BRT</span></div></div><section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch"><div class="lg:col-span-7 bg-[#FFFFFF] border border-[#E4E4E7] border-l-4 border-l-[#1B6B53] rounded-2xl p-7 relative overflow-hidden flex flex-col justify-between"><svg class="absolute right-0 top-0 w-72 h-64 text-[#71717A] opacity-20 pointer-events-none -mr-8 -mt-8" fill="none" stroke="currentColor" stroke-width="1.2" viewbox="0 0 280 240"><path d="M40,0 C90,40 110,80 150,90 C210,105 240,70 280,110"></path><path d="M20,30 C70,70 90,110 130,120 C190,135 220,100 280,140"></path><path d="M0,60 C50,100 70,140 110,150 C170,165 200,130 280,170"></path><path d="M0,100 C40,135 60,170 100,180 C150,195 190,170 280,210"></path><path d="M0,140 C30,170 50,205 90,215 C140,230 180,205 280,245"></path><circle class="text-[#1B6B53]" cx="150" cy="90" fill="currentColor" r="3"></circle><circle cx="110" cy="150" fill="currentColor" r="2.5"></circle><line stroke="currentColor" stroke-dasharray="2 2" x1="150" x2="180" y1="90" y2="60"></line><text class="text-[#71717A]" fill="currentColor" font-family="'JetBrains Mono', monospace" font-size="8" x="185" y="60">ALT 940m</text></svg><div class="relative z-10"><h2 class="text-2xl font-semibold text-[#18181B] mb-2.5">Ritmo constante, Marina</h2><p class="text-base text-[#52525B] max-w-xl leading-relaxed">Você já completou 42 pedaladas registradas no Tracker. Seu ganho de elevação subiu 14% neste mês com média consistente em subidas de média e alta inclinação.</p></div><div class="flex flex-wrap items-center gap-3 mt-6 pt-2 relative z-10"><button class="h-[44px] px-5 rounded-[10px] font-medium inline-flex items-center gap-2 bg-[#1B6B53] hover:bg-[#155441] text-[#FFFFFF] transition-colors shadow-sm" type="button"><span class="material-symbols-outlined text-[19px]">file_upload</span><span>Importar GPX</span></button><button class="h-[44px] px-5 rounded-[10px] font-medium inline-flex items-center gap-2 bg-[#FFFFFF] border border-[#E4E4E7] text-[#18181B] hover:bg-[#F4F4F5] transition-colors" type="button"><span class="material-symbols-outlined text-[19px] text-[#71717A]">tune</span><span>Gerenciar metas</span></button></div></div><div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4"><div class="bg-[#FFFFFF] border border-[#E4E4E7] rounded-2xl p-6 flex flex-col justify-between"><div><div class="flex items-center justify-between gap-2 mb-3"><span class="font-mono text-xs text-[#71717A] tracking-wider uppercase font-medium">DISTÂNCIA TOTAL</span><div class="w-8 h-8 rounded-lg bg-[#F4F4F5] flex items-center justify-center text-[#1B6B53]"><span class="material-symbols-outlined text-[18px]">distance</span></div></div><div class="text-[32px] font-semibold tracking-[-0.03em] text-[#18181B] tabular-nums font-mono mb-1">2.486,4 <span class="text-sm text-[#71717A] font-normal">km</span></div></div><div class="pt-3"><div class="font-mono text-xs text-[#71717A] tabular-nums">42 atividades registradas</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums mt-0.5">+184,2 km este ciclo</div></div></div><div class="bg-[#FFFFFF] border border-[#E4E4E7] rounded-2xl p-6 flex flex-col justify-between"><div><div class="flex items-center justify-between gap-2 mb-3"><span class="font-mono text-xs text-[#71717A] tracking-wider uppercase font-medium">ELEVAÇÃO TOTAL</span><div class="w-8 h-8 rounded-lg bg-[#F4F4F5] flex items-center justify-center text-[#1B6B53]"><span class="material-symbols-outlined text-[18px]">terrain</span></div></div><div class="text-[32px] font-semibold tracking-[-0.03em] text-[#18181B] tabular-nums font-mono mb-1">38.420 <span class="text-sm text-[#71717A] font-normal">m</span></div></div><div class="pt-3"><div class="font-mono text-xs text-[#71717A] tabular-nums">Média 914 m/pedal</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums mt-0.5">+3.140 m acumulados</div></div></div></div></section><section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"><div class="lg:col-span-7 flex flex-col gap-6"><div class="bg-[#FFFFFF] border border-[#E4E4E7] rounded-2xl p-6"><div class="flex items-center justify-between pb-4 border-b border-[#E4E4E7]"><div><h2 class="text-lg font-semibold text-[#18181B]">Metas em andamento</h2><p class="text-xs text-[#71717A] mt-0.5 font-normal">3 metas ativas mais próximas da conclusão</p></div><a class="text-xs text-[#1B6B53] font-semibold hover:underline inline-flex items-center gap-1 group" href="#"><span>Ver todas</span><span class="transition-transform group-hover:translate-x-0.5 font-mono">→</span></a></div><div class="flex flex-col divide-y divide-[#E4E4E7]"><div class="py-4"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2"><span class="text-sm text-[#18181B] font-semibold">Desafio de Altimetria Alpina</span><span class="font-mono text-xs text-[#18181B] tabular-nums font-medium">4.850 / 6.000 m <span class="text-[#71717A] font-normal">· 81%</span></span></div><div class="w-full h-2 bg-[#F4F4F5] rounded-full overflow-hidden mb-2.5"><div class="h-full bg-[#1B6B53] rounded-full transition-all duration-500" style="width: 81%"></div></div><div class="flex items-center justify-between gap-2"><span class="font-mono text-xs text-[#71717A] tabular-nums">Prazo: 22/11/2026</span><span class="bg-[#FEF3C7] text-[#B45309] text-xs font-medium px-2.5 py-0.5 rounded-full tabular-nums">3 dias restantes</span></div></div><div class="py-4"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2"><span class="text-sm text-[#18181B] font-semibold">Base Aeróbica em Selim</span><span class="font-mono text-xs text-[#18181B] tabular-nums font-medium">28,5 / 40 h <span class="text-[#71717A] font-normal">· 71%</span></span></div><div class="w-full h-2 bg-[#F4F4F5] rounded-full overflow-hidden mb-2.5"><div class="h-full bg-[#1B6B53] rounded-full transition-all duration-500" style="width: 71%"></div></div><div class="flex items-center justify-between gap-2"><span class="font-mono text-xs text-[#71717A] tabular-nums">Prazo: 20/12/2026</span><span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-[#F4F4F5] text-[#52525B] font-medium">Em andamento</span></div></div><div class="pt-4"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2"><span class="text-sm text-[#18181B] font-semibold">Volume Mensal de Estrada</span><span class="font-mono text-xs text-[#18181B] tabular-nums font-medium">340 / 500 km <span class="text-[#71717A] font-normal">· 68%</span></span></div><div class="w-full h-2 bg-[#F4F4F5] rounded-full overflow-hidden mb-2.5"><div class="h-full bg-[#1B6B53] rounded-full transition-all duration-500" style="width: 68%"></div></div><div class="flex items-center justify-between gap-2"><span class="font-mono text-xs text-[#71717A] tabular-nums">Prazo: 30/11/2026</span><span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-[#F4F4F5] text-[#52525B] font-medium">Em andamento</span></div></div></div></div><div class="bg-[#FFFFFF] border border-[#E4E4E7] rounded-2xl p-6"><div class="flex items-center justify-between mb-6"><div><h2 class="text-lg font-semibold text-[#18181B]">Distância nos últimos 7 dias</h2><p class="font-mono text-xs text-[#71717A] mt-0.5 uppercase tracking-wide">HISTÓRICO SEMANAL COMPARATIVO</p></div><span class="font-mono text-xs bg-[#F4F4F5] px-3 py-1 rounded-full text-[#1B6B53] font-semibold tabular-nums">Semana: 184,2 km</span></div><div class="relative pt-10"><div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8 pr-2"><div class="w-full flex items-center justify-between border-b border-[#E4E4E7]"><span class="font-mono text-[10px] text-[#71717A] tabular-nums">60 km</span></div><div class="w-full flex items-center justify-between border-b border-[#E4E4E7]"><span class="font-mono text-[10px] text-[#71717A] tabular-nums">40 km</span></div><div class="w-full flex items-center justify-between border-b border-[#E4E4E7]"><span class="font-mono text-[10px] text-[#71717A] tabular-nums">20 km</span></div><div class="w-full flex items-center justify-between border-b border-[#E4E4E7]"><span class="font-mono text-[10px] text-[#71717A] tabular-nums">0 km</span></div></div><div class="relative h-48 flex items-end justify-between gap-2 sm:gap-4 px-3 sm:px-8 pb-8 z-10"><div class="flex-1 flex flex-col items-center h-full justify-end group"><span class="font-mono text-[11px] text-[#52525B] font-medium opacity-0 group-hover:opacity-100 transition-opacity mb-1 tabular-nums">18,5</span><div class="w-full max-w-[38px] bg-[#1B6B53] rounded-t-[6px] hover:opacity-90 transition-all" style="height: 26%;"></div></div><div class="flex-1 flex flex-col items-center h-full justify-end group"><span class="font-mono text-[10px] text-[#71717A] mb-1 tabular-nums">0,0</span><div class="w-full max-w-[38px] h-1 bg-[#E4E4E7] rounded-full"></div></div><div class="flex-1 flex flex-col items-center h-full justify-end group"><span class="font-mono text-[11px] text-[#52525B] font-medium opacity-0 group-hover:opacity-100 transition-opacity mb-1 tabular-nums">34,2</span><div class="w-full max-w-[38px] bg-[#1B6B53] rounded-t-[6px] hover:opacity-90 transition-all" style="height: 48%;"></div></div><div class="flex-1 flex flex-col items-center h-full justify-end group"><span class="font-mono text-[11px] text-[#52525B] font-medium opacity-0 group-hover:opacity-100 transition-opacity mb-1 tabular-nums">26,8</span><div class="w-full max-w-[38px] bg-[#1B6B53] rounded-t-[6px] hover:opacity-90 transition-all" style="height: 38%;"></div></div><div class="flex-1 flex flex-col items-center h-full justify-end group"><span class="font-mono text-[11px] text-[#52525B] font-medium opacity-0 group-hover:opacity-100 transition-opacity mb-1 tabular-nums">14,1</span><div class="w-full max-w-[38px] bg-[#1B6B53] rounded-t-[6px] hover:opacity-90 transition-all" style="height: 20%;"></div></div><div class="flex-1 flex flex-col items-center h-full justify-end relative group"><div class="absolute -top-7 bg-[#145340] text-[#FFFFFF] font-mono text-[10px] px-2 py-0.5 rounded shadow-sm whitespace-nowrap">Pico 62,4 km</div><div class="w-full max-w-[38px] bg-[#145340] rounded-t-[6px] transition-all shadow-sm" style="height: 89%;"></div></div><div class="flex-1 flex flex-col items-center h-full justify-end group"><span class="font-mono text-[11px] text-[#52525B] font-medium opacity-0 group-hover:opacity-100 transition-opacity mb-1 tabular-nums">28,2</span><div class="w-full max-w-[38px] bg-[#1B6B53] rounded-t-[6px] hover:opacity-90 transition-all" style="height: 40%;"></div></div></div><div class="flex justify-between gap-2 sm:gap-4 px-3 sm:px-8 border-t border-[#E4E4E7] pt-2.5"><span class="flex-1 text-center text-xs text-[#52525B] font-medium">Seg 10</span><span class="flex-1 text-center text-xs text-[#71717A]">Ter 11</span><span class="flex-1 text-center text-xs text-[#52525B] font-medium">Qua 12</span><span class="flex-1 text-center text-xs text-[#52525B] font-medium">Qui 13</span><span class="flex-1 text-center text-xs text-[#52525B] font-medium">Sex 14</span><span class="flex-1 text-center text-xs text-[#1B6B53] font-semibold">Sáb 15</span><span class="flex-1 text-center text-xs text-[#52525B] font-medium">Dom 16</span></div></div></div></div><div class="lg:col-span-5 bg-[#FFFFFF] border border-[#E4E4E7] rounded-2xl p-6 flex flex-col justify-between"><div><div class="flex items-center justify-between pb-4 border-b border-[#E4E4E7] mb-2"><div><h2 class="text-lg font-semibold text-[#18181B]">Últimas rotas</h2><p class="font-mono text-xs text-[#71717A] mt-0.5 uppercase tracking-wide">FEED CRONOLÓGICO GPX</p></div><a class="text-xs text-[#1B6B53] font-semibold hover:underline inline-flex items-center gap-1 group" href="#"><span>Ver todas</span><span class="transition-transform group-hover:translate-x-0.5 font-mono">→</span></a></div><div class="flex flex-col divide-y divide-[#E4E4E7]"><div class="py-3.5 flex items-center justify-between gap-3 group"><div class="min-w-0 flex-1"><div class="flex items-center gap-2 mb-1 flex-wrap"><a class="text-sm text-[#18181B] font-semibold hover:text-[#1B6B53] transition-colors truncate" href="#">Serra do Japi — Loop Norte</a><span class="text-[11px] font-semibold px-2 py-0.5 rounded uppercase bg-[#FFF7ED] text-[#C2410C]">HARD</span></div><div class="font-mono text-xs text-[#71717A] truncate tabular-nums">14/11/2026 · Jundiaí, BR</div></div><div class="text-right flex-shrink-0"><div class="font-mono text-sm font-bold text-[#18181B] tabular-nums">48,4 km</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums">+865 m</div></div></div><div class="py-3.5 flex items-center justify-between gap-3 group"><div class="min-w-0 flex-1"><div class="flex items-center gap-2 mb-1 flex-wrap"><a class="text-sm text-[#18181B] font-semibold hover:text-[#1B6B53] transition-colors truncate" href="#">Treino Intervalado Anel Viário</a><span class="text-[11px] font-semibold px-2 py-0.5 rounded uppercase bg-[#FEF3C7] text-[#B45309]">MODERATE</span></div><div class="font-mono text-xs text-[#71717A] truncate tabular-nums">11/11/2026 · Campinas, BR</div></div><div class="text-right flex-shrink-0"><div class="font-mono text-sm font-bold text-[#18181B] tabular-nums">36,2 km</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums">+310 m</div></div></div><div class="py-3.5 flex items-center justify-between gap-3 group"><div class="min-w-0 flex-1"><div class="flex items-center gap-2 mb-1 flex-wrap"><a class="text-sm text-[#18181B] font-semibold hover:text-[#1B6B53] transition-colors truncate" href="#">Estrada dos Romeiros — Pirapora</a><span class="text-[11px] font-semibold px-2 py-0.5 rounded uppercase bg-[#FFF7ED] text-[#C2410C]">HARD</span></div><div class="font-mono text-xs text-[#71717A] truncate tabular-nums">08/11/2026 · Cabreúva, BR</div></div><div class="text-right flex-shrink-0"><div class="font-mono text-sm font-bold text-[#18181B] tabular-nums">72,6 km</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums">+1.140 m</div></div></div><div class="py-3.5 flex items-center justify-between gap-3 group"><div class="min-w-0 flex-1"><div class="flex items-center gap-2 mb-1 flex-wrap"><a class="text-sm text-[#18181B] font-semibold hover:text-[#1B6B53] transition-colors truncate" href="#">Reconhecimento Serra da Cantareira</a><span class="text-[11px] font-semibold px-2 py-0.5 rounded uppercase bg-[#FFF7ED] text-[#C2410C]">HARD</span></div><div class="font-mono text-xs text-[#71717A] truncate tabular-nums">04/11/2026 · Mairiporã, BR</div></div><div class="text-right flex-shrink-0"><div class="font-mono text-sm font-bold text-[#18181B] tabular-nums">29,5 km</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums">+740 m</div></div></div><div class="py-3.5 flex items-center justify-between gap-3 group"><div class="min-w-0 flex-1"><div class="flex items-center gap-2 mb-1 flex-wrap"><a class="text-sm text-[#18181B] font-semibold hover:text-[#1B6B53] transition-colors truncate" href="#">Circuito das Frutas — Morungaba</a><span class="text-[11px] font-semibold px-2 py-0.5 rounded uppercase bg-[#FFF7ED] text-[#C2410C]">HARD</span></div><div class="font-mono text-xs text-[#71717A] truncate tabular-nums">01/11/2026 · Morungaba, BR</div></div><div class="text-right flex-shrink-0"><div class="font-mono text-sm font-bold text-[#18181B] tabular-nums">64,5 km</div><div class="font-mono text-xs text-[#1B6B53] font-medium tabular-nums">+1.280 m</div></div></div></div></div><div class="pt-5 mt-3 border-t border-[#E4E4E7] flex items-center justify-between text-[#71717A]"><span class="font-mono text-xs flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-[#1B6B53]">sensors</span> Sincronizado via GPX Telemetry</span><button class="font-mono text-xs text-[#52525B] hover:text-[#18181B] transition-colors flex items-center gap-1" type="button"><span class="material-symbols-outlined text-[14px]">download</span> Exportar CSV</button></div></div></section></div></main>
+<!-- Global Footer -->
+<footer class="w-full border-t border-hairline bg-surface mt-auto">
+<div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-steel gap-4">
+<div class="flex items-center gap-2">
+<span class="font-mono font-medium text-obsidian tracking-wider">TRACKER TELEMETRIA ESPORTIVA</span>
+<span>·</span>
+<span>© 2026 Tracker Precision Cartography</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="hover:text-obsidian transition-colors" href="#">Termos</a>
+<a class="hover:text-obsidian transition-colors" href="#">Privacidade</a>
+<a class="hover:text-obsidian transition-colors" href="#">Suporte</a>
+</div>
+</div>
+</footer>
+</body></html>

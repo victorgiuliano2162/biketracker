@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracker — Explorar rotas públicas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            alabaster: '#FAFAFA',
+            pure: '#FFFFFF',
+            mist: '#F4F4F5',
+            obsidian: '#18181B',
+            graphite: '#52525B',
+            steel: '#71717A',
+            hairline: '#E4E4E7',
+            alpine: {
+              DEFAULT: '#1B6B53',
+              dark: '#145340',
+              tint: '#EFF7F4',
+            },
+          },
+          boxShadow: {
+            whisper: '0 12px 32px -12px rgba(24, 24, 27, 0.08)',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1B6B53;
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      background: #145340;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1B6B53;
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+<body class="bg-[#FAFAFA] text-[#18181B] font-sans antialiased min-h-screen flex flex-col selection:bg-[#EFF7F4] selection:text-[#1B6B53]">
+
+  <!-- 1. Sticky Global TopBar (64px) -->
+  <header class="sticky top-0 z-50 h-16 w-full bg-white border-b border-[#E4E4E7]">
+    <div class="max-w-[1400px] h-full mx-auto px-12 flex items-center justify-between">
+      
+      <!-- Brand & Navigation -->
+      <div class="flex items-center space-x-10">
+        <!-- Logo -->
+        <a href="#" class="flex items-center space-x-2.5 group focus:outline-none">
+          <div class="w-8 h-8 rounded-lg bg-[#EFF7F4] border border-[#1B6B53]/20 flex items-center justify-center text-[#1B6B53] transition-colors group-hover:bg-[#1B6B53] group-hover:text-white">
+            <!-- Contour / Bike vector icon -->
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 17a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/>
+              <path d="M14 17a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/>
+              <path d="M9 17l3-7 4 3 3-5"/>
+              <path d="M12 10h4"/>
+            </svg>
+          </div>
+          <span class="font-bold text-lg tracking-tight text-[#18181B]">Tracker</span>
+        </a>
+
+        <!-- Center-left Menu -->
+        <nav class="flex items-center space-x-1">
+          <!-- Active Home -->
+          <a href="#" class="px-3.5 py-1.5 rounded-full bg-[#EFF7F4] text-[#1B6B53] font-semibold text-sm flex items-center transition-colors">
+            <span>Home</span>
+          </a>
+
+          <!-- Mapas Dropdown -->
+          <button type="button" class="px-3.5 py-1.5 rounded-full text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5] font-medium text-sm flex items-center space-x-1 transition-colors">
+            <span>Mapas</span>
+            <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Status Dropdown -->
+          <button type="button" class="px-3.5 py-1.5 rounded-full text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5] font-medium text-sm flex items-center space-x-1 transition-colors">
+            <span>Status</span>
+            <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Right User Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Ghost Button Perfil -->
+        <button class="h-10 px-3.5 rounded-[10px] text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5] font-medium text-sm flex items-center space-x-2 transition-colors">
+          <svg class="w-4 h-4 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Perfil</span>
+        </button>
+
+        <!-- Secondary Outline Sair -->
+        <button class="h-10 px-3.5 rounded-[10px] border border-[#E4E4E7] bg-white text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5] hover:border-[#D4D4D8] font-medium text-sm flex items-center space-x-2 transition-all">
+          <svg class="w-4 h-4 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Sair</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-[1400px] w-full mx-auto px-12 pt-8 pb-16 flex-1 flex flex-col space-y-6">
+
+    <!-- 2. Page Header -->
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div class="space-y-1.5">
+        <h1 class="text-[36px] font-bold tracking-[-0.025em] text-[#18181B] leading-tight">
+          Explorar rotas públicas
+        </h1>
+        <p class="text-[16px] text-[#52525B]">
+          Percursos de ciclismo compartilhados pela comunidade com telemetria verificada.
+        </p>
+      </div>
+
+      <!-- Active Filter Status Pill -->
+      <div class="self-start md:self-auto">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#EFF7F4] border border-[#1B6B53]/20 text-[#1B6B53]">
+          <span class="w-2 h-2 rounded-full bg-[#1B6B53] animate-pulse"></span>
+          <span class="text-sm font-medium">Raio de <span class="font-mono font-semibold tabular-nums">35 km</span> · Campinas, <span class="font-mono font-semibold">BR</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Integrated Geolocation & Radius Control Bar -->
+    <section class="bg-white rounded-[16px] border border-[#E4E4E7] p-4 lg:p-5 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        
+        <!-- Left button: Usar minha localização -->
+        <button type="button" class="h-11 px-4 rounded-[10px] border border-[#1B6B53] bg-[#EFF7F4] text-[#1B6B53] hover:bg-[#1B6B53] hover:text-white font-medium text-sm flex items-center justify-center space-x-2.5 transition-all shadow-sm">
+          <!-- Crosshair vector -->
+          <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v3"/>
+            <path d="M12 18v3"/>
+            <path d="M3 12h3"/>
+            <path d="M18 12h3"/>
+          </svg>
+          <span>Usar minha localização</span>
+        </button>
+
+        <!-- Center: Radius Slider -->
+        <div class="flex-1 max-w-2xl px-2 lg:px-6">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[13px] font-medium text-[#52525B]">Raio de busca</span>
+            <div class="flex items-baseline space-x-1">
+              <span id="radius-value" class="text-sm font-bold font-mono text-[#18181B] tabular-nums">35 km</span>
+              <span class="text-[11px] text-[#71717A] font-mono tabular-nums">(5 – 100 km)</span>
+            </div>
+          </div>
+          <div class="relative flex items-center">
+            <input 
+              id="radius-slider" 
+              type="range" 
+              min="5" 
+              max="100" 
+              value="35" 
+              class="w-full h-2 bg-[#F4F4F5] rounded-full appearance-none cursor-pointer accent-[#1B6B53] focus:outline-none"
+              style="background: linear-gradient(to right, #1B6B53 0%, #1B6B53 31.5%, #F4F4F5 31.5%, #F4F4F5 100%);"
+            >
+          </div>
+          <div class="flex justify-between items-center mt-1 text-[11px] text-[#71717A] font-mono tabular-nums">
+            <span>5 km</span>
+            <span>25 km</span>
+            <span>50 km</span>
+            <span>75 km</span>
+            <span>100 km</span>
+          </div>
+        </div>
+
+        <!-- Right: Ghost button Limpar filtro -->
+        <div class="flex items-center justify-end">
+          <button type="button" class="h-11 px-4 rounded-[10px] text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5] font-medium text-sm flex items-center space-x-2 transition-colors">
+            <svg class="w-4 h-4 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>Limpar filtro</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. Strict 2-Column Architectural Route Card Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- CARD 1: Serra do Japi — Loop Norte -->
+      <article class="bg-white rounded-[16px] border border-[#E4E4E7] p-6 flex flex-col justify-between hover:border-[#1B6B53]/40 hover:shadow-whisper transition-all duration-200">
+        <div>
+          <!-- Top Row -->
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-[17px] font-semibold text-[#18181B] leading-snug hover:text-[#1B6B53] transition-colors cursor-pointer">
+              Serra do Japi — Loop Norte
+            </h3>
+            <!-- Difficulty HARD: #C2410C on #FFF7ED -->
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#FFF7ED] text-[#C2410C] border border-[#FFEDD5]">
+              HARD
+            </span>
+          </div>
+
+          <!-- Metadata Row -->
+          <div class="flex flex-wrap items-center gap-y-1.5 gap-x-4 mt-2.5 text-[13px] text-[#52525B]">
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Marina Costa</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Jundiaí, <span class="font-mono font-semibold">BR</span></span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[#71717A]">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-mono text-[12px] tabular-nums">14/11/2026 · 06:42</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Footer -->
+        <div class="mt-6 pt-4 border-t border-[#E4E4E7] flex items-end justify-between">
+          <div class="flex items-center space-x-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Distância</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                48,4 <span class="text-sm font-normal text-[#71717A]">km</span>
+              </div>
+            </div>
+            <div class="w-px h-8 bg-[#E4E4E7]"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Elevação</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                +865 <span class="text-sm font-normal text-[#71717A]">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alpine Pine Sparkline SVG -->
+          <div class="w-32 h-10 flex items-center justify-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 120 40" fill="none">
+              <defs>
+                <linearGradient id="grad-1" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#EFF7F4" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#EFF7F4" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 35 Q 20 30, 35 18 T 65 24 T 95 8 L 120 14 L 120 40 L 0 40 Z" fill="url(#grad-1)" />
+              <path d="M 0 35 Q 20 30, 35 18 T 65 24 T 95 8 L 120 14" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 2: Estrada dos Romeiros — Pirapora -->
+      <article class="bg-white rounded-[16px] border border-[#E4E4E7] p-6 flex flex-col justify-between hover:border-[#1B6B53]/40 hover:shadow-whisper transition-all duration-200">
+        <div>
+          <!-- Top Row -->
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-[17px] font-semibold text-[#18181B] leading-snug hover:text-[#1B6B53] transition-colors cursor-pointer">
+              Estrada dos Romeiros — Pirapora
+            </h3>
+            <!-- Difficulty MODERATE: #B45309 on #FEF3C7 -->
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]">
+              MODERATE
+            </span>
+          </div>
+
+          <!-- Metadata Row -->
+          <div class="flex flex-wrap items-center gap-y-1.5 gap-x-4 mt-2.5 text-[13px] text-[#52525B]">
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Rafael Nogueira</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Cabreúva, <span class="font-mono font-semibold">BR</span></span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[#71717A]">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-mono text-[12px] tabular-nums">13/11/2026 · 07:15</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Footer -->
+        <div class="mt-6 pt-4 border-t border-[#E4E4E7] flex items-end justify-between">
+          <div class="flex items-center space-x-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Distância</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                72,6 <span class="text-sm font-normal text-[#71717A]">km</span>
+              </div>
+            </div>
+            <div class="w-px h-8 bg-[#E4E4E7]"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Elevação</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                +1.140 <span class="text-sm font-normal text-[#71717A]">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alpine Pine Sparkline SVG -->
+          <div class="w-32 h-10 flex items-center justify-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 120 40" fill="none">
+              <defs>
+                <linearGradient id="grad-2" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#EFF7F4" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#EFF7F4" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 32 Q 25 38, 45 22 T 80 16 T 105 10 L 120 28 L 120 40 L 0 40 Z" fill="url(#grad-2)" />
+              <path d="M 0 32 Q 25 38, 45 22 T 80 16 T 105 10 L 120 28" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 3: Subida do Pico do Jaraguá -->
+      <article class="bg-white rounded-[16px] border border-[#E4E4E7] p-6 flex flex-col justify-between hover:border-[#1B6B53]/40 hover:shadow-whisper transition-all duration-200">
+        <div>
+          <!-- Top Row -->
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-[17px] font-semibold text-[#18181B] leading-snug hover:text-[#1B6B53] transition-colors cursor-pointer">
+              Subida do Pico do Jaraguá
+            </h3>
+            <!-- Difficulty EXPERT: #C93B3B on #FEF2F2 -->
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#FEF2F2] text-[#C93B3B] border border-[#FEE2E2]">
+              EXPERT
+            </span>
+          </div>
+
+          <!-- Metadata Row -->
+          <div class="flex flex-wrap items-center gap-y-1.5 gap-x-4 mt-2.5 text-[13px] text-[#52525B]">
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Camila Rezende</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>São Paulo, <span class="font-mono font-semibold">BR</span></span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[#71717A]">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-mono text-[12px] tabular-nums">12/11/2026 · 06:08</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Footer -->
+        <div class="mt-6 pt-4 border-t border-[#E4E4E7] flex items-end justify-between">
+          <div class="flex items-center space-x-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Distância</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                26,2 <span class="text-sm font-normal text-[#71717A]">km</span>
+              </div>
+            </div>
+            <div class="w-px h-8 bg-[#E4E4E7]"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Elevação</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                +690 <span class="text-sm font-normal text-[#71717A]">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alpine Pine Sparkline SVG (Steep Wall Profile) -->
+          <div class="w-32 h-10 flex items-center justify-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 120 40" fill="none">
+              <defs>
+                <linearGradient id="grad-3" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#EFF7F4" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#EFF7F4" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 38 L 40 36 L 85 10 L 110 5 L 120 6 L 120 40 L 0 40 Z" fill="url(#grad-3)" />
+              <path d="M 0 38 L 40 36 L 85 10 L 110 5 L 120 6" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 4: Ciclovia Marginal & Villa-Lobos -->
+      <article class="bg-white rounded-[16px] border border-[#E4E4E7] p-6 flex flex-col justify-between hover:border-[#1B6B53]/40 hover:shadow-whisper transition-all duration-200">
+        <div>
+          <!-- Top Row -->
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-[17px] font-semibold text-[#18181B] leading-snug hover:text-[#1B6B53] transition-colors cursor-pointer">
+              Ciclovia Marginal &amp; Villa-Lobos
+            </h3>
+            <!-- Difficulty EASY: #15803D on #ECFDF3 -->
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#ECFDF3] text-[#15803D] border border-[#DCFCE7]">
+              EASY
+            </span>
+          </div>
+
+          <!-- Metadata Row -->
+          <div class="flex flex-wrap items-center gap-y-1.5 gap-x-4 mt-2.5 text-[13px] text-[#52525B]">
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Thiago Alencar</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>São Paulo, <span class="font-mono font-semibold">BR</span></span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[#71717A]">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-mono text-[12px] tabular-nums">10/11/2026 · 17:30</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Footer -->
+        <div class="mt-6 pt-4 border-t border-[#E4E4E7] flex items-end justify-between">
+          <div class="flex items-center space-x-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Distância</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                31,8 <span class="text-sm font-normal text-[#71717A]">km</span>
+              </div>
+            </div>
+            <div class="w-px h-8 bg-[#E4E4E7]"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Elevação</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                +185 <span class="text-sm font-normal text-[#71717A]">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alpine Pine Sparkline SVG (Flat Profile) -->
+          <div class="w-32 h-10 flex items-center justify-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 120 40" fill="none">
+              <defs>
+                <linearGradient id="grad-4" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#EFF7F4" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#EFF7F4" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 35 Q 30 33, 60 34 T 120 32 L 120 40 L 0 40 Z" fill="url(#grad-4)" />
+              <path d="M 0 35 Q 30 33, 60 34 T 120 32" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 5: Circuito das Frutas — Morungaba -->
+      <article class="bg-white rounded-[16px] border border-[#E4E4E7] p-6 flex flex-col justify-between hover:border-[#1B6B53]/40 hover:shadow-whisper transition-all duration-200">
+        <div>
+          <!-- Top Row -->
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-[17px] font-semibold text-[#18181B] leading-snug hover:text-[#1B6B53] transition-colors cursor-pointer">
+              Circuito das Frutas — Morungaba
+            </h3>
+            <!-- Difficulty HARD: #C2410C on #FFF7ED -->
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#FFF7ED] text-[#C2410C] border border-[#FFEDD5]">
+              HARD
+            </span>
+          </div>
+
+          <!-- Metadata Row -->
+          <div class="flex flex-wrap items-center gap-y-1.5 gap-x-4 mt-2.5 text-[13px] text-[#52525B]">
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Lucas Ferreira</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Morungaba, <span class="font-mono font-semibold">BR</span></span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[#71717A]">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-mono text-[12px] tabular-nums">09/11/2026 · 06:20</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Footer -->
+        <div class="mt-6 pt-4 border-t border-[#E4E4E7] flex items-end justify-between">
+          <div class="flex items-center space-x-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Distância</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                64,5 <span class="text-sm font-normal text-[#71717A]">km</span>
+              </div>
+            </div>
+            <div class="w-px h-8 bg-[#E4E4E7]"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Elevação</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                +1.280 <span class="text-sm font-normal text-[#71717A]">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alpine Pine Sparkline SVG (Roller-coaster Profile) -->
+          <div class="w-32 h-10 flex items-center justify-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 120 40" fill="none">
+              <defs>
+                <linearGradient id="grad-5" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#EFF7F4" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#EFF7F4" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 35 L 20 18 L 40 32 L 65 12 L 85 28 L 105 8 L 120 22 L 120 40 L 0 40 Z" fill="url(#grad-5)" />
+              <path d="M 0 35 L 20 18 L 40 32 L 65 12 L 85 28 L 105 8 L 120 22" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- CARD 6: Trilha da Pedra Grande — Atibaia -->
+      <article class="bg-white rounded-[16px] border border-[#E4E4E7] p-6 flex flex-col justify-between hover:border-[#1B6B53]/40 hover:shadow-whisper transition-all duration-200">
+        <div>
+          <!-- Top Row -->
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-[17px] font-semibold text-[#18181B] leading-snug hover:text-[#1B6B53] transition-colors cursor-pointer">
+              Trilha da Pedra Grande — Atibaia
+            </h3>
+            <!-- Difficulty MODERATE: #B45309 on #FEF3C7 -->
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]">
+              MODERATE
+            </span>
+          </div>
+
+          <!-- Metadata Row -->
+          <div class="flex flex-wrap items-center gap-y-1.5 gap-x-4 mt-2.5 text-[13px] text-[#52525B]">
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Beatriz Duarte</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-[#71717A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Atibaia, <span class="font-mono font-semibold">BR</span></span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[#71717A]">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-mono text-[12px] tabular-nums">08/11/2026 · 07:05</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Footer -->
+        <div class="mt-6 pt-4 border-t border-[#E4E4E7] flex items-end justify-between">
+          <div class="flex items-center space-x-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Distância</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                41,0 <span class="text-sm font-normal text-[#71717A]">km</span>
+              </div>
+            </div>
+            <div class="w-px h-8 bg-[#E4E4E7]"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-[#71717A] font-medium">Elevação</div>
+              <div class="font-mono font-bold text-[20px] text-[#18181B] tabular-nums mt-0.5">
+                +920 <span class="text-sm font-normal text-[#71717A]">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alpine Pine Sparkline SVG -->
+          <div class="w-32 h-10 flex items-center justify-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 120 40" fill="none">
+              <defs>
+                <linearGradient id="grad-6" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#EFF7F4" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#EFF7F4" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 36 Q 30 32, 55 24 T 90 10 L 120 18 L 120 40 L 0 40 Z" fill="url(#grad-6)" />
+              <path d="M 0 36 Q 30 32, 55 24 T 90 10 L 120 18" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- 5. Pagination Bar -->
+    <section class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#E4E4E7]">
+      <!-- Status text -->
+      <div class="text-sm font-mono text-[#71717A] tabular-nums">
+        Mostrando <span class="text-[#18181B] font-medium">1–6</span> de <span class="text-[#18181B] font-medium">42</span> rotas
+      </div>
+
+      <!-- Pagination Buttons -->
+      <div class="flex items-center space-x-1.5">
+        <!-- Anterior -->
+        <button type="button" class="h-11 px-3.5 rounded-[10px] border border-[#E4E4E7] bg-white text-[#71717A] hover:text-[#18181B] hover:border-[#D4D4D8] font-medium text-sm flex items-center space-x-1 transition-colors disabled:opacity-50" disabled>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Anterior</span>
+        </button>
+
+        <!-- Page Numbers -->
+        <button type="button" class="w-11 h-11 rounded-[10px] bg-[#1B6B53] text-white font-mono font-semibold text-sm flex items-center justify-center shadow-sm">
+          1
+        </button>
+
+        <button type="button" class="w-11 h-11 rounded-[10px] border border-[#E4E4E7] bg-white text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#F4F4F5] font-mono font-medium text-sm flex items-center justify-center transition-colors">
+          2
+        </button>
+
+        <button type="button" class="w-11 h-11 rounded-[10px] border border-[#E4E4E7] bg-white text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#F4F4F5] font-mono font-medium text-sm flex items-center justify-center transition-colors">
+          3
+        </button>
+
+        <span class="w-8 text-center text-[#71717A] font-mono font-medium text-sm">...</span>
+
+        <button type="button" class="w-11 h-11 rounded-[10px] border border-[#E4E4E7] bg-white text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#F4F4F5] font-mono font-medium text-sm flex items-center justify-center transition-colors">
+          7
+        </button>
+
+        <!-- Próxima -->
+        <button type="button" class="h-11 px-3.5 rounded-[10px] border border-[#E4E4E7] bg-white text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#F4F4F5] font-medium text-sm flex items-center space-x-1 transition-colors">
+          <span>Próxima</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Interactive proximity radius slider
+    const slider = document.getElementById('radius-slider');
+    const radiusDisplay = document.getElementById('radius-value');
+
+    if (slider && radiusDisplay) {
+      slider.addEventListener('input', function(e) {
+        const val = e.target.value;
+        radiusDisplay.textContent = val + ' km';
+        const percent = ((val - 5) / (100 - 5)) * 100;
+        slider.style.background = `linear-gradient(to right, #1B6B53 0%, #1B6B53 ${percent}%, #F4F4F5 ${percent}%, #F4F4F5 100%)`;
+      });
+    }
+  </script>
+</body>
+</html>

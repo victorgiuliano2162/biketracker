@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracker — Minhas Metas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#FAFAFA',
+            surface: {
+              DEFAULT: '#FFFFFF',
+              recessed: '#F4F4F5',
+            },
+            obsidian: '#18181B',
+            graphite: '#52525B',
+            steel: '#71717A',
+            hairline: '#E4E4E7',
+            pine: {
+              DEFAULT: '#1B6B53',
+              deep: '#145340',
+              tint: '#EFF7F4',
+            },
+            status: {
+              emerald: '#15803D',
+              emeraldBg: '#ECFDF3',
+              ochre: '#B45309',
+              ochreBg: '#FEF3C7',
+              burntClay: '#C2410C',
+              burntClayBg: '#FFF7ED',
+              crimson: '#C93B3B',
+              crimsonBg: '#FEF2F2',
+              slate: '#475569',
+              slateBg: '#F1F5F9',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .tabular-numbers {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-[#FAFAFA] text-obsidian font-sans antialiased min-h-screen flex flex-col selection:bg-pine/10 selection:text-pine">
+
+  <!-- Sticky Global TopBar (64px height, Pure Surface #FFFFFF, 1px bottom border Hairline Zinc #E4E4E7) -->
+  <header class="sticky top-0 z-50 bg-surface border-b border-hairline h-16 w-full px-6 lg:px-12 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <!-- Brand Logo & Wordmark -->
+      <a href="#" class="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-pine rounded-md py-1">
+        <svg class="w-6 h-6 text-pine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5.5" cy="17.5" r="3.5" />
+          <circle cx="18.5" cy="17.5" r="3.5" />
+          <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 3 3h4" />
+        </svg>
+        <span class="text-xl font-bold tracking-tight text-obsidian">Tracker</span>
+      </a>
+
+      <!-- Horizontal Menu -->
+      <nav class="hidden md:flex items-center gap-1" aria-label="Navegação Global">
+        <a href="#" class="px-3.5 py-1.5 text-sm font-medium text-graphite hover:text-obsidian transition-colors rounded-lg hover:bg-surface-recessed">
+          Home
+        </a>
+        
+        <button type="button" class="group flex items-center gap-1 px-3.5 py-1.5 text-sm font-medium text-graphite hover:text-obsidian transition-colors rounded-lg hover:bg-surface-recessed">
+          <span>Mapas</span>
+          <svg class="w-4 h-4 text-steel group-hover:text-obsidian transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+
+        <!-- Active Status Nav item -->
+        <div class="relative">
+          <button type="button" class="flex items-center gap-1 px-3.5 py-1.5 text-sm font-semibold text-pine transition-colors">
+            <span>Status</span>
+            <svg class="w-4 h-4 text-pine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <div class="absolute -bottom-[19px] left-3.5 right-3.5 h-[2px] bg-pine rounded-full"></div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Right User Area -->
+    <div class="flex items-center gap-3">
+      <a href="#" class="px-4 py-2 text-sm font-medium text-graphite hover:text-obsidian transition-colors rounded-lg hover:bg-surface-recessed">
+        Perfil
+      </a>
+      <a href="#" class="px-4 py-2 text-sm font-medium text-graphite hover:text-obsidian border border-hairline rounded-lg hover:bg-surface-recessed transition-colors">
+        Sair
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-10">
+
+    <!-- Page Header -->
+    <section class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-8 border-b border-hairline">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium font-mono uppercase tracking-wider text-pine bg-pine-tint border border-pine/15">
+            <span class="w-1.5 h-1.5 rounded-full bg-pine"></span>
+            Ciclo de Treinamento 2026
+          </span>
+        </div>
+        <h1 class="text-3xl lg:text-[36px] font-bold text-obsidian tracking-[-0.025em] leading-tight">
+          Minhas metas
+        </h1>
+        <p class="text-sm lg:text-base text-graphite mt-1.5">
+          4 em andamento <span class="text-steel mx-1">·</span> 1 concluída <span class="text-steel mx-1">·</span> 1 expirada
+        </p>
+      </div>
+
+      <!-- Action Button -->
+      <div>
+        <button type="button" class="inline-flex items-center justify-center gap-2 px-5 h-11 bg-pine hover:bg-pine-deep text-white font-medium text-sm rounded-[10px] shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-pine/40 active:scale-[0.99]">
+          <svg class="w-4 h-4 stroke-[2.2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Nova meta</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Goals Metric Summary Chips -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 mb-8">
+      <div class="bg-surface rounded-2xl border border-hairline p-4 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-medium text-steel uppercase tracking-wider">Distância Alvo</span>
+          <p class="text-xl font-bold font-mono text-obsidian tabular-numbers mt-0.5">800 <span class="text-xs font-sans text-steel font-normal">km</span></p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-surface-recessed flex items-center justify-center text-steel">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        </div>
+      </div>
+
+      <div class="bg-surface rounded-2xl border border-hairline p-4 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-medium text-steel uppercase tracking-wider">Ganho Altimétrico</span>
+          <p class="text-xl font-bold font-mono text-obsidian tabular-numbers mt-0.5">9.000 <span class="text-xs font-sans text-steel font-normal">m</span></p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-surface-recessed flex items-center justify-center text-steel">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+      </div>
+
+      <div class="bg-surface rounded-2xl border border-hairline p-4 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-medium text-steel uppercase tracking-wider">Volume em Horas</span>
+          <p class="text-xl font-bold font-mono text-obsidian tabular-numbers mt-0.5">40,0 <span class="text-xs font-sans text-steel font-normal">h</span></p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-surface-recessed flex items-center justify-center text-steel">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+
+      <div class="bg-surface rounded-2xl border border-hairline p-4 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-medium text-steel uppercase tracking-wider">Taxa de Eficácia</span>
+          <p class="text-xl font-bold font-mono text-pine tabular-numbers mt-0.5">74,2<span class="text-xs font-sans text-pine font-normal">%</span></p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-pine-tint flex items-center justify-center text-pine">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Goals Data Table Container -->
+    <div class="bg-surface rounded-2xl border border-hairline overflow-hidden shadow-[0_1px_3px_rgba(24,24,27,0.02)]">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse" style="table-layout: fixed;">
+          <colgroup>
+            <col style="width: 35%;">
+            <col style="width: 35%;">
+            <col style="width: 15%;">
+            <col style="width: 15%;">
+          </colgroup>
+          <thead>
+            <tr class="bg-surface-recessed border-b border-hairline text-steel text-xs font-semibold uppercase tracking-wider">
+              <th scope="col" class="py-4 px-6">Meta e Descrição</th>
+              <th scope="col" class="py-4 px-6">Progresso</th>
+              <th scope="col" class="py-4 px-6">Prazo</th>
+              <th scope="col" class="py-4 px-6 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-hairline">
+            
+            <!-- Row 1: Volume Mensal de Estrada -->
+            <tr class="group hover:bg-surface-recessed/60 transition-colors">
+              <td class="py-5 px-6 align-middle">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-pine-tint text-pine flex items-center justify-center shrink-0 mt-0.5 border border-pine/10">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-sm font-semibold text-obsidian tracking-tight group-hover:text-pine transition-colors">
+                      Volume Mensal de Estrada
+                    </h2>
+                    <p class="text-xs text-graphite mt-0.5">
+                      Base aeróbica semanal em rodovia
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="w-full max-w-md">
+                  <!-- Progress Bar Track -->
+                  <div class="w-full bg-surface-recessed h-2 rounded-full overflow-hidden border border-hairline/80">
+                    <div class="bg-pine h-full rounded-full transition-all duration-500" style="width: 68%;"></div>
+                  </div>
+                  <!-- Ratio & Percentage -->
+                  <div class="flex items-center justify-end gap-1.5 mt-2 text-xs font-mono text-obsidian tabular-numbers">
+                    <span class="font-medium text-graphite">340 / 500 km</span>
+                    <span class="text-steel">·</span>
+                    <span class="font-semibold text-pine">68%</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="flex flex-col items-start gap-1">
+                  <span class="font-mono text-xs font-medium text-obsidian tabular-numbers">30/11/2026</span>
+                  <span class="text-[11px] text-steel">Em andamento</span>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle text-right">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button type="button" aria-label="Editar Volume Mensal de Estrada" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-pine hover:bg-surface-recessed active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button type="button" aria-label="Excluir Volume Mensal de Estrada" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-status-crimson hover:bg-status-crimsonBg active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 2: Desafio de Altimetria Alpina -->
+            <tr class="group hover:bg-surface-recessed/60 transition-colors">
+              <td class="py-5 px-6 align-middle">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-pine-tint text-pine flex items-center justify-center shrink-0 mt-0.5 border border-pine/10">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-sm font-semibold text-obsidian tracking-tight group-hover:text-pine transition-colors">
+                      Desafio de Altimetria Alpina
+                    </h2>
+                    <p class="text-xs text-graphite mt-0.5">
+                      Subidas acumuladas na Serra do Japi
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="w-full max-w-md">
+                  <div class="w-full bg-surface-recessed h-2 rounded-full overflow-hidden border border-hairline/80">
+                    <div class="bg-pine h-full rounded-full transition-all duration-500" style="width: 81%;"></div>
+                  </div>
+                  <div class="flex items-center justify-end gap-1.5 mt-2 text-xs font-mono text-obsidian tabular-numbers">
+                    <span class="font-medium text-graphite">4.850 / 6.000 metros</span>
+                    <span class="text-steel">·</span>
+                    <span class="font-semibold text-pine">81%</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="flex flex-col items-start gap-1.5">
+                  <span class="font-mono text-xs font-medium text-obsidian tabular-numbers">22/11/2026</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium font-sans bg-[#FEF3C7] text-[#B45309] border border-[#B45309]/15">
+                    3 dias restantes
+                  </span>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle text-right">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button type="button" aria-label="Editar Desafio de Altimetria Alpina" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-pine hover:bg-surface-recessed active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button type="button" aria-label="Excluir Desafio de Altimetria Alpina" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-status-crimson hover:bg-status-crimsonBg active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 3: Travessia Mantiqueira Prep -->
+            <tr class="group hover:bg-surface-recessed/60 transition-colors">
+              <td class="py-5 px-6 align-middle">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-status-emeraldBg text-status-emerald flex items-center justify-center shrink-0 mt-0.5 border border-status-emerald/15">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h2 class="text-sm font-semibold text-obsidian tracking-tight group-hover:text-status-emerald transition-colors">
+                        Travessia Mantiqueira Prep
+                      </h2>
+                    </div>
+                    <p class="text-xs text-graphite mt-0.5">
+                      Simulado de longa distância em serra
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="w-full max-w-md">
+                  <div class="w-full bg-surface-recessed h-2 rounded-full overflow-hidden border border-hairline/80">
+                    <div class="bg-status-emerald h-full rounded-full transition-all duration-500" style="width: 100%;"></div>
+                  </div>
+                  <div class="flex items-center justify-end gap-1.5 mt-2 text-xs font-mono text-obsidian tabular-numbers">
+                    <span class="font-medium text-graphite">300 / 300 km</span>
+                    <span class="text-steel">·</span>
+                    <span class="font-semibold text-status-emerald">100%</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="flex flex-col items-start gap-1.5">
+                  <span class="font-mono text-xs font-medium text-obsidian tabular-numbers">25/11/2026</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium font-sans bg-[#ECFDF3] text-[#15803D] border border-[#15803D]/15">
+                    Concluída
+                  </span>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle text-right">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button type="button" aria-label="Editar Travessia Mantiqueira Prep" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-pine hover:bg-surface-recessed active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button type="button" aria-label="Excluir Travessia Mantiqueira Prep" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-status-crimson hover:bg-status-crimsonBg active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 4: Consistência de Pedaladas -->
+            <tr class="group hover:bg-surface-recessed/60 transition-colors">
+              <td class="py-5 px-6 align-middle">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-pine-tint text-pine flex items-center justify-center shrink-0 mt-0.5 border border-pine/10">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 14 14" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-sm font-semibold text-obsidian tracking-tight group-hover:text-pine transition-colors">
+                      Consistência de Pedaladas
+                    </h2>
+                    <p class="text-xs text-graphite mt-0.5">
+                      Sessões contínuas ao longo do mês
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="w-full max-w-md">
+                  <div class="w-full bg-surface-recessed h-2 rounded-full overflow-hidden border border-hairline/80">
+                    <div class="bg-pine h-full rounded-full transition-all duration-500" style="width: 70%;"></div>
+                  </div>
+                  <div class="flex items-center justify-end gap-1.5 mt-2 text-xs font-mono text-obsidian tabular-numbers">
+                    <span class="font-medium text-graphite">14 / 20 rides</span>
+                    <span class="text-steel">·</span>
+                    <span class="font-semibold text-pine">70%</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="flex flex-col items-start gap-1">
+                  <span class="font-mono text-xs font-medium text-obsidian tabular-numbers">15/12/2026</span>
+                  <span class="text-[11px] text-steel">Em andamento</span>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle text-right">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button type="button" aria-label="Editar Consistência de Pedaladas" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-pine hover:bg-surface-recessed active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button type="button" aria-label="Excluir Consistência de Pedaladas" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-status-crimson hover:bg-status-crimsonBg active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 5: Base Aeróbica em Selim -->
+            <tr class="group hover:bg-surface-recessed/60 transition-colors">
+              <td class="py-5 px-6 align-middle">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-pine-tint text-pine flex items-center justify-center shrink-0 mt-0.5 border border-pine/10">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-sm font-semibold text-obsidian tracking-tight group-hover:text-pine transition-colors">
+                      Base Aeróbica em Selim
+                    </h2>
+                    <p class="text-xs text-graphite mt-0.5">
+                      Tempo líquido em zona aeróbica Z2
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="w-full max-w-md">
+                  <div class="w-full bg-surface-recessed h-2 rounded-full overflow-hidden border border-hairline/80">
+                    <div class="bg-pine h-full rounded-full transition-all duration-500" style="width: 71%;"></div>
+                  </div>
+                  <div class="flex items-center justify-end gap-1.5 mt-2 text-xs font-mono text-obsidian tabular-numbers">
+                    <span class="font-medium text-graphite">28,5 / 40 horas</span>
+                    <span class="text-steel">·</span>
+                    <span class="font-semibold text-pine">71%</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="flex flex-col items-start gap-1">
+                  <span class="font-mono text-xs font-medium text-obsidian tabular-numbers">20/12/2026</span>
+                  <span class="text-[11px] text-steel">Em andamento</span>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle text-right">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button type="button" aria-label="Editar Base Aeróbica em Selim" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-pine hover:bg-surface-recessed active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button type="button" aria-label="Excluir Base Aeróbica em Selim" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-status-crimson hover:bg-status-crimsonBg active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 6: Bloco de Montanha Outubro -->
+            <tr class="group hover:bg-surface-recessed/60 transition-colors bg-[#FEF2F2]/10">
+              <td class="py-5 px-6 align-middle">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-9 h-9 rounded-xl bg-status-crimsonBg text-status-crimson flex items-center justify-center shrink-0 mt-0.5 border border-status-crimson/15">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-sm font-semibold text-obsidian tracking-tight group-hover:text-status-crimson transition-colors">
+                      Bloco de Montanha Outubro
+                    </h2>
+                    <p class="text-xs text-graphite mt-0.5">
+                      Volume de escalada em treinos curtos
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="w-full max-w-md">
+                  <div class="w-full bg-surface-recessed h-2 rounded-full overflow-hidden border border-hairline/80">
+                    <div class="bg-status-crimson/80 h-full rounded-full transition-all duration-500" style="width: 64%;"></div>
+                  </div>
+                  <div class="flex items-center justify-end gap-1.5 mt-2 text-xs font-mono text-obsidian tabular-numbers">
+                    <span class="font-medium text-graphite">1.920 / 3.000 metros</span>
+                    <span class="text-steel">·</span>
+                    <span class="font-semibold text-status-crimson">64%</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle">
+                <div class="flex flex-col items-start gap-1.5">
+                  <span class="font-mono text-xs font-medium text-steel tabular-numbers line-through">31/10/2026</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium font-sans bg-[#FEF2F2] text-[#C93B3B] border border-[#C93B3B]/15">
+                    Expirada
+                  </span>
+                </div>
+              </td>
+              <td class="py-5 px-6 align-middle text-right">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button type="button" aria-label="Editar Bloco de Montanha Outubro" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-pine hover:bg-surface-recessed active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button type="button" aria-label="Excluir Bloco de Montanha Outubro" class="w-11 h-11 inline-flex items-center justify-center rounded-[10px] text-graphite hover:text-status-crimson hover:bg-status-crimsonBg active:scale-95 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer / Telemetry Status bar -->
+      <div class="bg-surface border-t border-hairline px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-xs text-graphite gap-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-pine animate-pulse"></span>
+          <span class="font-mono text-steel">SINCRONIZADO COM STRAVA & GARMIN CONNECT</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <span class="text-steel">Total de metas: <strong class="text-obsidian font-mono">6</strong></span>
+          <span class="text-steel">Última atualização: <strong class="text-obsidian font-mono">Hoje, 09:41 BRT</strong></span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="w-full border-t border-hairline bg-surface mt-auto">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-steel gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-mono font-medium text-obsidian tracking-wider">TRACKER TELEMETRIA ESPORTIVA</span>
+        <span>·</span>
+        <span>© 2026 Tracker Precision Cartography</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#" class="hover:text-obsidian transition-colors">Termos</a>
+        <a href="#" class="hover:text-obsidian transition-colors">Privacidade</a>
+        <a href="#" class="hover:text-obsidian transition-colors">Suporte</a>
+        <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-surface-recessed text-steel border border-hairline">SYS v2.4 OK</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracker — Entrar na sua conta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #FAFAFA;
+      color: #18181B;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono-tabular {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .whisper-shadow {
+      box-shadow: 0 12px 32px -12px rgba(24, 24, 27, 0.08);
+    }
+    .frosted-hud {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    /* Input focus styling */
+    .field-input:focus {
+      outline: none;
+      border-color: #1B6B53;
+      box-shadow: 0 0 0 2px rgba(27, 107, 83, 0.15);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col m-0 p-0 overflow-x-hidden">
+  <main class="min-h-[100dvh] w-full flex flex-col lg:flex-row">
+    
+    <!-- Left Column: 55% Editorial Cartographic Map Panel -->
+    <section class="relative lg:w-[55%] w-full min-h-[420px] lg:min-h-[100dvh] bg-[#F4F4F5] border-b lg:border-b-0 lg:border-r border-[#E4E4E7] flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-hidden select-none">
+      
+      <!-- Top Swiss Metadata Badge -->
+      <div class="relative z-10 flex items-center justify-between">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 border border-[#E4E4E7] whisper-shadow">
+          <span class="w-2 h-2 rounded-full bg-[#1B6B53]"></span>
+          <span class="text-xs font-mono-tabular text-[#52525B] tracking-tight">CARTOGRAFIA GPX V4.2 · S 23°14' W 46°58'</span>
+        </div>
+        <div class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EFF7F4] border border-[#1B6B53]/20">
+          <span class="text-[11px] font-medium text-[#1B6B53] tracking-wide uppercase">TELEMETRIA VERIFICADA</span>
+        </div>
+      </div>
+
+      <!-- Topographic Contour & GPX Route Layer (Vector Graphic) -->
+      <div class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+        <svg class="w-full h-full object-cover" viewBox="0 0 800 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Area fill for route elevation profile below -->
+            <linearGradient id="elevationGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1B6B53" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#1B6B53" stop-opacity="0.0"/>
+            </linearGradient>
+            <!-- Map grid pattern -->
+            <pattern id="swissGrid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#E4E4E7" stroke-width="0.75" stroke-dasharray="2 4" opacity="0.6"/>
+            </pattern>
+          </defs>
+
+          <!-- Background coordinate grid -->
+          <rect width="100%" height="100%" fill="url(#swissGrid)" />
+
+          <!-- Topographic Contour Lines (Hairline subtle Swiss style) -->
+          <path d="M-50,220 C140,180 260,280 430,210 C600,140 700,260 850,230" stroke="#D4D4D8" stroke-width="1" stroke-dasharray="3 3" opacity="0.7" fill="none"/>
+          <path d="M-50,300 C120,260 280,360 460,300 C640,240 720,340 850,310" stroke="#E4E4E7" stroke-width="1" fill="none"/>
+          <path d="M-50,380 C100,340 300,440 490,380 C680,320 740,420 850,390" stroke="#D4D4D8" stroke-width="1" opacity="0.7" fill="none"/>
+          <path d="M-50,460 C110,420 320,520 520,460 C720,400 760,500 850,470" stroke="#E4E4E7" stroke-width="1" fill="none"/>
+          <path d="M-50,540 C130,500 340,600 550,540 C760,480 780,580 850,550" stroke="#D4D4D8" stroke-width="1" stroke-dasharray="3 3" opacity="0.7" fill="none"/>
+          <path d="M-50,620 C150,580 360,680 580,620 C800,560 800,660 850,630" stroke="#E4E4E7" stroke-width="1" fill="none"/>
+
+          <!-- Organic Ridge Contours -->
+          <ellipse cx="440" cy="380" rx="280" ry="160" stroke="#E4E4E7" stroke-width="1" fill="none" opacity="0.8"/>
+          <ellipse cx="450" cy="370" rx="210" ry="115" stroke="#D4D4D8" stroke-width="1" fill="none" opacity="0.7"/>
+          <ellipse cx="460" cy="360" rx="140" ry="75" stroke="#E4E4E7" stroke-width="1" fill="none" opacity="0.9"/>
+          <ellipse cx="465" cy="355" rx="70" ry="38" stroke="#D4D4D8" stroke-width="1" fill="none" opacity="0.8"/>
+
+          <!-- Elevation peak markers -->
+          <g opacity="0.85">
+            <path d="M465,347 L465,353 M462,350 L468,350" stroke="#71717A" stroke-width="1.2"/>
+            <text x="473" y="353" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500">1.198 m</text>
+          </g>
+
+          <g opacity="0.85">
+            <path d="M220,247 L220,253 M217,250 L223,250" stroke="#71717A" stroke-width="1.2"/>
+            <text x="228" y="253" fill="#71717A" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="500">942 m</text>
+          </g>
+
+          <!-- Primary GPX Cycling Route Loop (Alpine Pine #1B6B53) -->
+          <path id="gpxPath" d="M 180,640 
+                   C 140,580 150,490 210,430 
+                   C 260,380 340,410 390,340 
+                   C 430,280 490,260 550,290 
+                   C 630,330 650,420 590,490 
+                   C 530,560 480,520 420,580 
+                   C 360,640 310,690 230,680 
+                   Z" 
+                fill="none" 
+                stroke="#1B6B53" 
+                stroke-width="3.5" 
+                stroke-linecap="round" 
+                stroke-linejoin="round"/>
+
+          <!-- Route directional pulses & glow layer -->
+          <path d="M 180,640 
+                   C 140,580 150,490 210,430 
+                   C 260,380 340,410 390,340 
+                   C 430,280 490,260 550,290 
+                   C 630,330 650,420 590,490 
+                   C 530,560 480,520 420,580 
+                   C 360,640 310,690 230,680 
+                   Z" 
+                fill="none" 
+                stroke="#1B6B53" 
+                stroke-width="10" 
+                stroke-linecap="round" 
+                opacity="0.12"/>
+
+          <!-- Waypoint Markers along the route -->
+          <!-- Start / Finish -->
+          <circle cx="180" cy="640" r="7" fill="#FFFFFF" stroke="#1B6B53" stroke-width="3"/>
+          <circle cx="180" cy="640" r="2.5" fill="#1B6B53"/>
+          
+          <!-- Midpoint 1 - Climb base -->
+          <circle cx="390" cy="340" r="4.5" fill="#FFFFFF" stroke="#1B6B53" stroke-width="2"/>
+          
+          <!-- Summit Checkpoint -->
+          <circle cx="550" cy="290" r="6" fill="#FFFFFF" stroke="#C2410C" stroke-width="2.5"/>
+          <circle cx="550" cy="290" r="2" fill="#C2410C"/>
+          <text x="564" y="294" fill="#C2410C" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600">KM 24.8 · TOPO</text>
+
+          <!-- Downhill transition -->
+          <circle cx="590" cy="490" r="4.5" fill="#FFFFFF" stroke="#1B6B53" stroke-width="2"/>
+        </svg>
+      </div>
+
+      <!-- Anchored Bottom-Left: Frosted HUD Card -->
+      <div class="relative z-10 mt-auto pt-8">
+        <div class="max-w-[420px] rounded-[20px] frosted-hud border border-[#E4E4E7] p-5 sm:p-6 whisper-shadow transition-all duration-300 hover:border-[#1B6B53]/30">
+          
+          <!-- Header: Title & Difficulty Badge -->
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <div>
+              <div class="inline-flex items-center gap-1.5 mb-1 text-[11px] font-mono-tabular uppercase tracking-wider text-[#71717A]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#1B6B53]">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                </svg>
+                <span>Segmento em Destaque</span>
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold tracking-tight text-[#18181B] font-['Geist'] leading-snug">
+                Serra do Japi — Loop Norte
+              </h2>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-[#FFF7ED] text-[#C2410C] border border-[#C2410C]/20 uppercase">
+              HARD
+            </span>
+          </div>
+
+          <!-- Location & Athlete Info -->
+          <div class="flex items-center gap-3 text-xs text-[#52525B] mb-4">
+            <span class="flex items-center gap-1">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Jundiaí, <span class="font-mono-tabular font-medium text-[#18181B]">BR</span>
+            </span>
+            <span class="text-[#E4E4E7]">·</span>
+            <span class="flex items-center gap-1">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#71717A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Marina Costa
+            </span>
+          </div>
+
+          <!-- Telemetry Metrics Strip & Elevation Curve -->
+          <div class="pt-3 border-t border-[#E4E4E7] grid grid-cols-2 gap-4 items-end">
+            <div class="flex items-baseline gap-4">
+              <div>
+                <span class="block text-[10px] font-medium tracking-wider uppercase text-[#71717A]">Distância</span>
+                <span class="text-xl sm:text-2xl font-bold font-mono-tabular text-[#18181B]">48,4<span class="text-xs font-normal text-[#71717A] ml-1">km</span></span>
+              </div>
+              <div>
+                <span class="block text-[10px] font-medium tracking-wider uppercase text-[#71717A]">Elevação</span>
+                <span class="text-xl sm:text-2xl font-bold font-mono-tabular text-[#18181B]">+865<span class="text-xs font-normal text-[#71717A] ml-1">m</span></span>
+              </div>
+            </div>
+
+            <!-- Mini Altimetric Profile Curve -->
+            <div class="w-full h-11 relative">
+              <svg class="w-full h-full" viewBox="0 0 120 40" preserveAspectRatio="none" fill="none">
+                <defs>
+                  <linearGradient id="hudGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1B6B53" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#1B6B53" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 0,34 Q 20,32 35,22 T 65,10 T 90,26 T 120,8 L 120,40 L 0,40 Z" fill="url(#hudGrad)" />
+                <path d="M 0,34 Q 20,32 35,22 T 65,10 T 90,26 T 120,8" stroke="#1B6B53" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div class="flex justify-between text-[9px] font-mono-tabular text-[#71717A] mt-0.5">
+                <span>0 km</span>
+                <span>Max 14%</span>
+                <span>48 km</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: 45% Authentication Column -->
+    <section class="lg:w-[45%] w-full min-h-[100dvh] bg-[#FAFAFA] flex flex-col justify-between p-6 sm:p-10 lg:p-16">
+      
+      <!-- Top Navigation / Back to exploration link -->
+      <div class="w-full max-w-[440px] mx-auto flex items-center justify-between text-xs">
+        <a href="#" class="inline-flex items-center gap-1.5 text-[#52525B] hover:text-[#18181B] transition-colors py-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Explorar rotas</span>
+        </a>
+        <div class="inline-flex items-center gap-1 text-[#71717A] font-mono-tabular">
+          <span>PORTAL ATLETA</span>
+        </div>
+      </div>
+
+      <!-- Main Login Container (Vertically & Horizontally Centered, max-width 440px) -->
+      <div class="w-full max-w-[440px] mx-auto my-auto py-8">
+        
+        <!-- Brand Lockup -->
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-[10px] bg-[#1B6B53] flex items-center justify-center text-white whisper-shadow">
+            <!-- Minimalist topographic / bike route geometric icon -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="16" r="3.5"></circle>
+              <circle cx="18" cy="16" r="3.5"></circle>
+              <path d="M6 16l4.5-7.5L14 13h4"></path>
+              <path d="M12 8.5l-2-4H7"></path>
+            </svg>
+          </div>
+          <span class="text-2xl font-bold tracking-tight text-[#18181B] font-['Geist']">
+            Tracker
+          </span>
+        </div>
+
+        <!-- Heading & Subtitle -->
+        <div class="mb-8">
+          <h1 class="text-3xl sm:text-[36px] font-bold tracking-[-0.025em] text-[#18181B] leading-tight mb-2.5">
+            Entrar na sua conta
+          </h1>
+          <p class="text-base text-[#52525B] leading-relaxed">
+            Acesse suas rotas GPX, mapas altimétricos e metas de treino.
+          </p>
+        </div>
+
+        <!-- Authentication Form -->
+        <form class="space-y-5" onsubmit="event.preventDefault();">
+          
+          <!-- E-mail Field -->
+          <div>
+            <label for="email" class="block text-[13px] font-medium text-[#52525B] mb-2">
+              E-mail
+            </label>
+            <div class="relative">
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="atleta@exemplo.com.br" 
+                required
+                class="field-input w-full h-12 px-4 rounded-[10px] bg-[#FFFFFF] border border-[#E4E4E7] text-[#18181B] placeholder-[#71717A] text-[15px] transition-colors"
+              />
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label for="password" class="block text-[13px] font-medium text-[#52525B]">
+                Senha
+              </label>
+              <a href="#" class="text-xs font-medium text-[#1B6B53] hover:text-[#145340] transition-colors">
+                Esqueci minha senha
+              </a>
+            </div>
+            <div class="relative flex items-center">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="••••••••••••" 
+                required
+                class="field-input w-full h-12 pl-4 pr-12 rounded-[10px] bg-[#FFFFFF] border border-[#E4E4E7] text-[#18181B] placeholder-[#71717A] text-[15px] transition-colors"
+              />
+              <button 
+                type="button" 
+                id="togglePassword" 
+                class="absolute right-1 w-11 h-11 flex items-center justify-center rounded-[8px] text-[#71717A] hover:text-[#18181B] hover:bg-[#F4F4F5] transition-colors"
+                aria-label="Alternar visibilidade da senha"
+                onclick="
+                  const pwd = document.getElementById('password');
+                  const eyeOpen = document.getElementById('eyeOpen');
+                  const eyeClosed = document.getElementById('eyeClosed');
+                  if (pwd.type === 'password') {
+                    pwd.type = 'text';
+                    eyeOpen.classList.add('hidden');
+                    eyeClosed.classList.remove('hidden');
+                  } else {
+                    pwd.type = 'password';
+                    eyeOpen.classList.remove('hidden');
+                    eyeClosed.classList.add('hidden');
+                  }
+                "
+              >
+                <!-- Eye Open Icon -->
+                <svg id="eyeOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <!-- Eye Off / Closed Icon -->
+                <svg id="eyeClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <p class="text-[12px] text-[#71717A] mt-1.5">
+              Mínimo de 8 caracteres alfanuméricos
+            </p>
+          </div>
+
+          <!-- Primary Submit Action -->
+          <div class="pt-2">
+            <button 
+              type="submit" 
+              class="w-full h-12 rounded-[10px] bg-[#1B6B53] hover:bg-[#145340] active:scale-[0.99] text-white font-medium text-base transition-all duration-150 flex items-center justify-center gap-2 whisper-shadow"
+            >
+              <span>Entrar</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+        </form>
+
+        <!-- Divider & Secondary Registration Link -->
+        <div class="mt-8 pt-6 border-t border-[#E4E4E7] text-center">
+          <p class="text-[14px] text-[#52525B]">
+            Novo no Tracker? 
+            <a href="#" class="font-medium text-[#1B6B53] hover:text-[#145340] hover:underline transition-colors ml-1">
+              Criar conta gratuitamente
+            </a>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Swiss Footer Telemetry & Legal -->
+      <div class="w-full max-w-[440px] mx-auto flex items-center justify-between text-[11px] text-[#71717A] font-mono-tabular border-t border-[#E4E4E7] pt-4">
+        <span>© 2026 TRACKER LABS</span>
+        <div class="flex items-center gap-3">
+          <a href="#" class="hover:text-[#18181B] transition-colors">Privacidade</a>
+          <span>·</span>
+          <a href="#" class="hover:text-[#18181B] transition-colors">Termos</a>
+          <span>·</span>
+          <span class="text-[#1B6B53]">SYS v2.4 OK</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</body>
+</html>
