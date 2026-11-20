@@ -64,7 +64,11 @@ public class RouteService {
         route.setDifficulty(request.difficulty());
         route.buildPath(geometryFactory, request.trackPoints());
 
-        return RouteResponse.from(routeRepository.save(route));
+        Route saved = routeRepository.save(route);
+        if (saved.isPublic()) {
+            generateAndSavePreview(saved);
+        }
+        return RouteResponse.from(saved);
     }
 
     @Transactional(readOnly = true)
@@ -194,7 +198,11 @@ public class RouteService {
 
         } else {
             route.setPublic(!route.isPublic());
-            return RouteResponse.from(routeRepository.save(route));
+            Route saved = routeRepository.save(route);
+        if (saved.isPublic()) {
+            generateAndSavePreview(saved);
+        }
+        return RouteResponse.from(saved);
         }
 
 
@@ -278,11 +286,28 @@ public class RouteService {
             */
     public String getPreviewUrl(String routeId) {
         // Verifica se a rota existe e é pública antes de consultar MinIO
-        routeRepository.findById(routeId)
+        Route route = routeRepository.findById(routeId)
                 .filter(Route::isPublic)
                 .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Rota não encontrada: " + routeId));
 
-        return minioStorageService.getRoutePreviewUrl(routeId);
+        String existingUrl = minioStorageService.getRoutePreviewUrl(routeId);
+        if (existingUrl != null) {
+            return existingUrl;
+        }
+        return generateAndSavePreview(route);
+    }
+
+    private String generateAndSavePreview(Route route) {
+        if (route.getPath() == null || route.getPath().getNumPoints() < 2) {
+            return null;
+        }
+        try {
+            byte[] pngBytes = RoutePreviewRenderer.renderPng(route.getPath());
+            return minioStorageService.uploadRoutePreview(route.getId(), pngBytes);
+        } catch (Exception e) {
+            logger.warn("Falha ao gerar/salvar preview automática da rota {}: {}", route.getId(), e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -302,12 +327,14 @@ public class RouteService {
     }
 
 
+     @Transactional(readOnly = true)
      public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
         return routeRepository.findAllByIsPublicTrue(pageable)
                 .map(RouteResponse::from);
     }
 
 
+     @Transactional(readOnly = true)
      public Page<RouteResponse> findPublicRoutesInBoundingBox(BoundingBoxRequest bbox, Pageable pageable) {
         // Passa Pageable sem sort — a ordenação está fixada na query nativa (ORDER BY r.start_time DESC)
         Pageable unsorted = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());

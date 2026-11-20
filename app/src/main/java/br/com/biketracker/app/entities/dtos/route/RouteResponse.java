@@ -17,7 +17,7 @@ public record RouteResponse(
         String country,
         boolean isPublic,
         RouteDifficulty routeDifficulty,
-        //String userName,   // <-- adicionado
+        String userName,
         String description
 ) {
     public static RouteResponse from(Route route) {
@@ -33,7 +33,7 @@ public record RouteResponse(
                 route.getCountry(),
                 route.isPublic(),
                 route.getDifficulty(),
-                //route.getUser() != null ? route.getUser().getUserName() : null,  // <-- adicionado
+                route.getUser() != null ? route.getUser().getName() : null,
                 route.getDescription()
         );
     }
