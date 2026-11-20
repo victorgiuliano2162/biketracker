@@ -9,8 +9,9 @@ export class LocationService {
 
   public getUserLocation(): Promise<{lat: number, lng: number}> {
     return new Promise((resolve, reject) => {
-      if(!navigator.geolocation) {
+      if (!navigator.geolocation) {
         reject("Geolocalização não suportada");
+        return;
       }
 
       navigator.geolocation.getCurrentPosition(
@@ -19,7 +20,8 @@ export class LocationService {
         },
         (err) => {
           reject(err);
-        }
+        },
+        { timeout: 8000, maximumAge: 60000 }
       );
     });
   }

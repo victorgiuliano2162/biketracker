@@ -31,10 +31,16 @@ export interface RouteReplayResponse {
 
 export interface PageResponse<T> {
   content: T[];
-  totalElements: number;
-  totalPages: number;
-  number: number;
-  size: number;
+  totalElements?: number;
+  totalPages?: number;
+  number?: number;
+  size?: number;
+  page?: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
 }
 
 export interface BoundingBox {

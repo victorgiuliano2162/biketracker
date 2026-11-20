@@ -21,8 +21,11 @@ declare const leafletImage: any;
 
 const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
   EASY: { label: 'Fácil', color: '#4caf50' },
+  FACIL: { label: 'Fácil', color: '#4caf50' },
   MODERATE: { label: 'Moderado', color: '#ff9800' },
+  MODERADA: { label: 'Moderada', color: '#ff9800' },
   HARD: { label: 'Difícil', color: '#f44336' },
+  DIFICIL: { label: 'Difícil', color: '#f44336' },
   EXPERT: { label: 'Expert', color: '#9c27b0' },
 };
 
@@ -95,13 +98,10 @@ export class RouteCardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routeService.checkPreview(this.route.id).subscribe({
       next: (url) => {
         if (url) {
-          // Já existe — exibe direto
           this.previewUrl = url;
           this.state = 'ready';
         } else {
-          // Não existe — precisa gerar via Leaflet
-          this.state = 'rendering';
-          this.generatePreview();
+          this.state = 'error';
         }
       },
       error: () => {

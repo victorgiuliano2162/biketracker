@@ -50,7 +50,7 @@ export class HomeComponent {
   readonly PAGE_SIZE = PAGE_SIZE;
  
   ngOnInit(): void {
-    this.tryAutoLocation();
+    this.loadRoutes();
   }
  
   /** Tenta obter localização silenciosamente ao carregar a página */
@@ -109,7 +109,7 @@ export class HomeComponent {
     obs$.subscribe({
       next: (page) => {
         this.routes = page.content;
-        this.totalElements = page.totalElements;
+        this.totalElements = page.totalElements ?? page.page?.totalElements ?? page.content.length;
         this.loading = false;
       },
       error: () => {
