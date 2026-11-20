@@ -1,0 +1,26 @@
+# Ambientes e Segredos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Certificados locais
+nginx/certs/*.pem
+nginx/certs/*.key
+nginx/certs/*.crt
+
+# Logs e arquivos temporários do sistema
+*.log
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Docker
+.docker/
