@@ -1,3 +1,9 @@
-<div class="spinner-overlay" *ngIf="loadingService.isLoading()">
-  <mat-spinner diameter="48" />
-</div>
+@if (loadingService.isLoading()) {
+  <div class="loading-bar-wrap" role="status" aria-live="polite" aria-label="Carregando">
+    <mat-progress-bar mode="indeterminate" class="loading-bar" />
+    <div class="loading-pill">
+      <mat-spinner diameter="14" />
+      <span>Carregando...</span>
+    </div>
+  </div>
+}

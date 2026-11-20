@@ -1,13 +1,37 @@
-.spinner-overlay {
+.loading-bar-wrap {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(2px);
+  pointer-events: none;
   animation: fadeIn 0.15s ease;
+}
+
+.loading-bar {
+  height: 3px;
+  --mdc-linear-progress-active-indicator-color: var(--accent-primary);
+  --mdc-linear-progress-track-color: transparent;
+}
+
+.loading-pill {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: var(--bg-hud, rgba(255, 255, 255, 0.9));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-hairline, rgba(0, 0, 0, 0.08));
+  box-shadow: var(--shadow-whisper, 0 2px 10px rgba(0, 0, 0, 0.08));
+  color: var(--text-secondary, #52525b);
+  font-size: 0.75rem;
+  font-weight: 500;
+  pointer-events: none;
 }
 
 @keyframes fadeIn {
