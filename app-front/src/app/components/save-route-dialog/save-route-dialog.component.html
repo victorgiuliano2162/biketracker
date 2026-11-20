@@ -1,96 +1,90 @@
 <div class="dialog-wrap">
-
   <!-- Header -->
   <div class="dialog-header">
-    <div class="header-icon">
-      <mat-icon>cloud_upload</mat-icon>
+    <div class="header-left">
+      <span class="header-kicker font-mono-tabular">ESTÚDIO GPX // GRAVAÇÃO</span>
+      <h2 mat-dialog-title class="header-title">Salvar rota na nuvem</h2>
     </div>
-    <div class="header-text">
-      <h2 mat-dialog-title>Salvar rota</h2>
-      <p class="header-sub">Revise as informações antes de enviar</p>
-    </div>
-    <button mat-icon-button class="close-btn" (click)="cancel()" matTooltip="Cancelar">
+    <button mat-icon-button class="close-btn" (click)="cancel()" matTooltip="Cancelar" aria-label="Fechar">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <!-- Stats row -->
+  <!-- Stats strip -->
   <div class="stats-row">
     <div class="stat-chip">
-      <mat-icon class="stat-icon">route</mat-icon>
-      <span class="stat-value">{{ distanceLabel }}</span>
-      <span class="stat-label">distância</span>
+      <span class="stat-label font-mono-tabular">DISTÂNCIA TOTAL</span>
+      <span class="stat-value font-mono-tabular">{{ distanceLabel }}</span>
     </div>
     <div class="stat-divider"></div>
     <div class="stat-chip">
-      <mat-icon class="stat-icon">terrain</mat-icon>
-      <span class="stat-value">{{ elevationLabel }}</span>
-      <span class="stat-label">elevação acumulada</span>
+      <span class="stat-label font-mono-tabular">GANHO DE ELEVAÇÃO</span>
+      <span class="stat-value stat-value--accent font-mono-tabular">{{ elevationLabel }}</span>
     </div>
   </div>
 
-  <mat-divider />
-
   <!-- Form -->
-  <mat-dialog-content>
+  <mat-dialog-content class="dialog-body">
     <form [formGroup]="form" class="route-form">
-
       <!-- Nome -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Nome da rota</mat-label>
-        <input matInput formControlName="name" placeholder="Ex: Trilha da Serra" maxlength="80" />
-        <mat-icon matSuffix>edit</mat-icon>
-        @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-          <mat-error>Nome é obrigatório</mat-error>
-        }
-        @if (form.get('name')?.hasError('maxlength')) {
-          <mat-error>Máximo de 80 caracteres</mat-error>
-        }
-      </mat-form-field>
-
-      <!-- País -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>País</mat-label>
-        <mat-select formControlName="country">
-          @for (c of countries; track c.code) {
-            <mat-option [value]="c.code">
-              <span class="flag">{{ c.flag }}</span>
-              {{ c.name }}
-            </mat-option>
+      <div class="field-group">
+        <label class="field-label" for="save-route-name">Nome da rota</label>
+        <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+          <input id="save-route-name" matInput formControlName="name" placeholder="Ex: Trilha da Serra" maxlength="80" />
+          @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+            <mat-error>Nome é obrigatório</mat-error>
           }
-        </mat-select>
-        <mat-icon matSuffix>public</mat-icon>
-      </mat-form-field>
-
-      <!-- Visibilidade -->
-      <div class="visibility-field">
-        <span class="visibility-label">Visibilidade</span>
-        <mat-button-toggle-group formControlName="isPublic" class="visibility-toggle">
-          <mat-button-toggle [value]="false">
-            <mat-icon>lock</mat-icon>
-            Privada
-          </mat-button-toggle>
-          <mat-button-toggle [value]="true">
-            <mat-icon>public</mat-icon>
-            Pública
-          </mat-button-toggle>
-        </mat-button-toggle-group>
-        <p class="visibility-hint">
-          @if (form.get('isPublic')?.value) {
-            Outros ciclistas poderão ver esta rota no mapa.
-          } @else {
-            Somente você verá esta rota.
+          @if (form.get('name')?.hasError('maxlength')) {
+            <mat-error>Máximo de 80 caracteres</mat-error>
           }
-        </p>
+        </mat-form-field>
       </div>
+
+      <!-- País + Visibilidade -->
+      <div class="paired-row">
+        <div class="field-group">
+          <label class="field-label">País</label>
+          <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+            <mat-select formControlName="country">
+              @for (c of countries; track c.code) {
+                <mat-option [value]="c.code">
+                  <span class="flag font-mono-tabular">{{ c.code }}</span>
+                  {{ c.name }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Visibilidade</span>
+          <mat-button-toggle-group formControlName="isPublic" class="visibility-toggle">
+            <mat-button-toggle [value]="false">
+              <mat-icon>lock</mat-icon>
+              <span>Privada</span>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="true">
+              <mat-icon>public</mat-icon>
+              <span>Pública</span>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+
+      <p class="visibility-hint">
+        @if (form.get('isPublic')?.value) {
+          Outros ciclistas poderão ver esta rota no mapa público.
+        } @else {
+          Somente você verá esta rota no seu histórico.
+        }
+      </p>
 
       <mat-divider class="section-divider" />
 
       <!-- Image upload -->
       <div class="image-section">
-        <span class="visibility-label">Fotos da rota <span class="optional-tag">opcional</span></span>
+        <span class="field-label">Fotos da rota <span class="optional-tag">(opcional)</span></span>
 
-        <!-- Drop zone -->
         <div
           class="drop-zone"
           [class.drag-over]="isDraggingOver"
@@ -105,7 +99,7 @@
         >
           <mat-icon class="drop-icon">add_photo_alternate</mat-icon>
           <p class="drop-text">Arraste fotos ou <span class="drop-link">clique para selecionar</span></p>
-          <p class="drop-hint">JPEG, PNG, WebP ou GIF · máx. 10 MB por arquivo</p>
+          <p class="drop-hint">JPEG, PNG, WebP ou GIF · máx. 10 MB</p>
           <input
             #fileInput
             type="file"
@@ -116,7 +110,6 @@
           />
         </div>
 
-        <!-- Avisos de imagens rejeitadas pelo modelo NSFW -->
         @if (rejectedImages.length > 0) {
           <div class="nsfw-warnings">
             @for (rejected of rejectedImages; track rejected.fileName; let i = $index) {
@@ -140,21 +133,18 @@
           </div>
         }
 
-        <!-- Preview grid -->
         @if (previews.length > 0) {
           <div class="preview-grid">
             @for (preview of previews; track preview.previewUrl; let i = $index) {
               <div class="preview-item" [class.preview-validating]="preview.validating">
                 <img [src]="preview.previewUrl" [alt]="preview.file.name" class="preview-img" />
 
-                <!-- Overlay de validação em andamento -->
                 @if (preview.validating) {
                   <div class="validating-overlay">
-                    <mat-spinner diameter="28" />
+                    <mat-spinner diameter="24" />
                   </div>
                 }
 
-                <!-- Botão de remover (oculto durante validação) -->
                 @if (!preview.validating) {
                   <button
                     mat-mini-fab
@@ -170,18 +160,17 @@
             }
           </div>
         }
-
       </div>
-
     </form>
   </mat-dialog-content>
 
   <!-- Actions -->
-  <mat-dialog-actions align="end">
-    <button mat-button (click)="cancel()">Cancelar</button>
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button (click)="cancel()">Cancelar</button>
     <button
       mat-flat-button
       color="primary"
+      class="save-btn"
       [disabled]="form.invalid || isValidating"
       (click)="confirm()"
       [matTooltip]="isValidating ? 'Aguarde a validação das fotos' : ''"
@@ -191,8 +180,7 @@
       } @else {
         <mat-icon>cloud_upload</mat-icon>
       }
-      Salvar rota
+      <span>Salvar rota</span>
     </button>
   </mat-dialog-actions>
-
 </div>

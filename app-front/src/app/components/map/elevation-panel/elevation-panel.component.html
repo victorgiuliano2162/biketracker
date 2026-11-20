@@ -1,12 +1,9 @@
 <div class="elevation-panel">
-
   <div class="panel-header" (click)="toggleExpand()">
     <div class="panel-header-left">
       <span class="route-name">{{ stats.name }}</span>
-      <span class="route-meta">
-        {{ stats.distanceKm | number:'1.1-1' }} km
-        &nbsp;·&nbsp;
-        {{ stats.points }} pontos
+      <span class="route-meta font-mono-tabular">
+        {{ stats.distanceKm | number:'1.1-1' }} km · {{ stats.points }} pontos
       </span>
     </div>
 
@@ -14,9 +11,9 @@
       @if (stats.loadingElevation) {
         <mat-spinner diameter="16" />
       } @else if (stats.elevationGainM !== null) {
-        <span class="elev-badge">
+        <span class="elev-badge font-mono-tabular">
           <mat-icon>trending_up</mat-icon>
-          {{ stats.elevationGainM | number:'1.0-0' }} m
+          +{{ stats.elevationGainM | number:'1.0-0' }} m
         </span>
       }
       <mat-icon class="expand-icon" [class.rotated]="expanded">
@@ -29,7 +26,7 @@
     <div class="chart-area">
       @if (stats.loadingElevation) {
         <div class="chart-loading">
-          <mat-spinner diameter="28" />
+          <mat-spinner diameter="24" />
           <span>Carregando elevação…</span>
         </div>
       } @else if (stats.elevationProfile) {
@@ -39,5 +36,4 @@
       }
     </div>
   }
-
 </div>

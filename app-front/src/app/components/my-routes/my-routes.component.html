@@ -1,79 +1,109 @@
 <div class="routes-container">
-  <div class="page-header">
-    <h2>Minhas rotas</h2>
-    <span>{{ totalElements }} rotas</span>
-  </div>
+  <header class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Minhas rotas</h1>
+      <span class="count-pill font-mono-tabular">{{ totalElements }} rotas</span>
+    </div>
+  </header>
 
   @if (loading) {
-    <div class="loading-wrapper"><mat-spinner diameter="40" /></div>
+    <div class="routes-card">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <div class="skeleton-row">
+          <div class="skeleton-shimmer sk-name"></div>
+          <div class="skeleton-shimmer sk-metric"></div>
+          <div class="skeleton-shimmer sk-action"></div>
+        </div>
+      }
+    </div>
   }
 
   @if (!loading && routes.length === 0) {
-    <p class="empty-state">Nenhuma rota encontrada.</p>
+    <div class="empty-state">
+      <div class="empty-icon-wrap">
+        <mat-icon>map</mat-icon>
+      </div>
+      <h3>Nenhuma rota encontrada</h3>
+      <p>Importe um arquivo GPX no Estúdio GPX para registrar sua primeira rota.</p>
+    </div>
   }
 
-  @for (route of routes; track route.id) {
-    <mat-card class="route-card">
-      <mat-card-content>
-        <div class="route-row">
+  @if (!loading && routes.length > 0) {
+    <div class="routes-card">
+      <div class="table-ribbon font-mono-tabular">
+        <div>PERCURSO E DATA</div>
+        <div>TELEMETRIA (DISTÂNCIA / ELEVAÇÃO)</div>
+        <div class="ribbon-right">PRIVACIDADE E AÇÕES</div>
+      </div>
 
-          <!-- Left: name + date -->
-          <div class="route-main">
-            <a class="route-name" (click)="openDetail(route.id)">{{ route.name }}</a>
-            <span class="route-date">{{ formatDate(route.startTime) }}</span>
-          </div>
-
-          <!-- Center: metrics -->
-          <div class="route-metrics">
-            <div class="metric">
-              <mat-icon class="metric-icon">route</mat-icon>
-              <span class="metric-value">{{ route.distanceInKm | number:'1.1-1' }} km</span>
+      <div class="routes-list">
+        @for (route of routes; track route.id) {
+          <div class="route-row">
+            <!-- Left: name + date -->
+            <div class="route-main">
+              <a class="route-name" (click)="openDetail(route.id)">{{ route.name }}</a>
+              <span class="route-date font-mono-tabular">{{ formatDate(route.startTime) }}</span>
             </div>
-            <div class="metric">
-              <mat-icon class="metric-icon">terrain</mat-icon>
-              <span class="metric-value">{{ route.elevationInMeters | number:'1.0-0' }} m</span>
+
+            <!-- Center: metrics -->
+            <div class="route-metrics">
+              <div class="metric">
+                <span class="metric-value font-mono-tabular">{{ route.distanceInKm | number:'1.1-1' }} km</span>
+                <span class="metric-label font-mono-tabular">DISTÂNCIA</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value metric-elev font-mono-tabular">+{{ route.elevationInMeters | number:'1.0-0' }} m</span>
+                <span class="metric-label font-mono-tabular">GANHO ELEV.</span>
+              </div>
+            </div>
+
+            <!-- Right: visibility chip + menu -->
+            <div class="route-actions">
+              <mat-chip
+                [class]="route.isPublic ? 'chip-public' : 'chip-private'"
+                (click)="togglePrivacy(route, $event)"
+                matTooltip="Alterar visibilidade"
+              >
+                <mat-icon>{{ route.isPublic ? 'public' : 'lock' }}</mat-icon>
+                {{ route.isPublic ? 'Pública' : 'Privada' }}
+              </mat-chip>
+
+              <button
+                mat-icon-button
+                class="menu-trigger-btn"
+                [matMenuTriggerFor]="routeMenu"
+                (click)="$event.stopPropagation()"
+                aria-label="Mais opções"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+
+              <mat-menu #routeMenu="matMenu">
+                <button mat-menu-item (click)="openDetail(route.id)">
+                  <mat-icon>open_in_new</mat-icon>
+                  <span>Ver detalhes</span>
+                </button>
+                <button mat-menu-item class="delete-menu-item" (click)="deleteRoute(route, $event)">
+                  <mat-icon>delete_outline</mat-icon>
+                  <span>Excluir</span>
+                </button>
+              </mat-menu>
             </div>
           </div>
-
-          <!-- Right: visibility chip + menu -->
-          <div class="route-actions">
-            <mat-chip
-              [class]="route.isPublic ? 'chip-public' : 'chip-private'"
-              (click)="togglePrivacy(route, $event)"
-              matTooltip="Alterar visibilidade"
-            >
-              <mat-icon>{{ route.isPublic ? 'public' : 'lock' }}</mat-icon>
-              {{ route.isPublic ? 'Pública' : 'Privada' }}
-            </mat-chip>
-
-            <button mat-icon-button [matMenuTriggerFor]="routeMenu" (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-
-            <mat-menu #routeMenu="matMenu">
-              <button mat-menu-item (click)="openDetail(route.id)">
-                <mat-icon>open_in_new</mat-icon>
-                Ver detalhes
-              </button>
-              <button mat-menu-item (click)="deleteRoute(route, $event)">
-                <mat-icon>delete</mat-icon>
-                Excluir
-              </button>
-            </mat-menu>
-          </div>
-
-        </div>
-      </mat-card-content>
-    </mat-card>
+        }
+      </div>
+    </div>
   }
 
   @if (totalElements > 0) {
-    <mat-paginator
-      [length]="totalElements"
-      [pageSize]="pageSize"
-      [pageIndex]="pageIndex"
-      [pageSizeOptions]="[5, 10, 20]"
-      (page)="onPageChange($event)"
-    />
+    <div class="paginator-wrap">
+      <mat-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="onPageChange($event)"
+      />
+    </div>
   }
 </div>
