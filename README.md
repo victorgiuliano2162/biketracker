@@ -1,9 +1,7 @@
 # Trakker
 
-# Trakker
-
 ![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-brightgreen?logo=spring)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.3-brightgreen?logo=spring)
 ![Angular](https://img.shields.io/badge/Angular-19-red?logo=angular)
 ![Docker](https://img.shields.io/badge/Docker-Container-blue?logo=docker)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -114,42 +112,44 @@ docker compose up --build
 
 ### Variáveis de ambiente
 
-<!-- Sugestão: liste aqui as variáveis necessárias, por exemplo: -->
+Copie `.env.example` para `.env` e preencha os valores necessários:
 
 | Variável | Descrição | Exemplo |
 |---|---|---|
-| `POSTGRES_USER` | Usuário do banco de dados | `trakker` |
-| `POSTGRES_PASSWORD` | Senha do banco de dados | `********` |
-| `MINIO_ROOT_USER` | Usuário do Minio | `trakker` |
-| `MINIO_ROOT_PASSWORD` | Senha do Minio | `********` |
-| `JWT_SECRET` | Segredo usado na geração de tokens OAuth2 | `********` |
+| `JWT_PRIVATE_KEY` | Chave privada RSA (PEM) para assinatura de tokens JWT | `-----BEGIN PRIVATE KEY-----...` |
+| `JWT_PUBLIC_KEY` | Chave pública RSA (PEM) para validação de tokens JWT | `-----BEGIN PUBLIC KEY-----...` |
+| `MAIL_USERNAME` | Usuário SMTP para envio de e-mails de recuperação de senha | `seu_email@provedor.com` |
+| `MAIL_PASSWORD` | Senha ou app password SMTP | `********` |
+| `MINIO_ACCESS_KEY` | Chave de acesso ao MinIO S3 | `minioadmin` |
+| `MINIO_SECRET_KEY` | Segredo de acesso ao MinIO S3 | `********` |
 
 # Principais EndPoints
 
 Cada endpoint desses também presume rotas filhas para tratar de atividade especificas.
 
 ### Backend
-Caso seja necessário realizar verificações no endpoints do backend todas as chamadas para  são iniciadas pelo préfixo ```api```, sem necessidade de explicitar a porta.
+Caso seja necessário realizar verificações nos endpoints do backend, todas as chamadas são iniciadas pelo prefixo `/api`, sem necessidade de explicitar a porta.
 
 | Método | Rota | Autenticação | Descrição |
 |---|---|---|---|
-| post | `/api/user` | Não | Criação de usuários |
-| post | `/api/auth/login` | Não | Login |
-| post | `/api/auth/refresh` | Não | Refresh de token |
-| post | `/api/auth/forgot-password` | Não | Solicitação de recuperação de senha |
-| post | `/api/auth/reset-password` | Não | Redefinição de senha |
-| get | `/api/health/**` | Não | Verificação de integridade da API |
-| get | `/api/routes/public/**` | Não | Rotas públicas |
-| get | `/api/routes/public/search/**` | Não | Busca de rotas públicas |
-| post | `/api/routes` | Sim | Gerenciamento de rotas do usuário |
-| get | `/api/activities/{activityId}/images` | Sim | Imagens referentes a cada atividade |
+| POST | `/api/user` | Não | Criação de usuários |
+| GET / PUT | `/api/user/me` | Sim | Consulta e edição do perfil do atleta autenticado |
+| POST | `/api/auth/login` | Não | Login (emite access + refresh token) |
+| POST | `/api/auth/refresh` | Não | Rotação e renovação de tokens |
+| POST | `/api/auth/logout` | Não | Revogação do refresh token |
+| POST | `/api/auth/forgot-password` | Não | Solicitação de recuperação de senha |
+| POST | `/api/auth/reset-password` | Não | Redefinição de senha |
+| GET | `/api/health/**` | Não | Verificação de integridade da API |
+| GET | `/api/routes/public/**` | Não | Listagem, busca espacial e preview de rotas públicas |
+| POST / GET / PATCH / DELETE | `/api/routes/**` | Sim | Criação, listagem, detalhes, replay, visibilidade e exclusão de rotas |
+| GET / POST / PUT / DELETE | `/api/goal/**` | Sim | Gestão de metas esportivas com cálculo automático de progresso |
+| GET | `/api/home/stats` | Sim | Estatísticas agregadas e metas ativas do dashboard |
+| GET / POST | `/api/activities/{activityId}/images` | Sim | Upload e URLs assinadas das fotos de cada rota |
 
 
 
 
 ### Frontend
-
-Aqui ignora-se prefixo. O naming para cada endpoint é simples e elucida sua função, contudo somente os 4 primeiros não exigem um usuário autenticado.
 
 | Rota | Autenticação necessária |
 |---|---|
@@ -160,7 +160,11 @@ Aqui ignora-se prefixo. O naming para cada endpoint é simples e elucida sua fun
 | `/home` | Sim |
 | `/map` | Sim |
 | `/routes` | Sim |
+| `/routes/:id` | Sim |
+| `/goals` | Sim |
+| `/goal` | Sim |
 | `/status` | Sim |
+| `/profile` | Sim |
 
 ## Como contribuir
 
