@@ -1,11 +1,13 @@
 package br.com.biketracker.app.services;
 
 
+import br.com.biketracker.app.entities.RefreshToken;
 import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.entities.dtos.auth.LoginRequest;
 import br.com.biketracker.app.entities.dtos.auth.LoginResponse;
 import br.com.biketracker.app.entities.dtos.auth.RefreshRequest;
 import br.com.biketracker.app.exceptions.ex.UnauthorizedException;
+import br.com.biketracker.app.repositories.RefreshTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +22,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.*;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,12 +47,15 @@ public class AuthServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
     private AuthService authService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        authService = new AuthService(authenticationManager, jwtEncoder, jwtDecoder, userService);
+        authService = new AuthService(authenticationManager, jwtEncoder, jwtDecoder, userService, refreshTokenRepository);
     }
 
     @Nested
@@ -121,6 +129,14 @@ public class AuthServiceTest {
             when(jwtMock.getSubject()).thenReturn("vitor@teste.com");
             when(userService.findByEmail("vitor@teste.com")).thenReturn(userMock);
 
+            RefreshToken stored = new RefreshToken(
+                    AuthService.sha256("valido-refresh-token"),
+                    "vitor@teste.com",
+                    Instant.now().plus(7, ChronoUnit.DAYS)
+            );
+            when(refreshTokenRepository.findByTokenHash(AuthService.sha256("valido-refresh-token")))
+                    .thenReturn(Optional.of(stored));
+
             when(mockNewAccessToken.getTokenValue()).thenReturn("novo-access-token");
             when(mockNewRefreshToken.getTokenValue()).thenReturn("novo-refresh-token");
             when(jwtEncoder.encode(any(JwtEncoderParameters.class)))
@@ -132,6 +148,47 @@ public class AuthServiceTest {
             assertThat(response).isNotNull();
             assertThat(response.accessToken()).isEqualTo("novo-access-token");
             assertThat(response.refreshToken()).isEqualTo("novo-refresh-token");
+            assertThat(stored.isRevoked()).isTrue();
+            verify(refreshTokenRepository, times(2)).save(any(RefreshToken.class));
+        }
+
+        @Test
+        @DisplayName("Deve lançar UnauthorizedException quando o refresh token já foi revogado")
+        void refresh_TokenRevogado_Erro() {
+            RefreshRequest request = new RefreshRequest("revogado-refresh-token");
+            Jwt jwtMock = mock(Jwt.class);
+            when(jwtDecoder.decode("revogado-refresh-token")).thenReturn(jwtMock);
+            when(jwtMock.getClaimAsString("token_type")).thenReturn("refresh");
+
+            RefreshToken stored = new RefreshToken(
+                    AuthService.sha256("revogado-refresh-token"),
+                    "vitor@teste.com",
+                    Instant.now().plus(7, ChronoUnit.DAYS)
+            );
+            stored.setRevoked(true);
+            when(refreshTokenRepository.findByTokenHash(AuthService.sha256("revogado-refresh-token")))
+                    .thenReturn(Optional.of(stored));
+
+            assertThatThrownBy(() -> authService.refresh(request))
+                    .isInstanceOf(UnauthorizedException.class)
+                    .hasMessageContaining("revogado");
+        }
+
+        @Test
+        @DisplayName("logout() deve marcar o refresh token como revogado")
+        void logout_RevogaRefreshToken() {
+            RefreshToken stored = new RefreshToken(
+                    AuthService.sha256("meu-refresh-token"),
+                    "vitor@teste.com",
+                    Instant.now().plus(7, ChronoUnit.DAYS)
+            );
+            when(refreshTokenRepository.findByTokenHash(AuthService.sha256("meu-refresh-token")))
+                    .thenReturn(Optional.of(stored));
+
+            authService.logout("meu-refresh-token");
+
+            assertThat(stored.isRevoked()).isTrue();
+            verify(refreshTokenRepository, times(1)).save(stored);
         }
 
         @Test

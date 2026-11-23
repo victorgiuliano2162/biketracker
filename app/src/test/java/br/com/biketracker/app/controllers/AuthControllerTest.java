@@ -90,6 +90,20 @@ public class AuthControllerTest {
 
             verify(authService, times(1)).refresh(any(RefreshRequest.class));
         }
+
+        @Test
+        @DisplayName("POST /api/auth/logout - Deve retornar 204 e revogar refresh token")
+        void logout_Sucesso() throws Exception {
+            RefreshRequest request = new RefreshRequest("refresh-token-ativo");
+            doNothing().when(authService).logout("refresh-token-ativo");
+
+            mockMvc.perform(post("/api/auth/logout")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isNoContent());
+
+            verify(authService, times(1)).logout("refresh-token-ativo");
+        }
     }
 
     @Nested
