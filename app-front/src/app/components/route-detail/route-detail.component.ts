@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   Component,
   ElementRef,
@@ -32,6 +33,12 @@ import { RouteDetailData } from '../../resolvers/route-detail.resolver';
 import { AuthService } from '../../services/auth/auth.service';
 import { EditRouteDialogComponent } from '../edit-route-dialog/edit-route-dialog.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import {
+  CommentResponse,
+  CommentService,
+} from '../../services/comment/comment.service';
 
 // route-detail.component.ts
 export interface ChartPoint {
@@ -43,6 +50,7 @@ export interface ChartPoint {
   selector: 'app-route-detail',
   imports: [
     CommonModule,
+    FormsModule,
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
@@ -52,6 +60,8 @@ export interface ChartPoint {
     MatDividerModule,
     MatDialogModule,
     MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
     RouteMapComponent,
   ],
   templateUrl: './route-detail.component.html',
@@ -63,6 +73,9 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
   route: RouteResponse | null = null;
   points: TrackPoint[] = [];
   imageUrls: string[] = [];
+  comments: CommentResponse[] = [];
+  newComment = '';
+  postingComment = false;
   chartData: ChartPoint[] = [];
   avgElev: number | null = null;
   hoverIndex: number | null = null;
@@ -77,6 +90,7 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private routeService: RouteService,
     private imageService: ActivityImageService,
+    private commentService: CommentService,
     private authService: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -102,6 +116,11 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     // Imagens continuam sendo carregadas de forma assíncrona (não bloqueiam a navegação)
     this.imageService.getPresignedUrls(data.route.id).subscribe({
       next: (urls) => (this.imageUrls = urls),
+      error: () => {},
+    });
+
+    this.commentService.list(data.route.id).subscribe({
+      next: (list) => (this.comments = list),
       error: () => {},
     });
  
@@ -205,6 +224,43 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
 
   onMapHover(index: number | null): void {
     this.hoverIndex = index;
+  }
+
+  canDeleteComment(comment: CommentResponse): boolean {
+    const currentUserId = this.authService.getCurrentUserId();
+    return Boolean(
+      this.isOwner || (currentUserId && comment.authorId === currentUserId),
+    );
+  }
+
+  submitComment(): void {
+    const content = this.newComment.trim();
+    if (!this.route || !content || this.postingComment) return;
+    this.postingComment = true;
+    this.commentService.create(this.route.id, content).subscribe({
+      next: (created) => {
+        this.comments = [created, ...this.comments];
+        this.newComment = '';
+        this.postingComment = false;
+      },
+      error: () => {
+        this.postingComment = false;
+        this.snackBar.open('Erro ao publicar comentário.', 'OK', { duration: 3000 });
+      },
+    });
+  }
+
+  deleteComment(comment: CommentResponse): void {
+    if (!this.route || !this.canDeleteComment(comment)) return;
+    if (!confirm('Excluir este comentário?')) return;
+    this.commentService.delete(this.route.id, comment.id).subscribe({
+      next: () => {
+        this.comments = this.comments.filter((c) => c.id !== comment.id);
+        this.snackBar.open('Comentário excluído.', '✓', { duration: 2500 });
+      },
+      error: () =>
+        this.snackBar.open('Erro ao excluir comentário.', 'OK', { duration: 3000 }),
+    });
   }
 
   goBack(): void {

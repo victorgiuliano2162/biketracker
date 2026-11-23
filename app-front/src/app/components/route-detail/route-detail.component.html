@@ -190,5 +190,68 @@
         </div>
       </section>
     }
+
+    <!-- Comments -->
+    <section class="section-card comments-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <mat-icon>chat_bubble_outline</mat-icon>
+          <span>Comentários ({{ comments.length }})</span>
+        </h2>
+      </div>
+
+      <form class="comment-form" (ngSubmit)="submitComment()">
+        <mat-form-field appearance="outline" class="comment-field" subscriptSizing="dynamic">
+          <textarea
+            matInput
+            [(ngModel)]="newComment"
+            name="newComment"
+            rows="2"
+            maxlength="1000"
+            placeholder="Escreva um comentário sobre esta rota..."
+          ></textarea>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="comment-submit-btn"
+          [disabled]="!newComment.trim() || postingComment"
+        >
+          {{ postingComment ? 'Publicando...' : 'Publicar' }}
+        </button>
+      </form>
+
+      @if (comments.length === 0) {
+        <p class="comments-empty">Nenhum comentário ainda. Seja o primeiro a comentar!</p>
+      } @else {
+        <div class="comments-list">
+          @for (comment of comments; track comment.id) {
+            <article class="comment-item">
+              <div class="comment-header">
+                <div>
+                  <strong class="comment-author">{{ comment.authorName }}</strong>
+                  <span class="comment-date font-mono-tabular">
+                    · {{ formatDate(comment.createdAt) }}
+                  </span>
+                </div>
+                @if (canDeleteComment(comment)) {
+                  <button
+                    mat-icon-button
+                    type="button"
+                    (click)="deleteComment(comment)"
+                    matTooltip="Excluir comentário"
+                    aria-label="Excluir comentário"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                }
+              </div>
+              <p class="comment-content">{{ comment.content }}</p>
+            </article>
+          }
+        </div>
+      }
+    </section>
   }
 </div>
