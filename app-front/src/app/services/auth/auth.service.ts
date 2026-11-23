@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 
 export interface LoginRequest {
@@ -55,6 +55,13 @@ export class AuthService {
   }
 
   logout(): void {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      this.http
+        .post<void>(`${this.apiUrl}/logout`, { refreshToken })
+        .pipe(catchError(() => of(null)))
+        .subscribe();
+    }
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     this.isAuthenticated.set(false);
