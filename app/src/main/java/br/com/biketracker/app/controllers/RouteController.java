@@ -6,6 +6,7 @@ import br.com.biketracker.app.entities.dtos.route.RouteReplayResponse;
 import br.com.biketracker.app.entities.dtos.route.RouteResponse;
 import br.com.biketracker.app.entities.dtos.route.RouteStatsResponse;
 import br.com.biketracker.app.services.RouteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public class RouteController {
     @PostMapping
     public ResponseEntity<RouteResponse> create(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody CreateRouteRequest request
+            @Valid @RequestBody CreateRouteRequest request
     ) {
         String userId = jwt.getSubject();
         return ResponseEntity.status(HttpStatus.CREATED)

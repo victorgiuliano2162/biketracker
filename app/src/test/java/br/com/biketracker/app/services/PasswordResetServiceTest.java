@@ -2,6 +2,7 @@ package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.PasswordResetToken;
 import br.com.biketracker.app.entities.User;
+import br.com.biketracker.app.exceptions.ex.BusinessException;
 import br.com.biketracker.app.repositories.PasswordResetTokenRepository;
 import br.com.biketracker.app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,46 +103,58 @@ public class PasswordResetServiceTest {
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando o token não for encontrado")
+        @DisplayName("Deve lançar BusinessException quando o token não for encontrado")
         void resetPassword_TokenInvalido_Erro() {
             String token = "token-fantasma";
             when(tokenRepository.findByToken(token)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "123"))
-                    .isInstanceOf(RuntimeException.class)
+            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "novaSenha123"))
+                    .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Token inválido");
 
             verifyNoInteractions(passwordEncoder, userRepository);
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando o token já tiver sido utilizado")
+        @DisplayName("Deve lançar BusinessException quando o token já tiver sido utilizado")
         void resetPassword_TokenJaUtilizado_Erro() {
             String token = "token-usado";
             PasswordResetToken resetToken = new PasswordResetToken(token, new User(), LocalDateTime.now().plusHours(1));
-            resetToken.setUsed(true); // Simula token usado
+            resetToken.setUsed(true);
 
             when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
 
-            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "123"))
-                    .isInstanceOf(RuntimeException.class)
+            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "novaSenha123"))
+                    .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Token já utilizado");
         }
 
         @Test
-        @DisplayName("Deve lançar exceção quando o token estiver expirado")
+        @DisplayName("Deve lançar BusinessException quando o token estiver expirado")
         void resetPassword_TokenExpirado_Erro() {
             String token = "token-expirado";
-            // Cria um token com data de expiração no passado (1 hora atrás)
             PasswordResetToken resetToken = new PasswordResetToken(token, new User(), LocalDateTime.now().minusHours(1));
 
-            // Nota: Se sua entidade PasswordResetToken tiver uma lógica interna baseada no LocalDateTime.now()
-            // dentro do método .isExpired(), o código abaixo funcionará perfeitamente.
             when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
 
-            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "123"))
-                    .isInstanceOf(RuntimeException.class)
+            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "novaSenha123"))
+                    .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("Token expirado");
+        }
+
+        @Test
+        @DisplayName("Deve lançar BusinessException quando a nova senha tiver menos de 8 caracteres")
+        void resetPassword_SenhaFraca_Erro() {
+            String token = "token-valido";
+            PasswordResetToken resetToken = new PasswordResetToken(token, new User(), LocalDateTime.now().plusHours(1));
+
+            when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+
+            assertThatThrownBy(() -> passwordResetService.resetPassword(token, "1234567"))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("no mínimo 8 caracteres");
+
+            verifyNoInteractions(passwordEncoder, userRepository);
         }
     }
 }

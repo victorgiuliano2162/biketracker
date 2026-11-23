@@ -4,14 +4,17 @@ package br.com.biketracker.app.controllers;
 import br.com.biketracker.app.entities.dtos.goal.GoalRequest;
 import br.com.biketracker.app.entities.dtos.goal.GoalResponse;
 import br.com.biketracker.app.services.GoalService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/api/goal")
 @RequiredArgsConstructor
@@ -22,7 +25,7 @@ public class GoalController {
     @PostMapping
     public ResponseEntity<List<GoalResponse>> createGoals(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody List<GoalRequest> goals
+            @RequestBody List<@Valid GoalRequest> goals
     ) {
         String userId = jwt.getClaimAsString("user_id");
         return ResponseEntity.ok(goalService.createGoals(userId, goals));
@@ -40,7 +43,7 @@ public class GoalController {
     public ResponseEntity<GoalResponse> update(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long id,
-            @RequestBody GoalRequest request
+            @Valid @RequestBody GoalRequest request
     ) {
         String userId = jwt.getClaimAsString("user_id");
         return ResponseEntity.ok(goalService.update(userId, id, request));

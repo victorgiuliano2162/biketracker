@@ -3,6 +3,7 @@ package br.com.biketracker.app.controllers;
 import br.com.biketracker.app.entities.dtos.auth.*;
 import br.com.biketracker.app.services.AuthService;
 import br.com.biketracker.app.services.PasswordResetService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,25 +23,25 @@ public class AuthController {
 
     // POST /api/auth/login 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     // POST /api/auth/refresh 
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponse> refresh(@RequestBody RefreshRequest request) {
+    public ResponseEntity<LoginResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request));
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         passwordResetService.requestPasswordReset(request.getEmail());
         // Sempre retorna 200 (não revela se o e-mail existe)
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok().build();
     }

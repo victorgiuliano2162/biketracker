@@ -4,6 +4,7 @@ package br.com.biketracker.app.exceptions;
 import br.com.biketracker.app.exceptions.ex.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -110,6 +111,23 @@ public class GlobalExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .map(e -> new ErrorResponse.FieldError(e.getField(), e.getDefaultMessage()))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse(400, "Bad Request", "Erro de validação nos campos enviados",
+                        request.getRequestURI(), fields)
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
+
+        List<ErrorResponse.FieldError> fields = ex.getConstraintViolations()
+                .stream()
+                .map(v -> new ErrorResponse.FieldError(
+                        v.getPropertyPath() != null ? v.getPropertyPath().toString() : "",
+                        v.getMessage()))
                 .toList();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(

@@ -2,6 +2,7 @@ package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.PasswordResetToken;
 import br.com.biketracker.app.entities.User;
+import br.com.biketracker.app.exceptions.ex.BusinessException;
 import br.com.biketracker.app.repositories.PasswordResetTokenRepository;
 import br.com.biketracker.app.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -47,14 +48,18 @@ public class PasswordResetService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token inválido"));
+                .orElseThrow(() -> new BusinessException("Token inválido"));
 
         if (resetToken.isUsed()) {
-            throw new RuntimeException("Token já utilizado");
+            throw new BusinessException("Token já utilizado");
         }
 
         if (resetToken.isExpired()) {
-            throw new RuntimeException("Token expirado");
+            throw new BusinessException("Token expirado");
+        }
+
+        if (newPassword == null || newPassword.isBlank() || newPassword.length() < 8) {
+            throw new BusinessException("A nova senha deve ter no mínimo 8 caracteres");
         }
 
         User user = resetToken.getUser();

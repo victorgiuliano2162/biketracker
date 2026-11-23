@@ -98,7 +98,7 @@ public class User {
                 ", bornAt=" + bornAt +
                 ", weight=" + weight +
                 ", age=" + age +
-                ", password='" + password + '\'' +
+                ", password='[PROTECTED]'" +
                 '}';
     }
 
