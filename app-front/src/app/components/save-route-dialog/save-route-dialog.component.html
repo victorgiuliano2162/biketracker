@@ -40,6 +40,26 @@
         </mat-form-field>
       </div>
 
+      <!-- Descrição (opcional) -->
+      <div class="field-group">
+        <label class="field-label" for="save-route-description">
+          Descrição <span class="optional-tag">(opcional)</span>
+        </label>
+        <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+          <textarea
+            id="save-route-description"
+            matInput
+            formControlName="description"
+            rows="3"
+            maxlength="1000"
+            placeholder="Conte como foi o pedal, terreno, pontos de apoio..."
+          ></textarea>
+          @if (form.get('description')?.hasError('maxlength')) {
+            <mat-error>Máximo de 1000 caracteres</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
       <!-- País + Visibilidade -->
       <div class="paired-row">
         <div class="field-group">

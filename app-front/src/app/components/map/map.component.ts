@@ -618,6 +618,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const request: CreateRouteRequest = {
         name: result.name,
+        description: result.description,
         distanceInKm,
         elevationInMeters,
         startTime: now,

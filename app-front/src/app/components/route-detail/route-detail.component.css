@@ -159,6 +159,14 @@
   color: var(--accent-primary);
 }
 
+.route-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
 .section-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-hairline);

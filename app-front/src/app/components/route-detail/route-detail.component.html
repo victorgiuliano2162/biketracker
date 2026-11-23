@@ -31,6 +31,9 @@
         <div class="header-info">
           <h1 class="route-title">{{ route?.name ?? '—' }}</h1>
           <span class="route-meta font-mono-tabular">
+            @if (route?.userName) {
+              Por {{ route!.userName }} ·
+            }
             {{ route ? formatDate(route.startTime) : '' }}
             @if (route?.startCity) {
               · {{ route!.startCity }}, {{ route!.country }}
@@ -106,6 +109,19 @@
         </div>
       }
     </section>
+
+    <!-- Description -->
+    @if (route?.description) {
+      <section class="section-card description-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <mat-icon>notes</mat-icon>
+            <span>Sobre a Rota</span>
+          </h2>
+        </div>
+        <p class="route-description">{{ route!.description }}</p>
+      </section>
+    }
 
     <!-- Map -->
     <section class="section-card">

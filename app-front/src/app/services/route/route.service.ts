@@ -26,6 +26,7 @@ export interface CreateRouteRequest {
   trackPoints: TrackPoint[];
   name: string;
   difficulty: string;
+  description?: string;
 }
 
 export interface RouteReplayResponse {

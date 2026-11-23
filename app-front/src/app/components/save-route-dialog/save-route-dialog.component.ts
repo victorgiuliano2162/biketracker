@@ -31,6 +31,7 @@ export interface SaveRouteDialogData {
 
 export interface SaveRouteDialogResult {
   name: string;
+  description?: string;
   country: string;
   isPublic: boolean;
   routeDifficulty: string;
@@ -131,6 +132,7 @@ export class SaveRouteDialogComponent implements OnInit, OnDestroy {
         this.data.defaultName,
         [Validators.required, Validators.maxLength(80)],
       ],
+      description: ['', [Validators.maxLength(1000)]],
       country: ['BR', Validators.required],
       isPublic: [false],
       dificulty: ['MODERADA', Validators.required],
@@ -196,9 +198,10 @@ export class SaveRouteDialogComponent implements OnInit, OnDestroy {
 
   confirm(): void {
     if (this.form.invalid || this.isValidating) return;
-    const { name, country, isPublic, dificulty } = this.form.value;
+    const { name, description, country, isPublic, dificulty } = this.form.value;
     this.dialogRef.close({
       name,
+      description: (description ?? '').trim() || undefined,
       country,
       isPublic,
       routeDifficulty: dificulty,
