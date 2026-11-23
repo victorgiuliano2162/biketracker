@@ -14,6 +14,7 @@ import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.entities.dtos.route.BoundingBoxRequest;
 import br.com.biketracker.app.entities.dtos.route.*;
 import br.com.biketracker.app.exceptions.ex.ResourceNotFoundException;
+import br.com.biketracker.app.repositories.CommentsRepository;
 import br.com.biketracker.app.repositories.RouteRepository;
 import br.com.biketracker.app.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class RouteService {
     private final MinioStorageService minioStorageService;
     private final ActivityImageService activityImageService;
     private final GoalService goalService;
+    private final CommentsRepository commentsRepository;
 
     @Transactional
 
@@ -259,6 +261,7 @@ public class RouteService {
         boolean owns = routeRepository.existsByIdAndUserId(routeId, userId);
         if (!owns) return false;
         activityImageService.deleteImageByRouteId(routeId);
+        commentsRepository.deleteByRouteId(routeId);
         minioStorageService.deleteRoutePreview(routeId);
         routeRepository.deleteById(routeId);
         goalService.recalculateProgressForUser(userId);

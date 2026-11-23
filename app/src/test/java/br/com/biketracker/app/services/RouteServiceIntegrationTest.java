@@ -8,6 +8,7 @@ import br.com.biketracker.app.entities.dtos.route.RouteResponse;
 import br.com.biketracker.app.entities.dtos.route.TrackPoint;
 import br.com.biketracker.app.entities.enums.RouteDifficulty;
 import br.com.biketracker.app.entities.enums.TipoSanguineo;
+import br.com.biketracker.app.repositories.CommentsRepository;
 import br.com.biketracker.app.repositories.RouteRepository;
 import br.com.biketracker.app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,8 +70,9 @@ class RouteServiceIntegrationTest {
                                   UserRepository userRepository,
                                   MinioStorageService minioStorageService,
                                   ActivityImageService activityImageService,
-                                  GoalService goalService) {
-            return new RouteService(routeRepository, userRepository, minioStorageService, activityImageService, goalService);
+                                  GoalService goalService,
+                                  CommentsRepository commentsRepository) {
+            return new RouteService(routeRepository, userRepository, minioStorageService, activityImageService, goalService, commentsRepository);
         }
     }
 

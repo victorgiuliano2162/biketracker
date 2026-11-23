@@ -21,6 +21,10 @@ public class Comment {
     @ManyToOne
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "route_id")
+    private Route route;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -30,9 +34,14 @@ public class Comment {
     private LocalDateTime updateAt;
 
     public Comment(User user, String content) {
+        this(user, null, content);
+    }
+
+    public Comment(User user, Route route, String content) {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
         this.user = user;
+        this.route = route;
         this.content = content;
         this.edited = false;
     }

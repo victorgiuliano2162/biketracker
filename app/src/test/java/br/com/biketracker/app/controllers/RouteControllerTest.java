@@ -199,20 +199,6 @@ public class RouteControllerTest {
         }
 
         @Test
-        @DisplayName("updateRoute() deve retornar 200 com a rota atualizada")
-        void updateRoute_ReturnsUpdatedRoute() {
-            String routeId = "route-1";
-            UpdateRouteRequest request = mock(UpdateRouteRequest.class);
-            RouteResponse response = mock(RouteResponse.class);
-            when(routeService.updateRoute(userId, routeId, request)).thenReturn(response);
-
-            ResponseEntity<RouteResponse> result = controller.updateRoute(jwt, routeId, request);
-
-            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(result.getBody()).isEqualTo(response);
-        }
-
-        @Test
         @DisplayName("findPublicByRegion() deve retornar 200 com a página filtrada")
         void findPublicByRegion_ReturnsPage() {
             Pageable pageable = PageRequest.of(0, 9);

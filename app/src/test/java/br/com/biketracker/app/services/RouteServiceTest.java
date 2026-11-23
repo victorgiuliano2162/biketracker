@@ -7,6 +7,7 @@ import br.com.biketracker.app.entities.dtos.route.RouteResponse;
 import br.com.biketracker.app.entities.dtos.route.TrackPoint;
 import br.com.biketracker.app.entities.dtos.route.UpdateRouteRequest;
 import br.com.biketracker.app.entities.enums.RouteDifficulty;
+import br.com.biketracker.app.repositories.CommentsRepository;
 import br.com.biketracker.app.repositories.RouteRepository;
 import br.com.biketracker.app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,9 @@ public class RouteServiceTest {
 
         @Mock
         private GoalService goalService;
+
+        @Mock
+        private CommentsRepository commentsRepository;
 
         @InjectMocks
         private RouteService routeService;
