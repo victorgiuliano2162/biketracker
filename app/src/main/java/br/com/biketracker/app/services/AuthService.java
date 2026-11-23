@@ -1,6 +1,7 @@
 package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.RefreshToken;
+import br.com.biketracker.app.entities.enums.Role;
 import br.com.biketracker.app.entities.dtos.auth.LoginRequest;
 import br.com.biketracker.app.entities.dtos.auth.LoginResponse;
 import br.com.biketracker.app.entities.dtos.auth.RefreshRequest;
@@ -118,6 +119,10 @@ public class AuthService {
     private String generateAccessToken(String email) {
         Instant now = Instant.now();
         var user = userService.findByEmail(email);
+        if (!user.isActive()) {
+            throw new UnauthorizedException("Conta desativada");
+        }
+        Role role = user.getRole() != null ? user.getRole() : Role.USER;
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("biketracker")
                 .subject(email)
@@ -125,6 +130,7 @@ public class AuthService {
                 .expiresAt(now.plus(ACCESS_TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES))
                 .claim("token_type", "access")
                 .claim("user_id", user.getId())
+                .claim("role", role.name())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

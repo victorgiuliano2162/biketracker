@@ -1,6 +1,7 @@
 package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.User;
+import br.com.biketracker.app.exceptions.ex.BusinessException;
 import br.com.biketracker.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,5 +167,23 @@ public class UserService {
             throw new EntityNotFoundException("User not found with id: " + id);
         }
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public User toggleActive(String targetUserId, String adminUserId) {
+        if (targetUserId.equals(adminUserId)) {
+            throw new BusinessException("Você não pode desativar sua própria conta de administrador");
+        }
+        User target = findById(targetUserId);
+        target.setActive(!target.isActive());
+        return repository.save(target);
+    }
+
+    @Transactional
+    public void deleteByAdmin(String targetUserId, String adminUserId) {
+        if (targetUserId.equals(adminUserId)) {
+            throw new BusinessException("Você não pode excluir sua própria conta de administrador");
+        }
+        delete(targetUserId);
     }
 }

@@ -1,5 +1,6 @@
 package br.com.biketracker.app.entities;
 
+import br.com.biketracker.app.entities.enums.Role;
 import br.com.biketracker.app.entities.enums.TipoSanguineo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -54,6 +55,13 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private TipoSanguineo tipoSanguineo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'USER'")
+    private Role role = Role.USER;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
 
     //TODO evaluete the use os eager fetch
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")

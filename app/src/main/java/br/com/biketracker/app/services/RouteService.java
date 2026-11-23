@@ -48,9 +48,10 @@ public class RouteService {
     private final CommentsRepository commentsRepository;
 
     @Transactional
-
+    @CacheEvict(value = "publicRoutes", allEntries = true)
     public RouteResponse createRoute(String userId, CreateRouteRequest request) {
-        User user = userRepository.findByEmail(userId)
+        User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Route route = new Route();
@@ -79,6 +80,7 @@ public class RouteService {
     }
 
     @Transactional
+    @CacheEvict(value = "publicRoutes", allEntries = true)
     public RouteResponse updateRoute(String userId, String routeId, UpdateRouteRequest request) {
         User user = userRepository.findById(userId)
                 .or(() -> userRepository.findByEmail(userId))
@@ -252,7 +254,7 @@ public class RouteService {
     }
 
     @Transactional
-
+    @CacheEvict(value = "publicRoutes", allEntries = true)
     public boolean deleteRoute(String routeId, String userId) {
         log.info("Tentando deletar routeId={} userId={}", routeId, userId);
         logger.info("Exists check: {}", routeRepository.existsByIdAndUserId(routeId, userId));
@@ -270,7 +272,7 @@ public class RouteService {
 
 
     @Transactional
-
+    @CacheEvict(value = "publicRoutes", allEntries = true)
     public RouteResponse toggleVisibility(String userId, String routeId) {
         User user = userRepository.findById(userId)
                 .or(() -> userRepository.findByEmail(userId))
@@ -446,6 +448,7 @@ public class RouteService {
 
 
      @Transactional(readOnly = true)
+     @Cacheable(value = "publicRoutes", key = "#pageable.pageNumber + ':' + #pageable.pageSize + ':' + #pageable.sort")
      public Page<RouteResponse> listPublicRoutes(Pageable pageable) {
         return routeRepository.findAllByIsPublicTrue(pageable)
                 .map(RouteResponse::from);

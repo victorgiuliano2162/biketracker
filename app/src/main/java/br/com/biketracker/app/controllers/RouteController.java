@@ -37,7 +37,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody CreateRouteRequest request
     ) {
-        String userId = jwt.getSubject();
+        String userId = extractUserId(jwt);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(routeService.createRoute(userId, request));
     }
@@ -48,7 +48,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @PageableDefault(size = 10, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        String userId = jwt.getSubject();
+        String userId = extractUserId(jwt);
         return ResponseEntity.ok(routeService.listMyRoutes(userId, pageable));
     }
 
@@ -57,7 +57,7 @@ public class RouteController {
     public ResponseEntity<RouteStatsResponse> stats(
             @AuthenticationPrincipal Jwt jwt
     ) {
-        String userId = jwt.getClaimAsString("user_id");
+        String userId = extractUserId(jwt);
         return ResponseEntity.ok(routeService.getStats(userId));
     }
 
@@ -67,7 +67,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId
     ) {
-        String userId = jwt.getSubject();
+        String userId = extractUserId(jwt);
         return ResponseEntity.ok(routeService.getRouteReplay(userId, routeId));
     }
 
@@ -80,7 +80,7 @@ public class RouteController {
             @RequestParam double maxLon,
             @RequestParam double maxLat
     ) {
-        String userId = jwt.getSubject();
+        String userId = extractUserId(jwt);
         var bbox = new BoundingBoxRequest(minLon, minLat, maxLon, maxLat);
         return ResponseEntity.ok(routeService.findByBoundingBox(userId, bbox));
     }
@@ -96,7 +96,7 @@ public class RouteController {
     @DeleteMapping("/del/{routeId}")
     public ResponseEntity<?> delete(@AuthenticationPrincipal Jwt jwt,
                                     @PathVariable String routeId) {
-        String userId = jwt.getClaimAsString("user_id");
+        String userId = extractUserId(jwt);
         boolean deleted = routeService.deleteRoute(routeId, userId);
         return deleted ? ResponseEntity.ok().build()
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -107,7 +107,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId
     ) {
-        String userId = jwt.getClaimAsString("user_id");
+        String userId = extractUserId(jwt);
         return ResponseEntity.ok(routeService.toggleVisibility(userId, routeId));
     }
 
@@ -117,9 +117,7 @@ public class RouteController {
             @PathVariable String routeId,
             @Valid @RequestBody UpdateRouteRequest request
     ) {
-        String userId = jwt.getClaimAsString("user_id") != null
-                ? jwt.getClaimAsString("user_id")
-                : jwt.getSubject();
+        String userId = extractUserId(jwt);
         return ResponseEntity.ok(routeService.updateRoute(userId, routeId, request));
     }
 
@@ -128,7 +126,7 @@ public class RouteController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId
     ) {
-        String userId = jwt.getClaimAsString("user_id");
+        String userId = extractUserId(jwt);
         return ResponseEntity.ok(routeService.getRouteById(userId, routeId));
     }
 
@@ -188,12 +186,14 @@ public class RouteController {
         if (!RouteService.isValidPng(pngBytes)) {
             return ResponseEntity.badRequest().build();
         }
-        String userId = jwt.getClaimAsString("user_id") != null
-                ? jwt.getClaimAsString("user_id")
-                : jwt.getSubject();
+        String userId = extractUserId(jwt);
         String url = routeService.savePreview(userId, routeId, pngBytes);
         return ResponseEntity.status(HttpStatus.CREATED).body(url);
     }
 
+    private String extractUserId(Jwt jwt) {
+        String id = jwt.getClaimAsString("user_id");
+        return (id != null && !id.isBlank()) ? id : jwt.getSubject();
+    }
 
 }
