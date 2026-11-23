@@ -59,7 +59,7 @@ O **Trackker** é um aplicativo web destinado a atletas amadores que desejam reg
 | RNF-04    | Usabilidade            | Mapas responsivos em resoluções de 320px até 4K                                        
 | RNF-05    | Segurança              | Autenticação JWT segura com proteção contra ataques comuns                             
 | RNF-06    | Segurança              | Respeitar visibilidade das rotas (privada só para o dono)                              
-| RNF-07    | Segurança              | Validação de uploads de fotos (tipo e tamanho máximo 5 MB)                             
+| RNF-07    | Segurança              | Validação de uploads de fotos (tipo e tamanho máximo 10 MB)                            
 | RNF-08    | Manutenibilidade       | Código bem estruturado e documentado (endpoints e classes)                             
 | RNF-09    | Escalabilidade         | Suportar até 1.000 rotas por usuário e 10.000 usuários ativos (meta inicial)           
 | RNF-10    | Integridade de Dados   | Cálculos de distância e altimetria feitos automaticamente no backend (PostGIS)         | 1          |
