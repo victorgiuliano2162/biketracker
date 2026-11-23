@@ -5,6 +5,7 @@ import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.entities.dtos.route.CreateRouteRequest;
 import br.com.biketracker.app.entities.dtos.route.RouteResponse;
 import br.com.biketracker.app.entities.dtos.route.TrackPoint;
+import br.com.biketracker.app.entities.dtos.route.UpdateRouteRequest;
 import br.com.biketracker.app.entities.enums.RouteDifficulty;
 import br.com.biketracker.app.repositories.RouteRepository;
 import br.com.biketracker.app.repositories.UserRepository;
@@ -97,6 +98,9 @@ public class RouteServiceTest {
             assertThat(response.id()).isEqualTo(routeId);
             assertThat(response.name()).isEqualTo("Giro de Domingo");
             assertThat(response.description()).isEqualTo("Treino longo");
+            // Recalculado no backend a partir dos trackPoints (ignora 50.5km e 600m do cliente)
+            assertThat(response.distanceInKm()).isGreaterThan(100.0);
+            assertThat(response.elevationInMeters()).isEqualTo(1.0);
             verify(routeRepository, times(1)).save(any(Route.class));
         }
 
@@ -230,6 +234,39 @@ public class RouteServiceTest {
             verify(activityImageService, times(1)).deleteImageByRouteId(routeId);
             verify(minioStorageService, times(1)).deleteRoutePreview(routeId);
             verify(routeRepository, times(1)).deleteById(routeId);
+        }
+
+        @Test
+        @DisplayName("Deve atualizar metadados da rota quando o usuário é dono")
+        void updateRoute_Owner_Success() {
+            UpdateRouteRequest req = new UpdateRouteRequest(
+                    "Novo Nome", "Nova descrição", RouteDifficulty.DIFICIL, "BR", "Recife"
+            );
+            when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+            when(routeRepository.findById(routeId)).thenReturn(Optional.of(testRoute));
+            when(routeRepository.save(any(Route.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            RouteResponse res = routeService.updateRoute(userId, routeId, req);
+
+            assertThat(res.name()).isEqualTo("Novo Nome");
+            assertThat(res.description()).isEqualTo("Nova descrição");
+            assertThat(res.routeDifficulty()).isEqualTo(RouteDifficulty.DIFICIL);
+            assertThat(res.startCity()).isEqualTo("Recife");
+        }
+
+        @Test
+        @DisplayName("Deve negar edição de rota quando o usuário não é dono")
+        void updateRoute_NotOwner_ThrowsAccessDenied() {
+            User other = new User();
+            other.setId(UUID.randomUUID().toString());
+            UpdateRouteRequest req = new UpdateRouteRequest(
+                    "Hack", "Hack", RouteDifficulty.FACIL, "BR", "Recife"
+            );
+            when(userRepository.findById(other.getId())).thenReturn(Optional.of(other));
+            when(routeRepository.findById(routeId)).thenReturn(Optional.of(testRoute));
+
+            assertThatThrownBy(() -> routeService.updateRoute(other.getId(), routeId, req))
+                    .isInstanceOf(AccessDeniedException.class);
         }
     }
 

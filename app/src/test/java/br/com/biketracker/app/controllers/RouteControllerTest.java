@@ -172,6 +172,20 @@ public class RouteControllerTest {
         }
 
         @Test
+        @DisplayName("updateRoute() deve retornar 200 com a rota atualizada")
+        void updateRoute_ReturnsUpdatedRoute() {
+            String routeId = "route-1";
+            UpdateRouteRequest request = mock(UpdateRouteRequest.class);
+            RouteResponse response = mock(RouteResponse.class);
+            when(routeService.updateRoute(userId, routeId, request)).thenReturn(response);
+
+            ResponseEntity<RouteResponse> result = controller.updateRoute(jwt, routeId, request);
+
+            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(result.getBody()).isEqualTo(response);
+        }
+
+        @Test
         @DisplayName("getById() deve retornar 200 com a rota")
         void getById_ReturnsRoute() {
             String routeId = "route-1";
@@ -179,6 +193,20 @@ public class RouteControllerTest {
             when(routeService.getRouteById(userId, routeId)).thenReturn(response);
 
             ResponseEntity<RouteResponse> result = controller.getById(jwt, routeId);
+
+            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(result.getBody()).isEqualTo(response);
+        }
+
+        @Test
+        @DisplayName("updateRoute() deve retornar 200 com a rota atualizada")
+        void updateRoute_ReturnsUpdatedRoute() {
+            String routeId = "route-1";
+            UpdateRouteRequest request = mock(UpdateRouteRequest.class);
+            RouteResponse response = mock(RouteResponse.class);
+            when(routeService.updateRoute(userId, routeId, request)).thenReturn(response);
+
+            ResponseEntity<RouteResponse> result = controller.updateRoute(jwt, routeId, request);
 
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(result.getBody()).isEqualTo(response);

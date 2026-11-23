@@ -5,6 +5,7 @@ import br.com.biketracker.app.entities.dtos.route.CreateRouteRequest;
 import br.com.biketracker.app.entities.dtos.route.RouteReplayResponse;
 import br.com.biketracker.app.entities.dtos.route.RouteResponse;
 import br.com.biketracker.app.entities.dtos.route.RouteStatsResponse;
+import br.com.biketracker.app.entities.dtos.route.UpdateRouteRequest;
 import br.com.biketracker.app.services.RouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -108,6 +109,18 @@ public class RouteController {
     ) {
         String userId = jwt.getClaimAsString("user_id");
         return ResponseEntity.ok(routeService.toggleVisibility(userId, routeId));
+    }
+
+    @PatchMapping("/{routeId}")
+    public ResponseEntity<RouteResponse> updateRoute(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String routeId,
+            @Valid @RequestBody UpdateRouteRequest request
+    ) {
+        String userId = jwt.getClaimAsString("user_id") != null
+                ? jwt.getClaimAsString("user_id")
+                : jwt.getSubject();
+        return ResponseEntity.ok(routeService.updateRoute(userId, routeId, request));
     }
 
     @GetMapping("/my/{routeId}")

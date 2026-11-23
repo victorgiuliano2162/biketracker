@@ -52,8 +52,10 @@ public class RouteService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Route route = new Route();
-        route.setDistanceInKm(request.distanceInKm());
-        route.setElevationInMeters(request.elevationInMeters());
+        double calculatedDistanceKm = calculateDistanceInKm(request.trackPoints());
+        double calculatedElevationM = calculateElevationGainInMeters(request.trackPoints());
+        route.setDistanceInKm(calculatedDistanceKm);
+        route.setElevationInMeters(calculatedElevationM);
         route.setStartTime(request.startTime());
         route.setEndTime(request.endTime());
         route.setCreatedAt(LocalDateTime.now());
@@ -72,6 +74,67 @@ public class RouteService {
             generateAndSavePreview(saved);
         }
         return RouteResponse.from(saved);
+    }
+
+    @Transactional
+    public RouteResponse updateRoute(String userId, String routeId, UpdateRouteRequest request) {
+        User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada: " + routeId));
+
+        if (route.getUser() == null || !route.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para editar esta rota");
+        }
+
+        route.setName(request.name().trim());
+        route.setDescription(request.description() != null ? request.description().trim() : null);
+        route.setDifficulty(request.difficulty());
+        if (request.country() != null) {
+            route.setCountry(request.country().trim());
+        }
+        if (request.startCity() != null) {
+            route.setStartCity(request.startCity().trim());
+        }
+
+        return RouteResponse.from(routeRepository.save(route));
+    }
+
+    public static double calculateDistanceInKm(List<TrackPoint> points) {
+        if (points == null || points.size() < 2) {
+            return 0.0;
+        }
+        double totalKm = 0.0;
+        for (int i = 1; i < points.size(); i++) {
+            totalKm += haversineKm(points.get(i - 1), points.get(i));
+        }
+        return Math.round(totalKm * 100.0) / 100.0;
+    }
+
+    public static double calculateElevationGainInMeters(List<TrackPoint> points) {
+        if (points == null || points.size() < 2) {
+            return 0.0;
+        }
+        double gain = 0.0;
+        for (int i = 1; i < points.size(); i++) {
+            double diff = points.get(i).altitudeInMeters() - points.get(i - 1).altitudeInMeters();
+            if (diff > 0) {
+                gain += diff;
+            }
+        }
+        return Math.round(gain * 10.0) / 10.0;
+    }
+
+    private static double haversineKm(TrackPoint p1, TrackPoint p2) {
+        final double R = 6371.0;
+        double dLat = Math.toRadians(p2.latitude() - p1.latitude());
+        double dLon = Math.toRadians(p2.longitude() - p1.longitude());
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(p1.latitude())) * Math.cos(Math.toRadians(p2.latitude()))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     @Transactional(readOnly = true)
