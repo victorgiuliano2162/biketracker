@@ -30,6 +30,8 @@ import {
 import { RouteResponse } from '../../models/route.model';
 import { RouteDetailData } from '../../resolvers/route-detail.resolver';
 import { AuthService } from '../../services/auth/auth.service';
+import { EditRouteDialogComponent } from '../edit-route-dialog/edit-route-dialog.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 // route-detail.component.ts
 export interface ChartPoint {
@@ -49,6 +51,7 @@ export interface ChartPoint {
     MatTooltipModule,
     MatDividerModule,
     MatDialogModule,
+    MatSnackBarModule,
     RouteMapComponent,
   ],
   templateUrl: './route-detail.component.html',
@@ -76,6 +79,7 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     private imageService: ActivityImageService,
     private authService: AuthService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
   ) {}
 
   get isOwner(): boolean {
@@ -142,6 +146,28 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     this.routeService.toggleVisibility(this.route.id).subscribe({
       next: (updated) => (this.route = updated),
       error: () => alert('Erro ao alterar visibilidade.'),
+    });
+  }
+
+  editRoute(): void {
+    if (!this.route || !this.isOwner) return;
+    const ref = this.dialog.open(EditRouteDialogComponent, {
+      data: this.route,
+      width: '520px',
+      maxWidth: '95vw',
+      autoFocus: 'dialog',
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result || !this.route) return;
+      this.routeService.updateRoute(this.route.id, result).subscribe({
+        next: (updated) => {
+          this.route = updated;
+          this.snackBar.open('Rota atualizada com sucesso!', '✓', { duration: 3000 });
+        },
+        error: () =>
+          this.snackBar.open('Erro ao atualizar rota.', 'OK', { duration: 3000 }),
+      });
     });
   }
 

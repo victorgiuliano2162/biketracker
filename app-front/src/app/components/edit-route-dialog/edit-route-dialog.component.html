@@ -1,0 +1,50 @@
+<h2 mat-dialog-title>Editar rota</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="edit-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome da rota</mat-label>
+      <input matInput formControlName="name" maxlength="150" />
+      @if (form.get('name')?.hasError('required')) {
+        <mat-error>Nome é obrigatório</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descrição</mat-label>
+      <textarea matInput formControlName="description" rows="3" maxlength="1000"></textarea>
+    </mat-form-field>
+
+    <div class="row-2">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dificuldade</mat-label>
+        <mat-select formControlName="difficulty">
+          @for (d of difficulties; track d.value) {
+            <mat-option [value]="d.value">{{ d.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>País</mat-label>
+        <mat-select formControlName="country">
+          @for (c of countries; track c.code) {
+            <mat-option [value]="c.code">{{ c.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cidade de partida</mat-label>
+      <input matInput formControlName="startCity" placeholder="Ex: Recife" />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" type="button" [disabled]="form.invalid" (click)="save()">
+    Salvar
+  </button>
+</mat-dialog-actions>

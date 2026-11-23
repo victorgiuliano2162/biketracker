@@ -70,6 +70,10 @@
           </button>
 
           <mat-menu #detailMenu="matMenu">
+            <button mat-menu-item (click)="editRoute()">
+              <mat-icon>edit</mat-icon>
+              <span>Editar rota</span>
+            </button>
             <button mat-menu-item (click)="deleteRoute()" class="delete-item">
               <mat-icon>delete_outline</mat-icon>
               <span>Excluir rota</span>

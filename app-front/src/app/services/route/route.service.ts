@@ -29,6 +29,14 @@ export interface CreateRouteRequest {
   description?: string;
 }
 
+export interface UpdateRouteRequest {
+  name: string;
+  description?: string;
+  difficulty: string;
+  country?: string;
+  startCity?: string;
+}
+
 export interface RouteReplayResponse {
   routeId: string;
   points: TrackPoint[];
@@ -93,6 +101,10 @@ export class RouteService {
       `${this.base}/${routeId}/visibility`,
       {},
     );
+  }
+
+  updateRoute(routeId: string, request: UpdateRouteRequest): Observable<RouteResponse> {
+    return this.http.patch<RouteResponse>(`${this.base}/${routeId}`, request);
   }
 
  

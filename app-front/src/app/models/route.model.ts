@@ -1,6 +1,6 @@
 // src/app/models/route.model.ts
 
-export type RouteDifficulty = 'EASY' | 'MODERATE' | 'HARD' | 'EXPERT';
+export type RouteDifficulty = 'FACIL' | 'MODERADA' | 'DIFICIL' | 'EASY' | 'MODERATE' | 'HARD' | 'EXPERT';
 
 export interface RouteResponse {
   id: string;
