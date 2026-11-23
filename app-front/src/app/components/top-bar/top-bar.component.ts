@@ -1,6 +1,6 @@
 import { AuthService } from './../../services/auth/auth.service';
-import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,24 +22,16 @@ import { MatDividerModule } from '@angular/material/divider';
 })
 export class TopBarComponent {
 
-  constructor(public authService: AuthService) {}
- 
-  onAtividade(tipo: string): void {
-    console.log('Atividade selecionada:', tipo);
-    // Implemente a navegação ou ação desejada
-  }
- 
-  onMapa(tipo: string): void {
-    console.log('Mapa selecionado:', tipo);
-    // Implemente a navegação ou ação desejada
-  }
- 
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+  ) {}
+
   onPerfil(): void {
-    console.log('Navegar para perfil');
+    this.router.navigate(['/profile']);
   }
- 
+
   onLogout(): void {
-    console.log('Logout');
     this.authService.logout();
   }
 

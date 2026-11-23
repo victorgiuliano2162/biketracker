@@ -10,27 +10,6 @@
 
       @if (authService.isAuthenticated()) {
         <nav class="desktop-nav" aria-label="Navegação principal">
-          @if (false) {
-            <button mat-button [matMenuTriggerFor]="menuAtividades" class="nav-item">
-              Atividades
-              <mat-icon iconPositionEnd>expand_more</mat-icon>
-            </button>
-            <mat-menu #menuAtividades="matMenu">
-              <button mat-menu-item (click)="onAtividade('cross-country')">
-                <mat-icon>terrain</mat-icon>
-                Cross Country
-              </button>
-              <button mat-menu-item (click)="onAtividade('enduro')">
-                <mat-icon>electric_bolt</mat-icon>
-                Enduro
-              </button>
-              <button mat-menu-item (click)="onAtividade('downhill')">
-                <mat-icon>moving</mat-icon>
-                Downhill
-              </button>
-            </mat-menu>
-          }
-
           <a class="nav-link" routerLink="login">Home</a>
 
           <button type="button" class="nav-link nav-dropdown" [matMenuTriggerFor]="menuMapas">

@@ -1,0 +1,187 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.profile-page {
+  min-height: calc(100dvh - 64px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  background-color: var(--bg-canvas);
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 640px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-whisper);
+  padding: 32px;
+}
+
+.profile-header {
+  margin-bottom: 28px;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.kicker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background-color: var(--accent-tint);
+  color: var(--accent-primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--accent-primary);
+}
+
+.profile-title {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.profile-subtitle {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.error-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: #c62828;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-heading mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+}
+
+.section-heading .health-icon {
+  color: var(--accent-primary);
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.full-field {
+  width: 100%;
+}
+
+.section-divider {
+  border-top-color: var(--border-hairline) !important;
+  margin: 4px 0;
+}
+
+.form-actions {
+  margin-top: 4px;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 48px !important;
+  min-height: 48px !important;
+  background-color: var(--accent-primary) !important;
+  color: #ffffff !important;
+  font-size: 1rem !important;
+}
+
+@media (max-width: 767px) {
+  .profile-page {
+    padding: 20px 16px;
+  }
+
+  .profile-card {
+    padding: 20px 16px;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .span-2 {
+    grid-column: span 1;
+  }
+}

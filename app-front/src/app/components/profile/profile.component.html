@@ -1,0 +1,159 @@
+<main class="profile-page">
+  <div class="profile-card">
+    <header class="profile-header">
+      <div class="header-top">
+        <div class="kicker-pill font-mono-tabular">
+          <span class="kicker-dot"></span>
+          <span>PERFIL DO ATLETA</span>
+        </div>
+        <button mat-stroked-button type="button" (click)="goBack()" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Voltar</span>
+        </button>
+      </div>
+      <h1 class="profile-title">Meus dados</h1>
+      <p class="profile-subtitle">
+        Mantenha suas informações cadastrais, biométricas e de emergência atualizadas.
+      </p>
+    </header>
+
+    @if (loading) {
+      <div class="state-box">
+        <mat-spinner diameter="36"></mat-spinner>
+        <p>Carregando dados do perfil...</p>
+      </div>
+    } @else if (loadError) {
+      <div class="state-box">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <p>Não foi possível carregar seu perfil.</p>
+        <button mat-flat-button color="primary" type="button" (click)="loadProfile()">
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="profile-form">
+        <section class="form-section">
+          <div class="section-heading">
+            <mat-icon>badge</mat-icon>
+            <h2>Dados Cadastrais</h2>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field-group span-2">
+              <label class="field-label" for="prof-name">Nome completo</label>
+              <mat-form-field appearance="outline" class="full-field" subscriptSizing="dynamic">
+                <input id="prof-name" matInput formControlName="name" placeholder="Seu nome completo" />
+                <mat-icon matPrefix>person_outline</mat-icon>
+                @if (profileForm.get('name')?.hasError('required')) {
+                  <mat-error>Nome é obrigatório</mat-error>
+                }
+                @if (profileForm.get('name')?.hasError('minlength')) {
+                  <mat-error>Mínimo de 3 caracteres</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="field-group span-2">
+              <label class="field-label" for="prof-email">E-mail</label>
+              <mat-form-field appearance="outline" class="full-field" subscriptSizing="dynamic">
+                <input id="prof-email" matInput type="email" formControlName="email" placeholder="seu@email.com" />
+                <mat-icon matPrefix>mail_outline</mat-icon>
+                @if (profileForm.get('email')?.hasError('required')) {
+                  <mat-error>E-mail é obrigatório</mat-error>
+                }
+                @if (profileForm.get('email')?.hasError('email')) {
+                  <mat-error>Informe um e-mail válido</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+        </section>
+
+        <mat-divider class="section-divider" />
+
+        <section class="form-section">
+          <div class="section-heading">
+            <mat-icon class="health-icon">health_and_safety</mat-icon>
+            <h2>Dados Biométricos e Emergência</h2>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="prof-age">Idade (anos)</label>
+              <mat-form-field appearance="outline" class="full-field" subscriptSizing="dynamic">
+                <input id="prof-age" matInput type="number" inputmode="numeric" formControlName="age" />
+                <mat-icon matPrefix>cake</mat-icon>
+                @if (profileForm.get('age')?.hasError('required')) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+                @if (profileForm.get('age')?.hasError('min') || profileForm.get('age')?.hasError('max')) {
+                  <mat-error>Idade entre 1 e 120 anos</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="prof-weight">Peso (kg)</label>
+              <mat-form-field appearance="outline" class="full-field" subscriptSizing="dynamic">
+                <input id="prof-weight" matInput type="number" inputmode="decimal" step="0.1" formControlName="weight" />
+                <mat-icon matPrefix>monitor_weight</mat-icon>
+                @if (profileForm.get('weight')?.hasError('required')) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+                @if (profileForm.get('weight')?.hasError('min') || profileForm.get('weight')?.hasError('max')) {
+                  <mat-error>Peso entre 1 e 500 kg</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Tipo sanguíneo</label>
+              <mat-form-field appearance="outline" class="full-field" subscriptSizing="dynamic">
+                <mat-select formControlName="tipoSanguineo" placeholder="Selecione">
+                  @for (tipo of tiposSanguineos; track tipo.value) {
+                    <mat-option [value]="tipo.value">{{ tipo.label }}</mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix>bloodtype</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="prof-born">Data de nascimento</label>
+              <mat-form-field appearance="outline" class="full-field" subscriptSizing="dynamic">
+                <input
+                  id="prof-born"
+                  matInput
+                  [matDatepicker]="pickerBorn"
+                  formControlName="bornAt"
+                  placeholder="dd/mm/aaaa"
+                />
+                <mat-icon matPrefix>event</mat-icon>
+                <mat-datepicker-toggle matIconSuffix [for]="pickerBorn" />
+                <mat-datepicker #pickerBorn />
+                @if (profileForm.get('bornAt')?.hasError('required')) {
+                  <mat-error>Data de nascimento é obrigatória</mat-error>
+                }
+                @if (profileForm.get('bornAt')?.hasError('futureDate')) {
+                  <mat-error>Data não pode ser futura</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="submit-btn"
+            [disabled]="profileForm.invalid || saving"
+          >
+            {{ saving ? 'Salvando...' : 'Salvar alterações' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</main>
