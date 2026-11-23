@@ -29,6 +29,7 @@ import {
 } from '../image-lightbox/image-lightbox.component';
 import { RouteResponse } from '../../models/route.model';
 import { RouteDetailData } from '../../resolvers/route-detail.resolver';
+import { AuthService } from '../../services/auth/auth.service';
 
 // route-detail.component.ts
 export interface ChartPoint {
@@ -73,8 +74,16 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private routeService: RouteService,
     private imageService: ActivityImageService,
+    private authService: AuthService,
     private dialog: MatDialog,
   ) {}
+
+  get isOwner(): boolean {
+    const currentUserId = this.authService.getCurrentUserId();
+    return Boolean(
+      this.route?.ownerId && currentUserId && this.route.ownerId === currentUserId,
+    );
+  }
 
  ngOnInit(): void {
     // O resolver já garantiu que os dados existem antes de chegar aqui.
@@ -129,7 +138,7 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
   // ── Actions ────────────────────────────────────────────────────────────────
 
   togglePrivacy(): void {
-    if (!this.route) return;
+    if (!this.route || !this.isOwner) return;
     this.routeService.toggleVisibility(this.route.id).subscribe({
       next: (updated) => (this.route = updated),
       error: () => alert('Erro ao alterar visibilidade.'),
@@ -137,7 +146,7 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
   }
 
   deleteRoute(): void {
-    if (!this.route) return;
+    if (!this.route || !this.isOwner) return;
     if (!confirm(`Excluir a rota "${this.route.name}"?`)) return;
     this.routeService.deleteRoute(this.route.id).subscribe({
       next: () => this.router.navigate(['/routes']),

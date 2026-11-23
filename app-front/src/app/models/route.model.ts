@@ -15,6 +15,8 @@ export interface RouteResponse {
   isPublic: boolean;
   routeDifficulty: RouteDifficulty;
   userName: string;
+  description?: string;
+  ownerId?: string;
 }
 
 export interface TrackPoint {

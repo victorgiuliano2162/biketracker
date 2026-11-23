@@ -52,25 +52,32 @@
           <span>Baixar GPX</span>
         </button>
 
-        <mat-chip
-          [class]="route?.isPublic ? 'chip-public' : 'chip-private'"
-          (click)="togglePrivacy()"
-          matTooltip="Alterar visibilidade"
-        >
-          <mat-icon>{{ route?.isPublic ? 'public' : 'lock' }}</mat-icon>
-          <span>{{ route?.isPublic ? 'Pública' : 'Privada' }}</span>
-        </mat-chip>
+        @if (isOwner) {
+          <mat-chip
+            [class]="route?.isPublic ? 'chip-public' : 'chip-private'"
+            (click)="togglePrivacy()"
+            matTooltip="Alterar visibilidade"
+          >
+            <mat-icon>{{ route?.isPublic ? 'public' : 'lock' }}</mat-icon>
+            <span>{{ route?.isPublic ? 'Pública' : 'Privada' }}</span>
+          </mat-chip>
 
-        <button mat-icon-button class="more-btn" [matMenuTriggerFor]="detailMenu" aria-label="Mais opções">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-
-        <mat-menu #detailMenu="matMenu">
-          <button mat-menu-item (click)="deleteRoute()" class="delete-item">
-            <mat-icon>delete_outline</mat-icon>
-            <span>Excluir rota</span>
+          <button mat-icon-button class="more-btn" [matMenuTriggerFor]="detailMenu" aria-label="Mais opções">
+            <mat-icon>more_vert</mat-icon>
           </button>
-        </mat-menu>
+
+          <mat-menu #detailMenu="matMenu">
+            <button mat-menu-item (click)="deleteRoute()" class="delete-item">
+              <mat-icon>delete_outline</mat-icon>
+              <span>Excluir rota</span>
+            </button>
+          </mat-menu>
+        } @else if (route?.isPublic) {
+          <mat-chip class="chip-public" [disabled]="true">
+            <mat-icon>public</mat-icon>
+            <span>Pública</span>
+          </mat-chip>
+        }
       </div>
     </header>
 
