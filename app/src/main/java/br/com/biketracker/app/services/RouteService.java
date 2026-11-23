@@ -93,11 +93,12 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
-
     public Page<RouteResponse> listMyRoutes(String userId, Pageable pageable) {
-        var u = userRepository.findByEmail(userId);
+        User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         return routeRepository
-                .findByUserIdOrderByStartTimeDesc(u.get().getId(), pageable)
+                .findByUserIdOrderByStartTimeDesc(user.getId(), pageable)
                 .map(RouteResponse::from);
     }
 
@@ -167,10 +168,12 @@ public class RouteService {
 
 
     @Transactional(readOnly = true)
-     public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
-        var u = userRepository.findByEmail(userId);
+    public List<RouteResponse> findByBoundingBox(String userId, BoundingBoxRequest bbox) {
+        User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         List<String> ids = routeRepository.findIdsByUserAndBoundingBox(
-                u.get().getId(),
+                user.getId(),
                 bbox.minLon(), bbox.minLat(),
                 bbox.maxLon(), bbox.maxLat()
         );

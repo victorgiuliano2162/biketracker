@@ -153,7 +153,7 @@ public class MinioStorageService {
                             .build()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Falha ao deletar imagem '{}' no MinIO: {}", objectKey, e.getMessage(), e);
         }
 
     }
