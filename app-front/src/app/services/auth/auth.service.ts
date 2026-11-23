@@ -33,7 +33,6 @@ export class AuthService {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         this.isAuthenticated.set(true);
-        console.log('Acces Token:', response.accessToken);
       }),
     );
   }

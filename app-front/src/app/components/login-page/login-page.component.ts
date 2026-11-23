@@ -46,11 +46,9 @@ export class LoginPageComponent {
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => { 
-        console.log('Login token:', this.authService.getAccessToken());
         setTimeout(() => this.router.navigate(['/home']), 150);
       },
       error: (err) => {
-        console.log(err)
         this.errorMessage = err.status === 401
           ? 'E-mail ou senha incorretos.'
           : 'Erro ao realizar login. Tente novamente.';
