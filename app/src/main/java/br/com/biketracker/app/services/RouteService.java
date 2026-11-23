@@ -62,6 +62,7 @@ public class RouteService {
         route.setPublic(request.isPublic());
         route.setUser(user);
         route.setName(request.name());
+        route.setDescription(request.description());
         route.setDifficulty(request.difficulty());
         route.buildPath(geometryFactory, request.trackPoints());
 
@@ -192,6 +193,7 @@ public class RouteService {
         boolean owns = routeRepository.existsByIdAndUserId(routeId, userId);
         if (!owns) return false;
         activityImageService.deleteImageByRouteId(routeId);
+        minioStorageService.deleteRoutePreview(routeId);
         routeRepository.deleteById(routeId);
         goalService.recalculateProgressForUser(userId);
         return true;
@@ -216,6 +218,8 @@ public class RouteService {
             Route saved = routeRepository.save(route);
             if (saved.isPublic()) {
                 generateAndSavePreview(saved);
+            } else {
+                minioStorageService.deleteRoutePreview(saved.getId());
             }
             return RouteResponse.from(saved);
         }

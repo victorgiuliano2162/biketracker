@@ -118,4 +118,12 @@ public class MinioStorageServiceTest {
 
         assertThat(url).isNull();
     }
+
+    @Test
+    @DisplayName("Deve chamar removeObject no bucket de previews ao deletar preview da rota")
+    void deleteRoutePreview_Sucesso() throws Exception {
+        minioStorageService.deleteRoutePreview("rota-123");
+
+        verify(minioClient, times(1)).removeObject(any(RemoveObjectArgs.class));
+    }
 }

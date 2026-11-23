@@ -206,4 +206,18 @@ public class MinioStorageService {
         }
     }
 
+    public void deleteRoutePreview(String routeId) {
+        String objectKey = "previews/" + routeId + ".png";
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(PREVIEW_BUCKET)
+                            .object(objectKey)
+                            .build()
+            );
+        } catch (Exception e) {
+            log.warn("Falha ao remover preview da rota {} no MinIO: {}", routeId, e.getMessage());
+        }
+    }
+
 }

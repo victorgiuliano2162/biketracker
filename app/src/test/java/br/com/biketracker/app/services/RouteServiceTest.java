@@ -96,6 +96,7 @@ public class RouteServiceTest {
             assertThat(response).isNotNull();
             assertThat(response.id()).isEqualTo(routeId);
             assertThat(response.name()).isEqualTo("Giro de Domingo");
+            assertThat(response.description()).isEqualTo("Treino longo");
             verify(routeRepository, times(1)).save(any(Route.class));
         }
 
@@ -202,6 +203,33 @@ public class RouteServiceTest {
             // Assert
             assertThat(response.isPublic()).isNotEqualTo(initialVisibility);
             assertThat(response.isPublic()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve remover preview no MinIO ao tornar rota pública em privada")
+        void toggleVisibility_ToPrivate_DeletesPreview() {
+            testRoute.setPublic(true);
+            when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(testUser));
+            when(routeRepository.findById(routeId)).thenReturn(Optional.of(testRoute));
+            when(routeRepository.save(any(Route.class))).thenReturn(testRoute);
+
+            RouteResponse response = routeService.toggleVisibility(userEmail, routeId);
+
+            assertThat(response.isPublic()).isFalse();
+            verify(minioStorageService, times(1)).deleteRoutePreview(routeId);
+        }
+
+        @Test
+        @DisplayName("Deve remover preview no MinIO ao deletar rota pertencente ao usuário")
+        void deleteRoute_Owner_DeletesPreviewAndImages() {
+            when(routeRepository.existsByIdAndUserId(routeId, userId)).thenReturn(true);
+
+            boolean result = routeService.deleteRoute(routeId, userId);
+
+            assertThat(result).isTrue();
+            verify(activityImageService, times(1)).deleteImageByRouteId(routeId);
+            verify(minioStorageService, times(1)).deleteRoutePreview(routeId);
+            verify(routeRepository, times(1)).deleteById(routeId);
         }
     }
 
