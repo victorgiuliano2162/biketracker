@@ -81,7 +81,8 @@ public class RouteService {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada: " + routeId));
 
-        if (!route.getUser().getId().equals(user.getId())) {
+        boolean isOwner = route.getUser() != null && route.getUser().getId().equals(user.getId());
+        if (!route.isPublic() && !isOwner) {
             throw new AccessDeniedException("Essa rota não pertence ao usuário");
         }
 
@@ -113,8 +114,19 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public RouteReplayResponse getRouteReplay(String userId, String routeId) {
-        var u = userRepository.findByEmail(userId);
-        List<Object[]> rows = routeRepository.findRoutePointsByRouteId(routeId, u.get().getId());
+        User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + routeId));
+
+        boolean isOwner = route.getUser() != null && route.getUser().getId().equals(user.getId());
+        if (!route.isPublic() && !isOwner) {
+            throw new AccessDeniedException("Essa rota não pertence ao usuário");
+        }
+
+        List<Object[]> rows = routeRepository.findRoutePointsByRouteId(routeId, user.getId());
 
         if (rows.isEmpty()) {
             throw new ResourceNotFoundException("Route not found: " + routeId);
@@ -312,18 +324,48 @@ public class RouteService {
 
     /**
      * Recebe o PNG gerado pelo Leaflet no frontend e persiste no MinIO.
+     * Valida ownership da rota e assinatura binária PNG.
      * Retorna a URL pública da imagem salva.
      */
-    public String savePreview(String routeId, byte[] pngBytes) {
-        routeRepository.findById(routeId)
-                .filter(Route::isPublic)
-                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Rota não encontrada: " + routeId));
+    public String savePreview(String userId, String routeId, byte[] pngBytes) {
+        if (!isValidPng(pngBytes)) {
+            throw new IllegalArgumentException("Arquivo inválido: assinatura PNG não reconhecida");
+        }
+
+        User user = userRepository.findById(userId)
+                .or(() -> userRepository.findByEmail(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rota não encontrada: " + routeId));
+
+        if (route.getUser() == null || !route.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para alterar o preview desta rota");
+        }
+
+        if (!route.isPublic()) {
+            throw new ResourceNotFoundException("Rota pública não encontrada: " + routeId);
+        }
 
         try {
             return minioStorageService.uploadRoutePreview(routeId, pngBytes);
         } catch (Exception e) {
             throw new RuntimeException("Erro ao salvar preview da rota " + routeId, e);
         }
+    }
+
+    public static boolean isValidPng(byte[] bytes) {
+        if (bytes == null || bytes.length < 8) {
+            return false;
+        }
+        return bytes[0] == (byte) 0x89
+                && bytes[1] == (byte) 0x50
+                && bytes[2] == (byte) 0x4E
+                && bytes[3] == (byte) 0x47
+                && bytes[4] == (byte) 0x0D
+                && bytes[5] == (byte) 0x0A
+                && bytes[6] == (byte) 0x1A
+                && bytes[7] == (byte) 0x0A;
     }
 
 

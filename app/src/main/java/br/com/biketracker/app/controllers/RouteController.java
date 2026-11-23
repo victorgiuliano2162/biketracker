@@ -156,21 +156,28 @@ public class RouteController {
 
     /**
      * Recebe o PNG gerado pelo Leaflet no frontend e persiste no MinIO.
-     * Requer autenticação para evitar uploads arbitrários.
+     * Requer autenticação, ownership da rota e assinatura binária PNG válida.
      */
     @PostMapping("/public/{routeId}/preview")
     public ResponseEntity<String> uploadPreview(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String routeId,
             @RequestBody byte[] pngBytes
     ) {
         if (pngBytes == null || pngBytes.length == 0) {
             return ResponseEntity.badRequest().build();
         }
-        // Limite de 2MB para o PNG
+        // Limite de 3MB para o PNG
         if (pngBytes.length > 3 * 1024 * 1024) {
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
         }
-        String url = routeService.savePreview(routeId, pngBytes);
+        if (!RouteService.isValidPng(pngBytes)) {
+            return ResponseEntity.badRequest().build();
+        }
+        String userId = jwt.getClaimAsString("user_id") != null
+                ? jwt.getClaimAsString("user_id")
+                : jwt.getSubject();
+        String url = routeService.savePreview(userId, routeId, pngBytes);
         return ResponseEntity.status(HttpStatus.CREATED).body(url);
     }
 

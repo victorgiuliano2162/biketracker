@@ -45,7 +45,7 @@ SELECT
 FROM (
     SELECT ST_DumpPoints(r.path::geometry) AS dp
     FROM routes r
-    WHERE r.id = ?1 AND r.user_id = ?2
+    WHERE r.id = ?1 AND (r.user_id = ?2 OR r.is_public = true)
 ) AS dumped
 ORDER BY (dp).path[1]
             """, nativeQuery = true)

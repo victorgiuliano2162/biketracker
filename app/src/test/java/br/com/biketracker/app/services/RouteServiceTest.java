@@ -97,7 +97,7 @@ public class RouteServiceTest {
         }
 
         @Test
-        @DisplayName("Deve lançar AccessDeniedException ao buscar rota de outro usuário")
+        @DisplayName("Deve lançar AccessDeniedException ao buscar rota privada de outro usuário")
         void getRouteById_AccessDenied() {
             // Arrange
             User hacker = new User();
@@ -110,6 +110,62 @@ public class RouteServiceTest {
             assertThatThrownBy(() -> routeService.getRouteById("hacker@teste.com", routeId))
                     .isInstanceOf(AccessDeniedException.class)
                     .hasMessageContaining("Essa rota não pertence ao usuário");
+        }
+
+        @Test
+        @DisplayName("Deve permitir visualizar rota pública de outro usuário e retornar ownerId")
+        void getRouteById_PublicRoute_AllowsOtherUser() {
+            testRoute.setPublic(true);
+            User otherUser = new User();
+            otherUser.setId(UUID.randomUUID().toString());
+
+            when(userRepository.findById("other@teste.com")).thenReturn(Optional.empty());
+            when(userRepository.findByEmail("other@teste.com")).thenReturn(Optional.of(otherUser));
+            when(routeRepository.findById(routeId)).thenReturn(Optional.of(testRoute));
+
+            RouteResponse response = routeService.getRouteById("other@teste.com", routeId);
+
+            assertThat(response.id()).isEqualTo(routeId);
+            assertThat(response.ownerId()).isEqualTo(userId);
+        }
+
+        @Test
+        @DisplayName("Deve negar savePreview quando o usuário não é dono da rota")
+        void savePreview_NotOwner_ThrowsAccessDenied() {
+            testRoute.setPublic(true);
+            User otherUser = new User();
+            otherUser.setId(UUID.randomUUID().toString());
+            byte[] validPng = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00};
+
+            when(userRepository.findById(otherUser.getId())).thenReturn(Optional.of(otherUser));
+            when(routeRepository.findById(routeId)).thenReturn(Optional.of(testRoute));
+
+            assertThatThrownBy(() -> routeService.savePreview(otherUser.getId(), routeId, validPng))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar savePreview com bytes que não são PNG")
+        void savePreview_InvalidPng_ThrowsIllegalArgument() {
+            byte[] invalidBytes = "not-a-png".getBytes();
+
+            assertThatThrownBy(() -> routeService.savePreview(userId, routeId, invalidBytes))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Deve salvar preview quando o dono envia PNG válido para rota pública")
+        void savePreview_OwnerValidPng_Success() throws Exception {
+            testRoute.setPublic(true);
+            byte[] validPng = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00};
+
+            when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+            when(routeRepository.findById(routeId)).thenReturn(Optional.of(testRoute));
+            when(minioStorageService.uploadRoutePreview(routeId, validPng)).thenReturn("https://minio/preview.png");
+
+            String url = routeService.savePreview(userId, routeId, validPng);
+
+            assertThat(url).isEqualTo("https://minio/preview.png");
         }
 
         @Test

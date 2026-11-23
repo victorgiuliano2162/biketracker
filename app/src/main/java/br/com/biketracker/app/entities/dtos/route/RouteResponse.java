@@ -18,7 +18,8 @@ public record RouteResponse(
         boolean isPublic,
         RouteDifficulty routeDifficulty,
         String userName,
-        String description
+        String description,
+        String ownerId
 ) {
     public static RouteResponse from(Route route) {
         return new RouteResponse(
@@ -34,7 +35,8 @@ public record RouteResponse(
                 route.isPublic(),
                 route.getDifficulty(),
                 route.getUser() != null ? route.getUser().getName() : null,
-                route.getDescription()
+                route.getDescription(),
+                route.getUser() != null ? route.getUser().getId() : null
         );
     }
 }

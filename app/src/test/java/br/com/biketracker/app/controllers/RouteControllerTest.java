@@ -250,17 +250,29 @@ public class RouteControllerTest {
         }
 
         @Test
-        @DisplayName("uploadPreview() deve retornar 201 com a URL salva")
+        @DisplayName("uploadPreview() deve retornar 201 com a URL salva quando PNG é válido")
         void uploadPreview_ReturnsCreated() {
             String routeId = "route-1";
-            byte[] png = "fake-png".getBytes();
+            byte[] png = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00};
             String url = "https://minio/preview.png";
-            when(routeService.savePreview(routeId, png)).thenReturn(url);
+            when(routeService.savePreview(userId, routeId, png)).thenReturn(url);
 
-            ResponseEntity<String> result = controller.uploadPreview(routeId, png);
+            ResponseEntity<String> result = controller.uploadPreview(jwt, routeId, png);
 
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
             assertThat(result.getBody()).isEqualTo(url);
+        }
+
+        @Test
+        @DisplayName("uploadPreview() deve retornar 400 quando o payload não tem assinatura PNG")
+        void uploadPreview_ReturnsBadRequest_WhenInvalidPng() {
+            String routeId = "route-1";
+            byte[] notPng = "fake-png-content".getBytes();
+
+            ResponseEntity<String> result = controller.uploadPreview(jwt, routeId, notPng);
+
+            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            verify(routeService, never()).savePreview(any(), any(), any());
         }
 
         @Test
@@ -268,10 +280,10 @@ public class RouteControllerTest {
         void uploadPreview_ReturnsBadRequest_WhenEmpty() {
             String routeId = "route-1";
 
-            ResponseEntity<String> result = controller.uploadPreview(routeId, new byte[0]);
+            ResponseEntity<String> result = controller.uploadPreview(jwt, routeId, new byte[0]);
 
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-            verify(routeService, never()).savePreview(any(), any());
+            verify(routeService, never()).savePreview(any(), any(), any());
         }
 
         @Test
@@ -279,7 +291,7 @@ public class RouteControllerTest {
         void uploadPreview_ReturnsBadRequest_WhenNull() {
             String routeId = "route-1";
 
-            ResponseEntity<String> result = controller.uploadPreview(routeId, null);
+            ResponseEntity<String> result = controller.uploadPreview(jwt, routeId, null);
 
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         }
@@ -290,10 +302,10 @@ public class RouteControllerTest {
             String routeId = "route-1";
             byte[] tooLarge = new byte[3 * 1024 * 1024 + 1];
 
-            ResponseEntity<String> result = controller.uploadPreview(routeId, tooLarge);
+            ResponseEntity<String> result = controller.uploadPreview(jwt, routeId, tooLarge);
 
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.PAYLOAD_TOO_LARGE);
-            verify(routeService, never()).savePreview(any(), any());
+            verify(routeService, never()).savePreview(any(), any(), any());
         }
 
         @Test
