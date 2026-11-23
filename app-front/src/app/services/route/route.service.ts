@@ -52,8 +52,8 @@ export class RouteService {
   listMine(
     page = 0,
     size = 10,
-  ): Observable<{ content: RouteResponse[]; totalElements: number }> {
-    return this.http.get<{ content: RouteResponse[]; totalElements: number }>(
+  ): Observable<PageResponse<RouteResponse>> {
+    return this.http.get<PageResponse<RouteResponse>>(
       `${this.base}/my`,
       { params: { page, size } },
     );

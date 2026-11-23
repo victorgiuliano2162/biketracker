@@ -1,4 +1,33 @@
-@if (stats) {
+@if (loading) {
+  <!-- Skeleton Bento Loading -->
+  <div class="status-container">
+    <div class="skeleton-shimmer sk-title"></div>
+    <div class="bento-row-top">
+      <div class="skeleton-shimmer sk-banner"></div>
+      <div class="kpi-pair">
+        <div class="skeleton-shimmer sk-kpi"></div>
+        <div class="skeleton-shimmer sk-kpi"></div>
+      </div>
+    </div>
+    <div class="bento-row-bottom">
+      <div class="skeleton-shimmer sk-panel"></div>
+      <div class="skeleton-shimmer sk-panel"></div>
+    </div>
+  </div>
+} @else if (error) {
+  <div class="status-container">
+    <div class="panel-card empty-state">
+      <div class="empty-icon-wrap">
+        <mat-icon>error_outline</mat-icon>
+      </div>
+      <h2>Não foi possível carregar suas estatísticas</h2>
+      <p>Verifique sua conexão e tente novamente.</p>
+      <button mat-flat-button color="primary" type="button" (click)="loadStats()">
+        Tentar novamente
+      </button>
+    </div>
+  </div>
+} @else if (stats) {
   <div class="status-container">
     <header class="page-header">
       <h1 class="page-title">Estatísticas &amp; Performance</h1>
@@ -147,21 +176,5 @@
         </div>
       </div>
     </section>
-  </div>
-} @else {
-  <!-- Skeleton Bento Loading -->
-  <div class="status-container">
-    <div class="skeleton-shimmer sk-title"></div>
-    <div class="bento-row-top">
-      <div class="skeleton-shimmer sk-banner"></div>
-      <div class="kpi-pair">
-        <div class="skeleton-shimmer sk-kpi"></div>
-        <div class="skeleton-shimmer sk-kpi"></div>
-      </div>
-    </div>
-    <div class="bento-row-bottom">
-      <div class="skeleton-shimmer sk-panel"></div>
-      <div class="skeleton-shimmer sk-panel"></div>
-    </div>
   </div>
 }

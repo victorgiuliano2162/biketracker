@@ -87,6 +87,7 @@ export class GoalListComponent implements OnInit {
   }
 
   delete(goal: GoalResponse): void {
+    if (!confirm(`Excluir a meta "${goal.name}"?`)) return;
     this.deletingId = goal.id;
     this.goalService.delete(goal.id).subscribe({
       next: () => {

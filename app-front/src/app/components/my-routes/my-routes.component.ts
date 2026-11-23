@@ -53,8 +53,8 @@ export class MyRoutesComponent implements OnInit {
     this.loading = true;
     this.routeService.listMine(this.pageIndex, this.pageSize).subscribe({
       next: (page) => {
-        this.routes = page.content;
-        this.totalElements = page.totalElements;
+        this.routes = page.content ?? [];
+        this.totalElements = page.page?.totalElements ?? page.totalElements ?? this.routes.length;
         this.loading = false;
       },
       error: () => (this.loading = false),
