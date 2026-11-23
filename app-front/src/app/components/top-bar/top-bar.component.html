@@ -45,6 +45,10 @@
               <span>Estatísticas</span>
             </button>
           </mat-menu>
+
+          @if (authService.isAdmin()) {
+            <a class="nav-link" routerLink="/admin/users">Admin</a>
+          }
         </nav>
       }
     </div>
@@ -107,6 +111,12 @@
             <mat-icon>person_outline</mat-icon>
             <span>Perfil</span>
           </button>
+          @if (authService.isAdmin()) {
+            <button mat-menu-item routerLink="/admin/users">
+              <mat-icon>admin_panel_settings</mat-icon>
+              <span>Administração</span>
+            </button>
+          }
           <button mat-menu-item (click)="onLogout()">
             <mat-icon>logout</mat-icon>
             <span>Sair</span>

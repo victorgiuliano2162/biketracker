@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, publicGuard } from './guards/Auth.guard';
+import { adminGuard, authGuard, publicGuard } from './guards/Auth.guard';
 import { routeDetailResolver } from './resolvers/route-detail.resolver';
 
 export const routes: Routes = [
@@ -65,6 +65,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/profile/profile.component').then((m) => m.ProfileComponent),
     canActivate: [authGuard],
+  },
+  {
+    path: 'admin/users',
+    loadComponent: () =>
+      import('./components/admin-users/admin-users.component').then((m) => m.AdminUsersComponent),
+    canActivate: [authGuard, adminGuard],
   },
   {
     path: 'forgot-password',

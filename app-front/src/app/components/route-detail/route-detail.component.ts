@@ -362,13 +362,26 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  private escapeXml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
   private buildGpx(route: RouteResponse, points: TrackPoint[]): string {
+    const safeName = this.escapeXml(route.name ?? 'Rota');
+    const descTag = route.description
+      ? `\n    <desc>${this.escapeXml(route.description)}</desc>`
+      : '';
     const trkpts = points
       .map(
         (p) =>
-          `    <trkpt lat="${p.latitude}" lon="${p.longitude}">\n      <ele>${p.altitudeInMeters}</ele>\n      <time>${p.recordedAt}</time>\n    </trkpt>`,
+          `    <trkpt lat="${p.latitude}" lon="${p.longitude}">\n      <ele>${p.altitudeInMeters}</ele>\n      <time>${this.escapeXml(String(p.recordedAt ?? ''))}</time>\n    </trkpt>`,
       )
       .join('\n');
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trakker"\n  xmlns="http://www.topografix.com/GPX/1/1">\n  <trk>\n    <name>${route.name}</name>\n    <trkseg>\n${trkpts}\n    </trkseg>\n  </trk>\n</gpx>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trakker"\n  xmlns="http://www.topografix.com/GPX/1/1">\n  <trk>\n    <name>${safeName}</name>${descTag}\n    <trkseg>\n${trkpts}\n    </trkseg>\n  </trk>\n</gpx>`;
   }
 }

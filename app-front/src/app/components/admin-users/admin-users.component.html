@@ -1,0 +1,89 @@
+<main class="admin-page">
+  <div class="admin-card">
+    <header class="admin-header">
+      <div class="kicker-pill font-mono-tabular">
+        <span class="kicker-dot"></span>
+        <span>ADMINISTRAÇÃO</span>
+      </div>
+      <h1 class="admin-title">Gestão de Usuários</h1>
+      <p class="admin-subtitle">
+        Visualize atletas cadastrados e gerencie o status das contas no sistema.
+      </p>
+    </header>
+
+    @if (loading) {
+      <div class="state-box">
+        <mat-spinner diameter="36"></mat-spinner>
+        <p>Carregando usuários...</p>
+      </div>
+    } @else if (error) {
+      <div class="state-box">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <p>Não foi possível carregar a lista de usuários.</p>
+        <button mat-flat-button color="primary" type="button" (click)="loadUsers()">
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table mat-table [dataSource]="users" class="users-table">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Nome</th>
+            <td mat-cell *matCellDef="let u">{{ u.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>E-mail</th>
+            <td mat-cell *matCellDef="let u" class="font-mono-tabular">{{ u.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Perfil</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="badge" [class.badge-admin]="u.role === 'ADMIN'">
+                {{ u.role }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="badge" [class.badge-active]="u.active" [class.badge-inactive]="!u.active">
+                {{ u.active ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Ações</th>
+            <td mat-cell *matCellDef="let u">
+              <button
+                mat-icon-button
+                type="button"
+                [disabled]="u.id === currentUserId"
+                (click)="toggleActive(u)"
+                [matTooltip]="u.active ? 'Desativar conta' : 'Ativar conta'"
+              >
+                <mat-icon>{{ u.active ? 'person_off' : 'person' }}</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                color="warn"
+                [disabled]="u.id === currentUserId"
+                (click)="deleteUser(u)"
+                matTooltip="Excluir usuário"
+              >
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    }
+  </div>
+</main>
