@@ -1,11 +1,13 @@
 package br.com.biketracker.app.services;
 
 import br.com.biketracker.app.entities.Goal;
+import br.com.biketracker.app.entities.Route;
 import br.com.biketracker.app.entities.User;
 import br.com.biketracker.app.entities.dtos.goal.GoalRequest;
 import br.com.biketracker.app.entities.dtos.goal.GoalResponse;
 import br.com.biketracker.app.exceptions.ex.ResourceNotFoundException;
 import br.com.biketracker.app.repositories.GoalRepository;
+import br.com.biketracker.app.repositories.RouteRepository;
 import br.com.biketracker.app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +37,15 @@ public class GoalServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private RouteRepository routeRepository;
+
     private GoalService goalService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        goalService = new GoalService(goalRepository, userRepository);
+        goalService = new GoalService(goalRepository, userRepository, routeRepository);
     }
 
     @Nested
@@ -168,6 +174,56 @@ public class GoalServiceTest {
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(goalRepository, never()).delete(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Testes para recalculateProgressForUser")
+    class RecalculateProgressTests {
+
+        @Test
+        @DisplayName("Deve recalcular currentValue para km, rides, metros e horas dentro do período da meta")
+        void recalculateProgress_AllUnits() {
+            String userId = "user-123";
+            User user = new User();
+            user.setId(userId);
+
+            LocalDate today = LocalDate.now();
+            Goal kmGoal = new Goal("100km", "Desc", 100.0, "km", today.plusDays(10), user);
+            Goal ridesGoal = new Goal("5 pedais", "Desc", 5.0, "rides", today.plusDays(10), user);
+            Goal elevGoal = new Goal("1000m", "Desc", 1000.0, "metros", today.plusDays(10), user);
+            Goal hoursGoal = new Goal("10h", "Desc", 10.0, "horas", today.plusDays(10), user);
+
+            Route r1 = new Route();
+            r1.setDistanceInKm(30.5);
+            r1.setElevationInMeters(400.0);
+            r1.setStartTime(today.atTime(7, 0));
+            r1.setEndTime(today.atTime(8, 30)); // 1.5h
+
+            Route r2 = new Route();
+            r2.setDistanceInKm(20.0);
+            r2.setElevationInMeters(250.0);
+            r2.setStartTime(today.plusDays(1).atTime(9, 0));
+            r2.setEndTime(today.plusDays(1).atTime(10, 0)); // 1.0h
+
+            // Rota fora do deadline (não deve contar)
+            Route rOut = new Route();
+            rOut.setDistanceInKm(99.0);
+            rOut.setElevationInMeters(999.0);
+            rOut.setStartTime(today.plusDays(15).atTime(9, 0));
+            rOut.setEndTime(today.plusDays(15).atTime(11, 0));
+
+            when(goalRepository.findByUserId(userId)).thenReturn(List.of(kmGoal, ridesGoal, elevGoal, hoursGoal));
+            when(routeRepository.findByUserIdSince(eq(userId), any(LocalDateTime.class)))
+                    .thenReturn(List.of(r1, r2, rOut));
+
+            goalService.recalculateProgressForUser(userId);
+
+            assertThat(kmGoal.getCurrentValue()).isEqualTo(50.5);
+            assertThat(ridesGoal.getCurrentValue()).isEqualTo(2.0);
+            assertThat(elevGoal.getCurrentValue()).isEqualTo(650.0);
+            assertThat(hoursGoal.getCurrentValue()).isEqualTo(2.5);
+            verify(goalRepository, times(1)).saveAll(anyList());
         }
     }
 }

@@ -43,6 +43,7 @@ public class RouteService {
             new GeometryFactory(new PrecisionModel(), 4326);
     private final MinioStorageService minioStorageService;
     private final ActivityImageService activityImageService;
+    private final GoalService goalService;
 
     @Transactional
 
@@ -65,6 +66,7 @@ public class RouteService {
         route.buildPath(geometryFactory, request.trackPoints());
 
         Route saved = routeRepository.save(route);
+        goalService.recalculateProgressForUser(user.getId());
         if (saved.isPublic()) {
             generateAndSavePreview(saved);
         }
@@ -191,6 +193,7 @@ public class RouteService {
         if (!owns) return false;
         activityImageService.deleteImageByRouteId(routeId);
         routeRepository.deleteById(routeId);
+        goalService.recalculateProgressForUser(userId);
         return true;
     }
 
@@ -211,10 +214,10 @@ public class RouteService {
         } else {
             route.setPublic(!route.isPublic());
             Route saved = routeRepository.save(route);
-        if (saved.isPublic()) {
-            generateAndSavePreview(saved);
-        }
-        return RouteResponse.from(saved);
+            if (saved.isPublic()) {
+                generateAndSavePreview(saved);
+            }
+            return RouteResponse.from(saved);
         }
 
 

@@ -43,6 +43,9 @@ public class RouteServiceTest {
         @Mock
         private ActivityImageService activityImageService;
 
+        @Mock
+        private GoalService goalService;
+
         @InjectMocks
         private RouteService routeService;
 

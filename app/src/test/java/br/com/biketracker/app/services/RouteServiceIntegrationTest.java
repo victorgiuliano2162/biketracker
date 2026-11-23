@@ -68,8 +68,9 @@ class RouteServiceIntegrationTest {
         RouteService routeService(RouteRepository routeRepository,
                                   UserRepository userRepository,
                                   MinioStorageService minioStorageService,
-                                  ActivityImageService activityImageService) {
-            return new RouteService(routeRepository, userRepository, minioStorageService, activityImageService);
+                                  ActivityImageService activityImageService,
+                                  GoalService goalService) {
+            return new RouteService(routeRepository, userRepository, minioStorageService, activityImageService, goalService);
         }
     }
 
@@ -78,6 +79,9 @@ class RouteServiceIntegrationTest {
 
     @MockitoBean
     private ActivityImageService activityImageService;
+
+    @MockitoBean
+    private GoalService goalService;
 
     @Autowired
     private RouteService routeService;
