@@ -41,17 +41,16 @@ export class NsfwValidationService {
 
     this.loading = true;
     this.readyPromise = (async () => {
-      // Dynamic imports — só entram no bundle quando este método é chamado
-      const [tf, nsfwjs] = await Promise.all([
+      // Dynamic imports — modelo MobileNetV2 (~2,6 MB) servido estaticamente em /models/mobilenet_v2/
+      const [tf, { load }] = await Promise.all([
         import('@tensorflow/tfjs'),
-        import('nsfwjs'),
+        import('nsfwjs/core'),
       ]);
 
       // Garante que o backend WebGL seja inicializado
       await tf.ready();
 
-      // Modelo hospedado pela própria biblioteca (InceptionV3 quantizado ~10 MB)
-      this.model = await nsfwjs.load();
+      this.model = await load('/models/mobilenet_v2/model.json');
       this.loading = false;
     })();
 
@@ -66,17 +65,15 @@ export class NsfwValidationService {
    */
   async classify(file: File): Promise<NsfwResult> {
     await this.ensureModel();
-    console.log('[NSFW] Modelo carregado, classificando...');
- 
+
     return new Promise((resolve) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
- 
+
       img.onload = async () => {
         try {
           const predictions: NsfwPrediction[] = await this.model.classify(img);
-          console.log('[NSFW] Predictions:', predictions); // remova após validar
- 
+
           const get = (name: string): number =>
             predictions.find((p) => p.className === name)?.probability ?? 0;
  
