@@ -18,9 +18,8 @@ describe('CreateUserComponent', () => {
         provideHttpClientTesting(),
         provideRouter([]),
         provideNoopAnimations(),
-      ]
-    })
-    .compileComponents();
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CreateUserComponent);
     component = fixture.componentInstance;
@@ -29,5 +28,13 @@ describe('CreateUserComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should expose all 8 unique blood types matching backend enum values', () => {
+    const values = component.tiposSanguineos.map((t) => t.value);
+    expect(values.length).toBe(8);
+    expect(new Set(values).size).toBe(8);
+    expect(values).toContain('A_NEGATIVO');
+    expect(values).toContain('A_POSITIVO');
   });
 });
