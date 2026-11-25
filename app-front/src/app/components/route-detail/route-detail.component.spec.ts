@@ -1,21 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
 
 import { RouteDetailComponent } from './route-detail.component';
 import { AuthService } from '../../services/auth/auth.service';
+import { CommentService } from '../../services/comment/comment.service';
 
 describe('RouteDetailComponent', () => {
   let component: RouteDetailComponent;
   let fixture: ComponentFixture<RouteDetailComponent>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let commentServiceSpy: jasmine.SpyObj<CommentService>;
 
   beforeEach(async () => {
     authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUserId']);
     authServiceSpy.getCurrentUserId.and.returnValue('owner-1');
+
+    commentServiceSpy = jasmine.createSpyObj('CommentService', ['list', 'create', 'delete']);
+    commentServiceSpy.list.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [RouteDetailComponent],
@@ -25,6 +30,7 @@ describe('RouteDetailComponent', () => {
         provideRouter([]),
         provideNoopAnimations(),
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: CommentService, useValue: commentServiceSpy },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -33,49 +39,84 @@ describe('RouteDetailComponent', () => {
                 data: {
                   route: {
                     id: '1',
-                    name: 'Rota Teste',
+                    name: 'Trilha A & B <Serra>',
+                    description: 'Subida "pesada" & técnica',
                     country: 'BR',
-                    totalDistance: 10,
-                    elevationGain: 100,
-                    elevationLoss: 100,
-                    elevationMax: 500,
-                    elevationMin: 200,
-                    dificulty: 'MODERATE',
+                    distanceInKm: 10,
+                    elevationInMeters: 100,
+                    startTime: new Date().toISOString(),
+                    endTime: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                    startCity: 'Recife',
+                    routeDifficulty: 'MODERADA',
                     isPublic: true,
                     ownerId: 'owner-1',
-                    createdDate: new Date().toISOString(),
-                    activityImages: [],
+                    userName: 'Victor',
                   },
-                  points: [],
+                  points: [
+                    {
+                      latitude: -8.05,
+                      longitude: -34.87,
+                      altitudeInMeters: 10,
+                      recordedAt: '2026-11-01T08:00:00',
+                    },
+                  ],
                 },
               },
             },
           },
         },
-      ]
-    })
-    .compileComponents();
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RouteDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create and identify owner with action menu button', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should identify owner and show action menu button', () => {
     expect(component.isOwner).toBeTrue();
-    const moreBtn = fixture.nativeElement.querySelector('.more-btn');
-    expect(moreBtn).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.more-btn')).toBeTruthy();
   });
 
   it('should hide action menu button for non-owner viewing public route', () => {
     authServiceSpy.getCurrentUserId.and.returnValue('other-user');
     fixture.detectChanges();
     expect(component.isOwner).toBeFalse();
-    const moreBtn = fixture.nativeElement.querySelector('.more-btn');
-    expect(moreBtn).toBeNull();
+    expect(fixture.nativeElement.querySelector('.more-btn')).toBeNull();
+  });
+
+  it('should escape XML special characters when building GPX export', () => {
+    const gpx = (component as any).buildGpx(component.route, component.points);
+    expect(gpx).toContain('<name>Trilha A &amp; B &lt;Serra&gt;</name>');
+    expect(gpx).toContain('<desc>Subida &quot;pesada&quot; &amp; técnica</desc>');
+  });
+
+  it('should publish and delete comments with permission check', () => {
+    const created = {
+      id: 42,
+      routeId: '1',
+      authorId: 'owner-1',
+      authorName: 'Victor',
+      content: 'Excelente pedal!',
+      edited: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    commentServiceSpy.create.and.returnValue(of(created));
+    commentServiceSpy.delete.and.returnValue(of(void 0));
+    spyOn(window, 'confirm').and.returnValue(true);
+
+    component.newComment = 'Excelente pedal!';
+    component.submitComment();
+
+    expect(component.comments.length).toBe(1);
+    expect(component.newComment).toBe('');
+    expect(component.canDeleteComment(created)).toBeTrue();
+
+    component.deleteComment(created);
+    expect(commentServiceSpy.delete).toHaveBeenCalledWith('1', 42);
+    expect(component.comments.length).toBe(0);
   });
 });
