@@ -172,7 +172,7 @@ export class RouteService {
     return this.http
       .get(`${this.base}/public/${routeId}/preview`, { responseType: 'text' })
       .pipe(
-        map((url) => url ?? null),
+        map((url) => url || null),
         catchError((err) => {
           // 204 No Content — ainda não foi gerado
           if (err.status === 204) return of(null);
