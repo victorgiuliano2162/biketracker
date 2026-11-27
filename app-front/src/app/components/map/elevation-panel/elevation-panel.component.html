@@ -30,7 +30,14 @@
           <span>Carregando elevação…</span>
         </div>
       } @else if (stats.elevationProfile) {
-        <canvas #chartCanvas class="chart-canvas"></canvas>
+        <app-elevation-chart
+          [distances]="stats.elevationProfile.distances"
+          [elevations]="stats.elevationProfile.elevations"
+          [color]="color"
+          [height]="150"
+          [showAxisTitles]="false"
+          (hoverIndex)="onChartHover($event)"
+        />
       } @else {
         <p class="no-data">Dados de elevação indisponíveis.</p>
       }

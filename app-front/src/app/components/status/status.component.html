@@ -37,14 +37,14 @@
       </div>
     </header>
 
-    <!-- Faixa 1: Bento Assimétrico (7fr Boas-vindas + 5fr KPIs) -->
+    <!-- Faixa 1: Bento Assimétrico -->
     <section class="bento-row-top">
       <div class="welcome-banner">
         <div class="welcome-content">
-          @if (stats.totalRides == 0) {
+          @if (stats.totalRides === 0) {
             <h2>Bem-vindo!</h2>
             <p>Você ainda não tem rotas registradas. Importe seu primeiro GPX para começar.</p>
-          } @else if (stats.totalRides == 1) {
+          } @else if (stats.totalRides === 1) {
             <h2>Bem-vindo de volta!</h2>
             <p>Você tem <strong class="font-mono-tabular">1</strong> rota registrada. Que tal sair para a próxima?</p>
           } @else {
@@ -83,26 +83,15 @@
       </div>
     </section>
 
-    <!-- Faixa 2: Bento Assimétrico (7fr Metas + Gráfico / 5fr Últimas rotas) -->
+    <!-- Faixa 2: Bento Assimétrico -->
     <section class="bento-row-bottom">
       <div class="bento-left-col">
-        @if (false) {
+        @if (chartData.length > 0) {
           <div class="panel-card chart-card">
             <div class="panel-header">
               <h2>Distância — últimos 7 dias</h2>
             </div>
-            <ngx-charts-bar-vertical
-              [results]="chartData"
-              [xAxis]="true"
-              [yAxis]="true"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="true"
-              yAxisLabel="km"
-              [gradient]="false"
-              [roundEdges]="true"
-              scheme="cool"
-              style="display: block; height: 260px">
-            </ngx-charts-bar-vertical>
+            <app-weekly-distance-chart [data]="chartData" [height]="220" />
           </div>
         }
 
@@ -115,31 +104,35 @@
             </div>
           </div>
 
-          <div *ngIf="stats.activeGoals.length === 0" class="empty-state">
-            <div class="empty-icon-wrap">
-              <mat-icon>emoji_events</mat-icon>
+          @if (stats.activeGoals.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon-wrap">
+                <mat-icon>emoji_events</mat-icon>
+              </div>
+              <p>Nenhuma meta cadastrada ainda.</p>
             </div>
-            <p>Nenhuma meta cadastrada ainda.</p>
-          </div>
+          }
 
           <div class="divider-list">
-            <div *ngFor="let goal of stats.activeGoals" class="goal-item">
-              <div class="goal-header">
-                <span class="goal-name">{{ goal.name }}</span>
-                <span class="goal-ratio font-mono-tabular">
-                  {{ goal.currentValue }} / {{ goal.targetValue }} {{ goal.unit }}
-                  <small>· {{ goal.progressPercent | number:'1.0-0' }}%</small>
-                </span>
+            @for (goal of stats.activeGoals; track goal.id) {
+              <div class="goal-item">
+                <div class="goal-header">
+                  <span class="goal-name">{{ goal.name }}</span>
+                  <span class="goal-ratio font-mono-tabular">
+                    {{ goal.currentValue }} / {{ goal.targetValue }} {{ goal.unit }}
+                    <small>· {{ goal.progressPercent | number:'1.0-0' }}%</small>
+                  </span>
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="goal.progressPercent"
+                  color="primary"
+                ></mat-progress-bar>
+                <div class="goal-footer font-mono-tabular">
+                  <span>Prazo: {{ goal.deadLine }}</span>
+                </div>
               </div>
-              <mat-progress-bar
-                mode="determinate"
-                [value]="goal.progressPercent"
-                color="primary"
-              ></mat-progress-bar>
-              <div class="goal-footer font-mono-tabular">
-                <span>Prazo: {{ goal.deadLine }}</span>
-              </div>
-            </div>
+            }
           </div>
         </div>
       </div>
@@ -153,26 +146,30 @@
           </div>
         </div>
 
-        <div *ngIf="stats.recentRides.length === 0" class="empty-state">
-          <div class="empty-icon-wrap">
-            <mat-icon>pedal_bike</mat-icon>
+        @if (stats.recentRides.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon-wrap">
+              <mat-icon>pedal_bike</mat-icon>
+            </div>
+            <p>Nenhuma pedalada registrada ainda.</p>
           </div>
-          <p>Nenhuma pedalada registrada ainda.</p>
-        </div>
+        }
 
         <div class="divider-list">
-          <div *ngFor="let ride of stats.recentRides" class="ride-item">
-            <div class="ride-left">
-              <span class="ride-icon-box">
-                <mat-icon>directions_bike</mat-icon>
-              </span>
-              <div class="ride-info">
-                <span class="ride-distance font-mono-tabular">{{ ride.distanceInKm | number:'1.1-1' }} km</span>
-                <span class="ride-date font-mono-tabular">{{ ride.startTime }}</span>
+          @for (ride of stats.recentRides; track ride.startTime) {
+            <div class="ride-item">
+              <div class="ride-left">
+                <span class="ride-icon-box">
+                  <mat-icon>directions_bike</mat-icon>
+                </span>
+                <div class="ride-info">
+                  <span class="ride-distance font-mono-tabular">{{ ride.distanceInKm | number:'1.1-1' }} km</span>
+                  <span class="ride-date font-mono-tabular">{{ ride.startTime }}</span>
+                </div>
               </div>
+              <span class="ride-elev font-mono-tabular">+{{ ride.elevationInMeters | number:'1.0-0' }} m</span>
             </div>
-            <span class="ride-elev font-mono-tabular">+{{ ride.elevationInMeters | number:'1.0-0' }} m</span>
-          </div>
+          }
         </div>
       </div>
     </section>

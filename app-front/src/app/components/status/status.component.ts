@@ -1,36 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { HomeDataService, HomeStats } from '../../services/home-data/home-data.service';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HomeDataService, HomeStats } from '../../services/home-data/home-data.service';
+import {
+  WeeklyBarPoint,
+  WeeklyDistanceChartComponent,
+} from '../../shared/ui/weekly-distance-chart/weekly-distance-chart.component';
 
 @Component({
   selector: 'app-status',
+  standalone: true,
   imports: [
-    CommonModule,
+    DecimalPipe,
     MatCardModule,
     MatIconModule,
     MatProgressBarModule,
     MatDividerModule,
     MatButtonModule,
-    NgxChartsModule,
+    WeeklyDistanceChartComponent,
   ],
   templateUrl: './status.component.html',
-  styleUrl: './status.component.css'
+  styleUrl: './status.component.css',
 })
 export class StatusComponent implements OnInit {
+  private readonly homeDataService = inject(HomeDataService);
+  private readonly destroyRef = inject(DestroyRef);
 
   stats: HomeStats | null = null;
   loading = true;
   error = false;
-
-  chartData: { name: string; value: number }[] = [];
-
-  constructor(private homeDataService: HomeDataService) {}
+  chartData: WeeklyBarPoint[] = [];
 
   ngOnInit(): void {
     this.loadStats();
@@ -39,20 +43,23 @@ export class StatusComponent implements OnInit {
   loadStats(): void {
     this.loading = true;
     this.error = false;
-    this.homeDataService.getStats().subscribe({
-      next: (data) => {
-        this.stats = data;
-        this.stats.activeGoals.sort((a, b) => b.progressPercent - a.progressPercent);
-        this.chartData = data.weeklyChart.map(d => ({
-          name: d.date,
-          value: d.distanceKm
-        }));
-        this.loading = false;
-      },
-      error: () => {
-        this.error = true;
-        this.loading = false;
-      }
-    });
+    this.homeDataService
+      .getStats()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.stats = data;
+          this.stats.activeGoals.sort((a, b) => b.progressPercent - a.progressPercent);
+          this.chartData = data.weeklyChart.map((d) => ({
+            name: d.date,
+            value: d.distanceKm,
+          }));
+          this.loading = false;
+        },
+        error: () => {
+          this.error = true;
+          this.loading = false;
+        },
+      });
   }
 }

@@ -1,0 +1,142 @@
+.image-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.optional-tag {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 16px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-control);
+  background-color: var(--bg-canvas);
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--accent-primary);
+  background-color: var(--accent-tint);
+}
+
+.drop-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: var(--accent-primary);
+}
+
+.drop-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.drop-link {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.drop-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.nsfw-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nsfw-warning-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background-color: var(--color-error-bg);
+  border: 1px solid rgba(201, 59, 59, 0.25);
+}
+
+.nsfw-warning-icon {
+  color: var(--color-error);
+  flex-shrink: 0;
+}
+
+.nsfw-warning-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8125rem;
+}
+
+.nsfw-warning-filename {
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nsfw-warning-reason {
+  color: var(--color-error);
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+.preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-hairline);
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.validating-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  background-color: rgba(24, 24, 27, 0.78) !important;
+  color: #ffffff !important;
+}

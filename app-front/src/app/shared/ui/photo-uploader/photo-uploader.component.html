@@ -1,0 +1,81 @@
+<div class="image-section">
+  <span class="field-label">Fotos da rota <span class="optional-tag">(opcional)</span></span>
+
+  <div
+    class="drop-zone"
+    [class.drag-over]="isDraggingOver()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="fileInput.click()"
+    aria-label="Clique ou arraste imagens aqui"
+  >
+    <mat-icon class="drop-icon">add_photo_alternate</mat-icon>
+    <p class="drop-text">Arraste fotos ou <span class="drop-link">clique para selecionar</span></p>
+    <p class="drop-hint">JPEG, PNG, WebP ou GIF · máx. 10 MB</p>
+    <input
+      #fileInput
+      type="file"
+      accept="image/jpeg,image/png,image/webp,image/gif"
+      multiple
+      hidden
+      (change)="onFileInputChange($event)"
+    />
+  </div>
+
+  @if (rejectedImages().length > 0) {
+    <div class="nsfw-warnings">
+      @for (rejected of rejectedImages(); track rejected.fileName; let i = $index) {
+        <div class="nsfw-warning-item">
+          <mat-icon class="nsfw-warning-icon">warning</mat-icon>
+          <div class="nsfw-warning-text">
+            <span class="nsfw-warning-filename">{{ rejected.fileName }}</span>
+            <span class="nsfw-warning-reason">{{ rejected.reason }}</span>
+          </div>
+          <button
+            mat-icon-button
+            type="button"
+            class="nsfw-dismiss-btn"
+            (click)="dismissRejected(i)"
+            matTooltip="Fechar aviso"
+            aria-label="Fechar aviso"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (previews().length > 0) {
+    <div class="preview-grid">
+      @for (preview of previews(); track preview.previewUrl; let i = $index) {
+        <div class="preview-item" [class.preview-validating]="preview.validating">
+          <img [src]="preview.previewUrl" [alt]="preview.file.name" class="preview-img" />
+
+          @if (preview.validating) {
+            <div class="validating-overlay">
+              <mat-spinner diameter="24" />
+            </div>
+          }
+
+          @if (!preview.validating) {
+            <button
+              mat-mini-fab
+              type="button"
+              class="remove-btn"
+              (click)="removeImage(i)"
+              [matTooltip]="'Remover ' + preview.file.name"
+              aria-label="Remover imagem"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

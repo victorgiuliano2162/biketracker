@@ -50,7 +50,7 @@ describe('SaveRouteDialogComponent', () => {
       description: '  Subida técnica com água no km 10  ',
       country: 'BR',
       isPublic: true,
-      dificulty: 'DIFICIL',
+      difficulty: 'DIFICIL',
     });
 
     component.confirm();
@@ -65,12 +65,10 @@ describe('SaveRouteDialogComponent', () => {
     });
   });
 
-  it('should reject disallowed file types and files larger than 10 MB', () => {
-    const textFile = new File(['abc'], 'notes.txt', { type: 'text/plain' });
-    expect((component as any).validate(textFile)).toBeFalse();
-
-    const validImage = new File(['img'], 'photo.png', { type: 'image/png' });
-    expect((component as any).validate(validImage)).toBeTrue();
+  it('should block confirm while images are validating', () => {
+    component.onValidatingChange(true);
+    component.confirm();
+    expect(dialogRefSpy.close).not.toHaveBeenCalled();
   });
 
   it('should close without payload on cancel', () => {
