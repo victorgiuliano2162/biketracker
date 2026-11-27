@@ -42,7 +42,7 @@
             <!-- Left: name + date -->
             <div class="route-main">
               <a class="route-name" (click)="openDetail(route.id)">{{ route.name }}</a>
-              <span class="route-date font-mono-tabular">{{ formatDate(route.startTime) }}</span>
+              <span class="route-date font-mono-tabular">{{ route.startTime | formatDate }}</span>
             </div>
 
             <!-- Center: metrics -->

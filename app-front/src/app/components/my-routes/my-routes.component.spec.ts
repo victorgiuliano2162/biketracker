@@ -4,6 +4,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { MyRoutesComponent } from './my-routes.component';
 import { RouteService } from '../../services/route/route.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 describe('MyRoutesComponent', () => {
   let component: MyRoutesComponent;
@@ -59,7 +60,8 @@ describe('MyRoutesComponent', () => {
   });
 
   it('should delete route when confirmed', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
+    const notification = TestBed.inject(NotificationService);
+    spyOn(notification, 'confirm').and.returnValue(of(true));
     routeServiceSpy.deleteRoute.and.returnValue(of(void 0));
 
     component.deleteRoute(component.routes[0], new MouseEvent('click'));

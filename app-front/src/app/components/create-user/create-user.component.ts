@@ -27,6 +27,9 @@ import { User } from '../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { SuccessdialogComponent } from '../successdialog/successdialog.component';
 import { MatSelectModule } from '@angular/material/select';
+import { DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NotificationService } from '../../shared/services/notification.service';
 
 function passwordMatchValidator(
   control: AbstractControl,
@@ -90,6 +93,9 @@ export class CreateUserComponent {
 
   registerForm: FormGroup;
 
+  private readonly notification = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
@@ -137,20 +143,26 @@ export class CreateUserComponent {
       tipoSanguineo: formValue.tipoSanguineo,
     });
 
-    this.userService.create(user).subscribe({
-      next: (createdUser) => {
-        const dialogRef = this.dialog.open(SuccessdialogComponent, {
-          width: '360px',
-          disableClose: true,
-        });
-        dialogRef.afterClosed().subscribe(() => {
-          this.router.navigate(['/login']);
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao criar usuário:', err);
-        alert(err);
-      },
-    });
+    this.userService
+      .create(user)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          const dialogRef = this.dialog.open(SuccessdialogComponent, {
+            width: '360px',
+            disableClose: true,
+          });
+          dialogRef
+            .afterClosed()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+              this.router.navigate(['/login']);
+            });
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Erro ao criar usuário. Tente novamente.';
+          this.notification.error(msg);
+        },
+      });
   }
 }

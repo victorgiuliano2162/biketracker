@@ -4,6 +4,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { GoalListComponent } from './goal-list.component';
 import { GoalService, GoalResponse } from '../../services/goal/goal.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 describe('GoalListComponent', () => {
   let component: GoalListComponent;
@@ -54,11 +55,12 @@ describe('GoalListComponent', () => {
   });
 
   it('should delete goal only when confirmed', () => {
-    const confirmSpy = spyOn(window, 'confirm').and.returnValue(false);
+    const notification = TestBed.inject(NotificationService);
+    const confirmSpy = spyOn(notification, 'confirm').and.returnValue(of(false));
     component.delete(mockGoals[0]);
     expect(goalServiceSpy.delete).not.toHaveBeenCalled();
 
-    confirmSpy.and.returnValue(true);
+    confirmSpy.and.returnValue(of(true));
     goalServiceSpy.delete.and.returnValue(of(void 0));
     component.delete(mockGoals[0]);
 

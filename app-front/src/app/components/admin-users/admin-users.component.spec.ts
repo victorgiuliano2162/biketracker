@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { AdminUsersComponent } from './admin-users.component';
 import { AdminService, AdminUserResponse } from '../../services/admin/admin.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 describe('AdminUsersComponent', () => {
   let component: AdminUsersComponent;
@@ -85,7 +86,8 @@ describe('AdminUsersComponent', () => {
   });
 
   it('should delete user after confirmation', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
+    const notification = TestBed.inject(NotificationService);
+    spyOn(notification, 'confirm').and.returnValue(of(true));
     adminServiceSpy.deleteUser.and.returnValue(of(void 0));
 
     component.deleteUser(mockUsers[1]);
@@ -95,7 +97,8 @@ describe('AdminUsersComponent', () => {
   });
 
   it('should not delete user when confirmation is cancelled', () => {
-    spyOn(window, 'confirm').and.returnValue(false);
+    const notification = TestBed.inject(NotificationService);
+    spyOn(notification, 'confirm').and.returnValue(of(false));
 
     component.deleteUser(mockUsers[1]);
 

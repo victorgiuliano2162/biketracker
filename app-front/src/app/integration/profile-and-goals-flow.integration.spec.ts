@@ -7,6 +7,8 @@ import { authInterceptor } from '../interceptors/auth/Auth.interceptor';
 import { loadingInterceptor } from '../interceptors/loading/Loading.interceptor';
 import { ProfileComponent } from '../components/profile/profile.component';
 import { GoalListComponent } from '../components/goal-list/goal-list.component';
+import { NotificationService } from '../shared/services/notification.service';
+import { of } from 'rxjs';
 
 function buildJwt(payload: Record<string, unknown>): string {
   return `${btoa(JSON.stringify({ alg: 'RS256' }))}.${btoa(JSON.stringify(payload))}.sig`;
@@ -111,7 +113,8 @@ describe('Integration: Profile & Goals Flows (Components + Real Services + Inter
     expect(component.goals.length).toBe(1);
     expect(component.goals[0].progressPercent).toBe(60);
 
-    spyOn(window, 'confirm').and.returnValue(true);
+    const notification = TestBed.inject(NotificationService);
+    spyOn(notification, 'confirm').and.returnValue(of(true));
     component.delete(component.goals[0]);
 
     const delReq = httpMock.expectOne('/api/goal/7');
