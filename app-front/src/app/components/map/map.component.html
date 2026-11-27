@@ -86,92 +86,16 @@
     (change)="onGpxFileSelected($event)"
   />
 
-  <!-- Painel lateral de camadas GPX (Frosted HUD) -->
-  <aside class="sidebar" [class.open]="sidebarOpen">
-    <div class="sidebar-header">
-      <div class="sidebar-header-left">
-        <mat-icon class="sidebar-header-icon">layers</mat-icon>
-        <span class="sidebar-title">Camadas GPX</span>
-      </div>
-      <button
-        mat-icon-button
-        matTooltip="Limpar seleção"
-        (click)="clearAll()"
-        class="sidebar-clear-btn"
-        aria-label="Limpar seleção"
-      >
-        <mat-icon>layers_clear</mat-icon>
-      </button>
-    </div>
-
-    <div class="sidebar-body">
-      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="route-tree">
-        <!-- Nó grupo -->
-        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
-          <div class="group-row">
-            <button mat-icon-button matTreeNodeToggle class="group-toggle" aria-label="Expandir grupo">
-              <mat-icon>{{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
-            </button>
-            <span class="group-label">{{ node.name }}</span>
-            <span class="group-count font-mono-tabular">{{ node.children?.length ?? 0 }}</span>
-          </div>
-        </mat-tree-node>
-
-        <!-- Nó folha -->
-        <mat-tree-node *matTreeNodeDef="let node; when: isLeaf" matTreeNodePadding>
-          <div class="route-row" [class.route-row--active]="isSelected(node)">
-            <span class="route-color-bar" [style.background]="node.color"></span>
-
-            <mat-checkbox
-              class="route-checkbox"
-              [checked]="isSelected(node)"
-              (change)="toggleRoute(node)"
-            ></mat-checkbox>
-
-            <span class="route-label" [title]="node.name">{{ node.name }}</span>
-
-            <div class="route-actions">
-              @if (!node.isSaved && node.coordinates) {
-                <button
-                  mat-icon-button
-                  class="action-btn action-btn--save"
-                  matTooltip="Salvar rota"
-                  [disabled]="savingRouteId === node.id"
-                  (click)="saveRoute(node, $event)"
-                >
-                  @if (savingRouteId === node.id) {
-                    <mat-spinner diameter="16" />
-                  } @else {
-                    <mat-icon>cloud_upload</mat-icon>
-                  }
-                </button>
-              }
-
-              @if (node.isSaved) {
-                <mat-icon class="saved-badge" matTooltip="Rota salva">cloud_done</mat-icon>
-              }
-
-              <button
-                mat-icon-button
-                class="action-btn action-btn--delete"
-                matTooltip="Excluir rota"
-                (click)="deleteRoute(node, $event)"
-              >
-                <mat-icon>delete_outline</mat-icon>
-              </button>
-            </div>
-          </div>
-        </mat-tree-node>
-      </mat-tree>
-
-      @if (dataSource.data.length === 0 || (localRoutes.length === 0 && savedRoutes.length === 0 && regionRoutes.length === 0)) {
-        <div class="sidebar-empty">
-          <div class="empty-icon">
-            <mat-icon>map</mat-icon>
-          </div>
-          <span>Nenhuma rota carregada</span>
-        </div>
-      }
-    </div>
-  </aside>
+  <!-- Painel lateral de camadas GPX -->
+  <app-map-sidebar
+    [open]="sidebarOpen"
+    [treeData]="treeData"
+    [selectedIds]="selectedRouteIds"
+    [savingRouteId]="savingRouteId"
+    [isEmpty]="isTreeEmpty"
+    (toggleRoute)="toggleRoute($event)"
+    (saveRoute)="saveRoute($event)"
+    (deleteRoute)="deleteRoute($event)"
+    (clearAll)="clearAll()"
+  />
 </div>

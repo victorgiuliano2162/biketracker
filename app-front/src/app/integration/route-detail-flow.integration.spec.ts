@@ -8,6 +8,8 @@ import { authInterceptor } from '../interceptors/auth/Auth.interceptor';
 import { authGuard } from '../guards/Auth.guard';
 import { routeDetailResolver } from '../resolvers/route-detail.resolver';
 import { RouteDetailComponent } from '../components/route-detail/route-detail.component';
+import { NotificationService } from '../shared/services/notification.service';
+import { of } from 'rxjs';
 
 function buildJwt(payload: Record<string, unknown>): string {
   return `${btoa(JSON.stringify({ alg: 'RS256' }))}.${btoa(JSON.stringify(payload))}.sig`;
@@ -121,7 +123,8 @@ describe('Integration: Route Detail Flow (Router + Resolver + Services + Compone
     expect(component.canDeleteComment(component.comments[0])).toBeTrue();
 
     // Visitante exclui o próprio comentário
-    spyOn(window, 'confirm').and.returnValue(true);
+    const notification = TestBed.inject(NotificationService);
+    spyOn(notification, 'confirm').and.returnValue(of(true));
     component.deleteComment(component.comments[0]);
 
     const delCommentReq = httpMock.expectOne('/api/routes/pub-42/comments/99');

@@ -167,68 +167,6 @@
   white-space: pre-line;
 }
 
-.comment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.comment-field {
-  width: 100%;
-}
-
-.comment-submit-btn {
-  align-self: flex-end;
-  background-color: var(--accent-primary) !important;
-  color: #ffffff !important;
-}
-
-.comments-empty {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.comment-item {
-  padding: 12px 14px;
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-control);
-  background-color: var(--bg-canvas);
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.comment-author {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-}
-
-.comment-date {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.comment-content {
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  white-space: pre-line;
-}
-
 .section-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-hairline);
@@ -269,55 +207,6 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border-hairline);
-}
-
-.chart-wrap {
-  position: relative;
-  width: 100%;
-  height: 260px;
-}
-
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.photo-item {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border-hairline);
-  cursor: pointer;
-}
-
-.photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 220ms var(--ease-spring);
-}
-
-.photo-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(24, 24, 27, 0.35);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 160ms ease;
-}
-
-.photo-item:hover .photo-img {
-  transform: scale(1.03);
-}
-
-.photo-item:hover .photo-overlay {
-  opacity: 1;
 }
 
 @media (max-width: 1023px) {

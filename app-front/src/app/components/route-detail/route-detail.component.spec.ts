@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { RouteDetailComponent } from './route-detail.component';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommentService } from '../../services/comment/comment.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 describe('RouteDetailComponent', () => {
   let component: RouteDetailComponent;
@@ -106,7 +107,8 @@ describe('RouteDetailComponent', () => {
     };
     commentServiceSpy.create.and.returnValue(of(created));
     commentServiceSpy.delete.and.returnValue(of(void 0));
-    spyOn(window, 'confirm').and.returnValue(true);
+    const notification = TestBed.inject(NotificationService);
+    spyOn(notification, 'confirm').and.returnValue(of(true));
 
     component.newComment = 'Excelente pedal!';
     component.submitComment();
