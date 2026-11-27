@@ -4,6 +4,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { LoginPageComponent } from './login-page.component';
 import { AuthService } from '../../services/auth/auth.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 describe('LoginPageComponent', () => {
   let component: LoginPageComponent;
@@ -54,7 +55,8 @@ describe('LoginPageComponent', () => {
   }));
 
   it('should show 401 message and clear password on invalid credentials', () => {
-    spyOn(window, 'alert');
+    const notification = TestBed.inject(NotificationService);
+    const errorSpy = spyOn(notification, 'error');
     authServiceSpy.login.and.returnValue(throwError(() => ({ status: 401 })));
     component.email = 'atleta@teste.com';
     component.password = 'errada';
@@ -63,7 +65,7 @@ describe('LoginPageComponent', () => {
 
     expect(component.errorMessage).toBe('E-mail ou senha incorretos.');
     expect(component.password).toBe('');
-    expect(window.alert).toHaveBeenCalledWith('E-mail ou senha incorretos.');
+    expect(errorSpy).toHaveBeenCalledWith('E-mail ou senha incorretos.');
   });
 
   it('should navigate to /subscribe on onRegister', () => {

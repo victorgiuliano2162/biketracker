@@ -1,39 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth/auth.service';
+import { AuthShellComponent } from '../../shared/ui/auth-shell/auth-shell.component';
+import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
   imports: [
     FormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
     RouterLink,
+    AuthShellComponent,
   ],
   templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.css'
+  styleUrl: './login-page.component.css',
 })
 export class LoginPageComponent {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly notification = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  email: string = '';
-  password: string = '';
-  hidePassword: boolean = true;
-  errorMessage: string = '';
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  email = '';
+  password = '';
+  hidePassword = true;
+  errorMessage = '';
 
   isValid(): boolean {
     return this.email.trim() !== '' && this.password.trim() !== '';
@@ -44,18 +41,22 @@ export class LoginPageComponent {
 
     this.errorMessage = '';
 
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: () => { 
-        setTimeout(() => this.router.navigate(['/home']), 150);
-      },
-      error: (err) => {
-        this.errorMessage = err.status === 401
-          ? 'E-mail ou senha incorretos.'
-          : 'Erro ao realizar login. Tente novamente.';
-          alert(this.errorMessage);
+    this.authService
+      .login({ email: this.email, password: this.password })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          setTimeout(() => this.router.navigate(['/home']), 150);
+        },
+        error: (err) => {
+          this.errorMessage =
+            err.status === 401
+              ? 'E-mail ou senha incorretos.'
+              : 'Erro ao realizar login. Tente novamente.';
+          this.notification.error(this.errorMessage);
           this.password = '';
-      }
-    });
+        },
+      });
   }
 
   onRegister(): void {

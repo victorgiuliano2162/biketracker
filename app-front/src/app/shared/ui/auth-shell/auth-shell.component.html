@@ -1,0 +1,90 @@
+<main class="auth-split">
+  <!-- Left Column: Cartographic Topographic Panel (desktop only) -->
+  <section class="auth-map-panel" aria-hidden="true">
+    <div class="map-badges">
+      <div class="coord-pill font-mono-tabular">
+        <span class="pulse-dot"></span>
+        <span>{{ coordsLabel() }}</span>
+      </div>
+      <div class="verified-pill">TELEMETRIA VERIFICADA</div>
+    </div>
+
+    @if (showTopoSvg()) {
+      <div class="topo-canvas">
+        <svg class="topo-svg" viewBox="0 0 800 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="swissGridAuth" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#E4E4E7" stroke-width="0.75" stroke-dasharray="2 4" opacity="0.7" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#swissGridAuth)" />
+          <path d="M-50,220 C140,180 260,280 430,210 C600,140 700,260 850,230" stroke="#D4D4D8" stroke-width="1" stroke-dasharray="3 3" opacity="0.7" />
+          <path d="M-50,300 C120,260 280,360 460,300 C640,240 720,340 850,310" stroke="#E4E4E7" stroke-width="1" />
+          <path d="M-50,380 C100,340 300,440 490,380 C680,320 740,420 850,390" stroke="#D4D4D8" stroke-width="1" opacity="0.7" />
+          <path d="M-50,460 C110,420 320,520 520,460 C720,400 760,500 850,470" stroke="#E4E4E7" stroke-width="1" />
+          <ellipse cx="440" cy="380" rx="280" ry="160" stroke="#E4E4E7" stroke-width="1" opacity="0.8" />
+          <ellipse cx="450" cy="370" rx="210" ry="115" stroke="#D4D4D8" stroke-width="1" opacity="0.7" />
+          <ellipse cx="460" cy="360" rx="140" ry="75" stroke="#E4E4E7" stroke-width="1" opacity="0.9" />
+          <path d="M 180,640 C 140,580 150,490 210,430 C 260,380 340,410 390,340 C 430,280 490,260 550,290 C 630,330 650,420 590,490 C 530,560 480,520 420,580 C 360,640 310,690 230,680 Z" stroke="#1B6B53" stroke-width="10" stroke-linecap="round" opacity="0.12" />
+          <path d="M 180,640 C 140,580 150,490 210,430 C 260,380 340,410 390,340 C 430,280 490,260 550,290 C 630,330 650,420 590,490 C 530,560 480,520 420,580 C 360,640 310,690 230,680 Z" stroke="#1B6B53" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="180" cy="640" r="7" fill="#FFFFFF" stroke="#1B6B53" stroke-width="3" />
+          <circle cx="550" cy="290" r="6" fill="#FFFFFF" stroke="#C2410C" stroke-width="2.5" />
+          <text x="564" y="294" fill="#C2410C" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600">KM 24.8 · TOPO</text>
+        </svg>
+      </div>
+    }
+
+    <div class="hud-card">
+      <div class="hud-header">
+        <div>
+          <span class="hud-kicker font-mono-tabular">SEGMENTO EM DESTAQUE</span>
+          <h2 class="hud-title">{{ segmentTitle() }}</h2>
+        </div>
+        <span class="hud-badge" [class]="'hud-badge hud-badge--' + badgeVariant()">
+          {{ badgeLabel() }}
+        </span>
+      </div>
+      <p class="hud-meta">{{ segmentMeta() }}</p>
+      <div class="hud-metrics">
+        <div>
+          <span class="hud-metric-label">DISTÂNCIA</span>
+          <span class="hud-metric-value font-mono-tabular">{{ distance() }} <small>km</small></span>
+        </div>
+        <div>
+          <span class="hud-metric-label">ELEVAÇÃO</span>
+          <span class="hud-metric-value font-mono-tabular">{{ elevation() }} <small>m</small></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right Column: Auth Form -->
+  <section class="auth-form-panel">
+    <div class="auth-form-top">
+      @if (showBackLink()) {
+        <a class="back-link" routerLink="/login">← Voltar para o login</a>
+      }
+      <span class="portal-tag font-mono-tabular">PORTAL ATLETA</span>
+    </div>
+
+    <div class="auth-form-box">
+      <div class="auth-brand">
+        <span class="auth-brand-icon">
+          @if (useBikeIcon()) {
+            <mat-icon>directions_bike</mat-icon>
+          } @else {
+            T
+          }
+        </span>
+        <span class="auth-brand-text">Tracker</span>
+      </div>
+
+      <ng-content />
+    </div>
+
+    <div class="auth-form-bottom font-mono-tabular">
+      <span>© 2026 TRACKER LABS</span>
+      <span class="sys-status">SYS v2.4 OK</span>
+    </div>
+  </section>
+</main>
