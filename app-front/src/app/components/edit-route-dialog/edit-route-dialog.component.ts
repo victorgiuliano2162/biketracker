@@ -18,7 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouteResponse } from '../../models/route.model';
 import { UpdateRouteRequest } from '../../services/route/route.service';
-import { COUNTRIES } from '../save-route-dialog/save-route-dialog.component';
+import { COUNTRIES, DIFFICULTY_OPTIONS } from '../../shared/utils/route-constants';
 
 @Component({
   selector: 'app-edit-route-dialog',
@@ -39,11 +39,7 @@ import { COUNTRIES } from '../save-route-dialog/save-route-dialog.component';
 export class EditRouteDialogComponent {
   form: FormGroup;
   countries = COUNTRIES;
-  difficulties = [
-    { value: 'FACIL', label: 'Fácil' },
-    { value: 'MODERADA', label: 'Moderada' },
-    { value: 'DIFICIL', label: 'Difícil' },
-  ];
+  difficulties = DIFFICULTY_OPTIONS;
 
   constructor(
     private fb: FormBuilder,

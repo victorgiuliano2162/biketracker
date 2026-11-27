@@ -1,29 +1,26 @@
 <article class="route-card">
   <div class="card-inner">
     <!-- Área da miniatura -->
-    <div class="map-thumbnail">
-      <div *ngIf="state === 'loading' || state === 'rendering'" class="thumb-placeholder skeleton-shimmer">
-        <span class="thumb-label font-mono-tabular">
-          {{ state === 'rendering' ? 'Gerando mapa...' : 'Carregando...' }}
-        </span>
-      </div>
+    <div class="map-thumbnail" #previewTarget>
+      @if (state === 'loading') {
+        <div class="thumb-placeholder skeleton-shimmer">
+          <span class="thumb-label font-mono-tabular">Carregando...</span>
+        </div>
+      }
 
-      <img
-        *ngIf="state === 'ready' && previewUrl"
-        [src]="previewUrl"
-        [alt]="'Traçado de ' + route.name"
-        class="preview-img"
-      />
+      @if (state === 'ready' && previewUrl) {
+        <img
+          [src]="previewUrl"
+          [alt]="'Traçado de ' + route.name"
+          class="preview-img"
+        />
+      }
 
-      <div
-        #leafletContainer
-        class="leaflet-render-target"
-        [class.active]="state === 'rendering'"
-      ></div>
-
-      <div *ngIf="state === 'error'" class="thumb-placeholder thumb-error">
-        <mat-icon>map</mat-icon>
-      </div>
+      @if (state === 'error') {
+        <div class="thumb-placeholder thumb-error">
+          <mat-icon>map</mat-icon>
+        </div>
+      }
     </div>
 
     <!-- Conteúdo -->
@@ -45,15 +42,15 @@
       <div class="route-meta">
         <span class="meta-item">
           <mat-icon class="meta-icon">person_outline</mat-icon>
-          <span>{{ route.userName ?? 'Anônimo' }}</span>
+          <span>{{ route.userName || 'Anônimo' }}</span>
         </span>
-        <ng-container *ngIf="route.startCity">
+        @if (route.startCity) {
           <span class="meta-sep">·</span>
           <span class="meta-item">
             <mat-icon class="meta-icon">location_on</mat-icon>
             <span>{{ route.startCity }}{{ route.country ? ', ' + route.country : '' }}</span>
           </span>
-        </ng-container>
+        }
       </div>
 
       <div class="metrics">
